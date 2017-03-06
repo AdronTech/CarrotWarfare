@@ -5,7 +5,7 @@ def get_player():
     player = game.entity.Entity()
     player.type = "player"
     player.dump = {"input": [], "seed_mode": "melee"}
-    player.update = player_update
+    player.update_function = player_update
     return player
 
 

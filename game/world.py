@@ -13,7 +13,6 @@ class World:
         self.events = []
 
     def update(self):
-
         # update each entity
         for e in self.entities:
             e.update()
