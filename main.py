@@ -17,9 +17,10 @@ if __name__ == "__main__":
     while True:
 
         # event
-        for e in pygame_events.get():
+        for e in pygame_events.get(QUIT):
             if e.type is QUIT:
                 quit()
+        pygame_events.pump()
 
         if next_update == now():
             # update timing
