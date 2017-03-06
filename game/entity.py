@@ -5,9 +5,7 @@ class Entity:
 
     def __init__(self):
         self.pos = math.Vector2()
-
-    def events(self):
-        pass
+        self.events = []
 
     def update(self):
         pass

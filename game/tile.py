@@ -3,4 +3,10 @@
 class Tile:
 
     def __init__(self):
-        pass
+        self.entities = []
+
+    def register(self, entity):
+        self.entities.append(entity)
+
+    def unregister(self, entity):
+        self.entities.remove(entity)
