@@ -1,5 +1,5 @@
 from pygame import display
-RESOLUTION = 10, 10
+RESOLUTION = 500, 500
 
 
 class PyGameWindow:
