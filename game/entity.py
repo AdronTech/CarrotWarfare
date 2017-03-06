@@ -1,8 +1,7 @@
 from pygame import math
 
 
-def do_nothing(self):
-    print(self.dump)
+def do_nothing(self: Entity):
     pass
 
 
