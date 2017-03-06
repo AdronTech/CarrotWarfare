@@ -1,5 +1,5 @@
+from game.input import get
 from game.tile import Tile
-from game.entity import Entity
 
 WORLD_DIMENSION = (20, 20)
 
@@ -13,6 +13,7 @@ class World:
         self.events = []
 
     def update(self):
+        commands = get()
         # update each entity
         for e in self.entities:
             e.update()
