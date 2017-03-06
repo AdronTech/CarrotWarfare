@@ -8,6 +8,8 @@ if __name__ == "__main__":
     display = PyGameWindow()
     from rendering.renderer import AbstractRenderer
     DEFAULT_RENDERER = AbstractRenderer()
+    from game.world import World
+    game_world = World()
 
     # main loop
     next_update = now()
@@ -16,8 +18,8 @@ if __name__ == "__main__":
             # update timing
             next(update_counter)
             next_update += update_delay
-            pass
+            game_world.update()
         else:
             # update timing
             next(redraw_counter)
-            DEFAULT_RENDERER.render(display.render_target, None)
+            DEFAULT_RENDERER.render(display.render_target, game_world)
