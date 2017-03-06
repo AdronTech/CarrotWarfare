@@ -7,8 +7,8 @@ from pygame.locals import *
 if __name__ == "__main__":
     pygame_init()
     display = PyGameWindow()
-    from rendering.renderer import AbstractRenderer
-    DEFAULT_RENDERER = AbstractRenderer()
+    from rendering.renderer import TestRenderer as Renderer
+    DEFAULT_RENDERER = Renderer()
     from game.world import World
     game_world = World()
 
@@ -30,3 +30,4 @@ if __name__ == "__main__":
             # update timing
             next(redraw_counter)
             DEFAULT_RENDERER.render(display.render_target, game_world)
+            display.flip()
