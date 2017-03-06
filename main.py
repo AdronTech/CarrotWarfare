@@ -7,7 +7,7 @@ from pygame.locals import *
 if __name__ == "__main__":
     pygame_init()
     display = PyGameWindow()
-    from rendering.renderer import TestRenderer as Renderer
+    from rendering.renderer import PerfectRenderer as Renderer
     DEFAULT_RENDERER = Renderer()
     from game.world import World
     game_world = World()
