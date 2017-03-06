@@ -6,7 +6,7 @@ from display import PyGameWindow
 if __name__ == "__main__":
     pygame_init()
     display = PyGameWindow()
-    from rendering.abstract_renderer import AbstractRenderer
+    from rendering.renderer import AbstractRenderer
     DEFAULT_RENDERER = AbstractRenderer()
 
     # main loop
