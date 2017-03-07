@@ -5,9 +5,10 @@ from rendering.constants import IMAGE_RESOURCE
 
 def load(path: str) -> Surface:
     try:
-        img = image.load_basic(join('assets/sprites', path))
+        img = image.load_extended(join('assets/sprites', path + ".png"))
     except error:
         raise SystemExit("Could not load image from {}".format(path))
+
     img.convert_alpha(img)
     return img
 
@@ -18,5 +19,5 @@ def load_all():
         for key in block_cache.keys():
             block_cache[key]["resource"] = load("playerTest")  # load(key)
             if block == "entities":
-                block_cache[key]["offset"] = (Surface(block_cache[key]["resource"]).get_width() / -2,
-                                              Surface(block_cache[key]["resource"]).get_height() * -1)
+                block_cache[key]["offset"] = (block_cache[key]["resource"].get_width() / -2,
+                                              block_cache[key]["resource"].get_height() * -1)

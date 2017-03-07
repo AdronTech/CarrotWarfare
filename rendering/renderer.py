@@ -1,10 +1,11 @@
-from pygame import Surface, draw
+from pygame import Surface, draw, Rect
 from pygame.gfxdraw import aacircle, aatrigon, filled_circle, filled_trigon
 from rendering.constants import *
 from game.tile import Tile
 from game.world import World
 from game.carrot import Carrot
 from game.player import Player
+from rendering.loader import load_all
 
 
 class AbstractRenderer:
@@ -37,6 +38,7 @@ class TestRenderer(AbstractRenderer):
 
 class PerfectRenderer(AbstractRenderer):
     def __init__(self):
+        load_all()
         self.main_surface = Surface(MAIN_SURFACE_SIZE)
         self.sub_surface = self.main_surface.subsurface(Rect(SUB_SURFACE_POSITION,
                                                              SUB_SURFACE_SIZE))
@@ -48,11 +50,17 @@ class PerfectRenderer(AbstractRenderer):
                                                           (TILE_SIZE, TILE_SIZE)))
 
     def render_player(self, player: Player):
-        # self.sub_surface.blit(IMAGE_RESOURCE["entities"]["player"+player.alliance]["resource"])
-        filled_circle(self.sub_surface, int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE),
-                      int(TILE_SIZE / 2), COLOR_PLAYERS[player.alliance])
-        aacircle(self.sub_surface, int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE),
-                 int(TILE_SIZE / 2), COLOR_PLAYERS[player.alliance])
+        resources = IMAGE_RESOURCE["entities"]["player" + str(player.alliance)]
+        image = resources["resource"]
+        self.sub_surface.blit(resources["resource"],
+                              (int(player.pos.x *
+                                   TILE_SIZE + resources["offset"][0]),
+                               int(player.pos.y *
+                                   TILE_SIZE + resources["offset"][1])))
+        # filled_circle(self.sub_surface, int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE),
+        #               int(TILE_SIZE / 2), COLOR_PLAYERS[player.alliance])
+        # aacircle(self.sub_surface, int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE),
+        #          int(TILE_SIZE / 2), COLOR_PLAYERS[player.alliance])
 
     def render_carrot(self, carrot: Carrot):
         filled_trigon(self.sub_surface,
