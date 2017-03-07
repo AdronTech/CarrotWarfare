@@ -16,8 +16,8 @@ class TestRenderer(AbstractRenderer):
         # background
         target.fill(COLOR_BACKGROUND)
 
-        for x in range(WORLD_DIMENSION[0]):
-            for y in range(WORLD_DIMENSION[1]):
+        for x in range(WORLD_DIMENSION["width"]):
+            for y in range(WORLD_DIMENSION["height"]):
 
                 col = COLOR_BACKGROUND
 

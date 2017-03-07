@@ -72,19 +72,28 @@ class Carrot(Entity):
 
     def enemy_nearby(self):
         for e in self.entities_in_sight:
-            if e is Carrot or (e is Player and e != self.player):
+            if (type(e) is Carrot or type(e) is Player) and e.alliance != self.alliance:
                 return True
 
     def get_nearest_enemy(self) -> Entity:
-        if not self.entities_in_sight:
+        enemies_in_sight =[]
+
+        # get all enemies
+        for e in self.entities_in_sight:
+            if (type(e) is Carrot or type(e) is Player) and e.alliance != self.alliance:
+                enemies_in_sight.append(e)
+
+        if not enemies_in_sight:
             return None
 
         index = 0
-        for i in range(1, len(self.entities_in_sight)):
-            if self.entities_in_sight[i].pos.distance_squared_to(self.pos) < self.entities_in_sight[index].pos.distance_squared_to(self.pos):
+
+        for i in range(1, len(enemies_in_sight)):
+
+            if enemies_in_sight[i].pos.distance_squared_to(self.pos) < enemies_in_sight[index].pos.distance_squared_to(self.pos):
                 index = i
 
-        return index
+        return enemies_in_sight[index]
 
     def call(self, target: Entity):
         self.target = target

@@ -5,10 +5,14 @@ from game.tile import *
 class Entity:
     def __init__(self, world: World, alliance, pos: math.Vector2 = math.Vector2()):
         self.pos = pos
+
         self.events = []
         self.world = world
         self.render_flags = {}
         self.alliance = alliance
+
+        t = self.world.grid[int(self.pos.x)][int(self.pos.y)]  # type: Tile
+        t.register(self)
 
     def update(self, events=None, input=None):
         pass

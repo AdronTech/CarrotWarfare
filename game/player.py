@@ -67,8 +67,6 @@ class Player(Entity):
         if self.get_seeds() > 0:
             plant_pos = {"x": int(self.pos.x), "y": int(self.pos.y)}
 
-            # TODO: plant the plant
-
             # log
             self.events.append({"name": "plant",
                                 "pos": plant_pos,
