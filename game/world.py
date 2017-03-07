@@ -3,6 +3,7 @@ from game.tile import Tile
 
 WORLD_DIMENSION = {"width": 20, "height": 20}
 
+
 class World:
     def __init__(self):
         self.player_count = 0
@@ -11,7 +12,7 @@ class World:
         self.events = []
 
     def update(self):
-        commands = get()
+        commands = get()  # type: [[][][][]]
         # update each entity
         for e in self.entities:
             e.update()
