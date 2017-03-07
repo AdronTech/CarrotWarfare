@@ -9,6 +9,7 @@ from pygame import Surface, Rect, draw
 
 CLR = {"white": (255, 255, 255), "black": (0, 0, 0)}
 
+
 class DebugRenderer(AbstractRenderer):
 
     def render_player(self, target, player: Player):

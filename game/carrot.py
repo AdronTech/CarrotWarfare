@@ -13,7 +13,8 @@ class Carrot(Entity):
         super().__init__(world, alliance, pos)
         self.state = CarrotState.idle
 
-        self.speed = 5
+        self.speed = 3
+        self.hp = 20
 
         self.sight_range = 4
         self.player_range = 0.1

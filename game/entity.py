@@ -4,13 +4,15 @@ from game.tile import *
 
 
 class Entity:
-    def __init__(self, world: World, alliance, pos: math.Vector2 = math.Vector2()):
+    def __init__(self, world: World, alliance, pos: math.Vector2 = math.Vector2(), hp=0):
         self.pos = pos
 
         self.events = []
         self.world = world
         self.render_flags = {}
         self.alliance = alliance
+        self.dir = math.Vector2(1, 0);
+        self.hp = hp
 
         t = self.world.grid[int(self.pos.x)][int(self.pos.y)]  # type: Tile
         t.register(self)
@@ -39,3 +41,22 @@ class Entity:
         # register
         t = self.world.grid[int(self.pos.x)][int(self.pos.y)]  # type: Tile
         t.register(self)
+
+    def hit(self, damage):
+        self.hp -= damage
+
+        print("hit", self)
+        # TODO: hit and death log
+
+        self.events.append({
+            "name": "hit",
+            "damage": damage,
+            "remaining": self.hp
+        })
+
+        if self.hp < 0:
+            self.hp = 0
+            self.world.events.append({
+                "name": "death",
+                "author": self
+            })
