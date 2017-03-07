@@ -36,6 +36,6 @@ def new_game() -> World:
     for i in range(world.player_count):
         world.entities.append(Player(world, i, Vector2() + SPAWN_POSITIONS[i]))
 
-    # for i in range(50):
-    #     world.entities.append(Carrot(world, randint(0, 3), Vector2(random()*WORLD_DIMENSION["width"], random() * WORLD_DIMENSION["height"])))
+    for i in range(100):
+        world.entities.append(Carrot(world, randint(0, 3), Vector2(random()*WORLD_DIMENSION["width"], random() * WORLD_DIMENSION["height"])))
     return world

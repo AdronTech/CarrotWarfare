@@ -1,6 +1,7 @@
 from enum import Enum
 from pygame import *
 import timing
+from timer import gen_timer
 from game.entity import Entity
 from game.world import *
 from game.player import Player
@@ -15,15 +16,15 @@ class Carrot(Entity):
         self.speed = 5
 
         self.sight_range = 4
-        self.player_range = 1
-        self.enemy_range = 1
+        self.player_range = 0.1
+        self.enemy_range = 0.1
 
         self.target = self  # type: Entity
         self.entities_in_sight = []  # type: list[Entity]
 
-    def update(self, events=None, input=None):
+        self.look_timer = gen_timer(1)
 
-        # print(self.state)
+    def update(self, events=None, input=None):
 
         # seeking
         if self.state is CarrotState.seek_pos or self.state is CarrotState.seek_enemy:
@@ -34,24 +35,22 @@ class Carrot(Entity):
 
                 self.set_pos(self.pos + dir)
 
-        # idle
-        if self.state is CarrotState.idle:
-            self.look_around()
+        # idle and seek enemy
+        if self.state is CarrotState.idle or self.state is CarrotState.seek_enemy:
+            if next(self.look_timer):
+                self.look_around()
 
-            if self.enemy_nearby():
-                self.target = self.get_nearest_enemy()
-                if self.target:
-                    self.state = CarrotState.seek_enemy
+                if self.enemy_nearby():
+                    self.target = self.get_nearest_enemy()
+                    if self.target:
+                        self.state = CarrotState.seek_enemy
+
         # seek enemy
-        elif self.state is CarrotState.seek_enemy:
-            self.look_around()
-
-            if self.enemy_nearby():
-                self.target = self.get_nearest_enemy()
+        if self.state is CarrotState.seek_enemy:
 
             if self.target:
                 if self.target.pos.distance_squared_to(self.pos) <= self.enemy_range:
-                    self.state = CarrotState.idle
+                    self.state = CarrotState.idle #### ATTACK
             else:
                 self.state = CarrotState.idle
 
