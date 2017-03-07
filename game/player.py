@@ -14,8 +14,8 @@ class SeedMode(Enum):
 
 class Player(Entity):
 
-    def __init__(self, world: World):
-        super().__init__(world)
+    def __init__(self, world: World, pos: math.Vector2):
+        super().__init__(world, pos)
 
         self.seed_mode = SeedMode.melee  # type: SeedMode
         self.seeds = [0 for i in range(len(list(SeedMode)))]

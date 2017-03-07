@@ -3,8 +3,8 @@ from game.world import *
 from game.tile import *
 
 class Entity:
-    def __init__(self, world: World):
-        self.pos = math.Vector2()
+    def __init__(self, world: World, pos: math.Vector2 = math.Vector2()):
+        self.pos = pos
         self.events = []
         self.world = world
         self.render_flags = {}
@@ -26,9 +26,9 @@ class Entity:
         if pos.y < 0:
             pos.y = 0
         if pos.x >= WORLD_DIMENSION["width"]:
-            pos.x = WORLD_DIMENSION["width"] - 1
+            pos.x = WORLD_DIMENSION["width"] - 0.001
         if pos.y >= WORLD_DIMENSION["height"]:
-            pos.y = WORLD_DIMENSION["height"] - 1
+            pos.y = WORLD_DIMENSION["height"] - 0.001
 
         # register
         t = self.world.grid[int(self.pos.x)][int(self.pos.y)]  # type: Tile
