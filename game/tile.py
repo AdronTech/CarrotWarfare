@@ -6,4 +6,5 @@ class Tile:
         self.entities.append(entity)
 
     def unregister(self, entity):
-        self.entities.remove(entity)
+        if entity in self.entities:
+            self.entities.remove(entity)
