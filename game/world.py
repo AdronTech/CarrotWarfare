@@ -1,7 +1,6 @@
 from game.input import get_input
 from game.input import lock_input
 from game.tile import Tile
-from game.player import Player
 
 WORLD_DIMENSION = {"width": 20, "height": 20}
 
@@ -23,9 +22,11 @@ class World:
             self.entities[i].update(events=self.events)
 
 
-def new_game():
+def new_game() -> World:
+    from game.player import Player
+    from pygame.math import Vector2
     world = World()
     world.player_count = lock_input()
     for i in range(world.player_count):
-        world.entities[i] = Player()
+        world.entities[i] = Player(world, Vector2())
     return world
