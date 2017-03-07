@@ -1,4 +1,5 @@
 from pygame import Surface, Rect, draw
+from pygame.gfxdraw import aacircle, aatrigon
 from rendering.constants import *
 from game.tile import Tile
 from game.world import World
@@ -47,17 +48,18 @@ class PerfectRenderer(AbstractRenderer):
                                                           (TILE_SIZE, TILE_SIZE)))
 
     def render_player(self, player: Player):
-        draw.circle(self.sub_surface, COLOR_PLAYERS[player.alliance],
-                    (int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE)),
-                    int(TILE_SIZE / 2))
+        aacircle(self.sub_surface, (int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE)),
+                 int(TILE_SIZE / 2), COLOR_PLAYERS[player.alliance])
 
     def render_carrot(self, carrot: Carrot):
-        draw.polygon(self.sub_surface, COLOR_PLAYERS[carrot.alliance],
-                     [(int(carrot.pos.x * TILE_SIZE), int(carrot.pos.y * TILE_SIZE)),
-                      (int((carrot.pos.x + 0.3) * TILE_SIZE),
-                       int((carrot.pos.y - 1) * TILE_SIZE)),
-                      (int((carrot.pos.x - 0.3) * TILE_SIZE),
-                       int((carrot.pos.y - 1) * TILE_SIZE))])
+        aatrigon(self.sub_surface,
+                 int(carrot.pos.x * TILE_SIZE),
+                 int(carrot.pos.y * TILE_SIZE),
+                 int((carrot.pos.x + 0.3) * TILE_SIZE),
+                 int((carrot.pos.y - 1) * TILE_SIZE),
+                 int((carrot.pos.x - 0.3) * TILE_SIZE),
+                 int((carrot.pos.y - 1) * TILE_SIZE),
+                 COLOR_PLAYERS[carrot.alliance])
 
     # def render_plant_melee(self, plant: PlantMelee):
     #     pass
