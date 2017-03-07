@@ -1,6 +1,7 @@
 from pygame import Surface, error, image
 from os.path import join
-from rendering.constants import IMAGE_RESOURCE
+from rendering.constants import IMAGE_RESOURCE, TILE_SIZE
+from pygame import transform
 
 
 def load(path: str) -> Surface:
@@ -19,5 +20,10 @@ def load_all():
         for key in block_cache.keys():
             block_cache[key]["resource"] = load("playerTest")  # load(key)
             if block == "entities":
-                block_cache[key]["offset"] = (block_cache[key]["resource"].get_width() / -2,
-                                              block_cache[key]["resource"].get_height() * -1)
+                ratio = block_cache[key]["resource"].get_width() / float(block_cache[key]["resource"].get_height())
+                block_cache[key]["scale"] = (int(TILE_SIZE * ratio), int(TILE_SIZE))
+
+                block_cache[key]["offset"] = (block_cache[key]["scale"][0] / -2,
+                                              block_cache[key]["scale"][1] * -1)
+                block_cache[key]["resource"] = transform.scale(block_cache[key]["resource"],
+                                                               block_cache[key]["scale"])

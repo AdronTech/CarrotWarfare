@@ -2,6 +2,7 @@ from pygame import Surface, draw, Rect
 from pygame.gfxdraw import aacircle, aatrigon, filled_circle, filled_trigon
 from rendering.constants import *
 from game.tile import Tile
+from game.entity import Entity
 from game.world import World
 from game.carrot import Carrot
 from game.player import Player
@@ -13,36 +14,28 @@ class AbstractRenderer:
         pass
 
 
-class TestRenderer(AbstractRenderer):
-    def render(self, target: Surface, world: World):
-        # background
-        target.fill(COLOR_BACKGROUND)
-
-        for x in range(WORLD_DIMENSION["width"]):
-            for y in range(WORLD_DIMENSION["height"]):
-
-                col = COLOR_BACKGROUND
-
-                t = world.grid[x][y]  # type: Tile
-                if t.entities:
-                    col = COLOR_PLAYERS[0]
-
-                draw.rect(target, col, Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
-
-                # for x in range(WORLD_DIMENSION[0]):
-                #     draw.line(target, CLR["white"], (x * TILESIZE[0], 0), (x * TILESIZE[0], RESOLUTION[1]))
-                #
-                # for y in range(WORLD_DIMENSION[1]):
-                #     draw.line(target, CLR["white"], (0, y * TILESIZE[1]), (RESOLUTION[0], y * TILESIZE[1]))
-
-
 class PerfectRenderer(AbstractRenderer):
     def __init__(self):
         load_all()
         self.main_surface = Surface(MAIN_SURFACE_SIZE)
+
+        print("Hello")
+
+        # draw 4 zones
+        self.main_surface.fill(COLOR_PLAYERS[0], Rect((0, 0),
+                                                      (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
+        self.main_surface.fill(COLOR_PLAYERS[1], Rect((MAIN_SURFACE_SIZE[0] / 2, 0),
+                                                      (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
+        self.main_surface.fill(COLOR_PLAYERS[2], Rect((0, MAIN_SURFACE_SIZE[1] / 2),
+                                                      (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
+        self.main_surface.fill(COLOR_PLAYERS[3], Rect((MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2),
+                                                      (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
+
         self.sub_surface = self.main_surface.subsurface(Rect(SUB_SURFACE_POSITION,
                                                              SUB_SURFACE_SIZE))
-        self.main_surface.fill(COLOR_BACKGROUND_SECONDARY)
+        self.ground_surface = Surface(SUB_SURFACE_SIZE)
+        self.ground_surface.fill(COLOR_BACKGROUND)
+
         self.screen_shake_current = (0, 0)
 
     def paint_square(self, square: (int, int), player: int):
@@ -52,7 +45,7 @@ class PerfectRenderer(AbstractRenderer):
     def render_player(self, player: Player):
         resources = IMAGE_RESOURCE["entities"]["player" + str(player.alliance)]
         image = resources["resource"]
-        self.sub_surface.blit(resources["resource"],
+        self.sub_surface.blit(image,
                               (int(player.pos.x *
                                    TILE_SIZE + resources["offset"][0]),
                                int(player.pos.y *
@@ -87,17 +80,40 @@ class PerfectRenderer(AbstractRenderer):
     #     pass
 
     def render(self, target: Surface, world: World):
-        self.sub_surface.fill(COLOR_BACKGROUND)
+        self.sub_surface.blit(self.ground_surface, (0, 0))
+
+        for y in range(WORLD_DIMENSION["height"]):
+
+            def extract_from_tile(tile: Tile, tx, ty):
+                for entity in tile.entities:
+                    yield entity
+                if "environment" in tile.render_flags:
+                    for env_object in tile.render_flags["environment"]:
+                        yield env_object, tx, ty
+
+            row = [e for x in range(WORLD_DIMENSION["width"])
+                   for e in extract_from_tile(world.grid[x][y], x, y)]  # type: list[Entity]
+
+            def depth_sort(e):
+                if issubclass(type(e), Entity):
+                    return e.pos.y
+                else:
+                    return e[2] + 0.5
+
+            row = sorted(row, key=depth_sort)
+            for entity in row:
+                e_type = type(entity)
+                if e_type is Player:
+                    self.render_player(entity)
+                elif e_type is Carrot:
+                    self.render_carrot(entity)
+                # else:
+                #     surf, x, y = entity
+                #     self.sub_surface.blit(surf, (int(x * TILE_SIZE - surf.get_width() / 2),
+                #                                  int((y + 0.5) * TILE_SIZE - surf.get_height())))
+
         x = SCREEN_SHAKE_OFFSET[0] * (1 + self.screen_shake_current[0])
         y = SCREEN_SHAKE_OFFSET[1] * (1 + self.screen_shake_current[1])
-        for i in range(len(world.entities)):
-            entity = world.entities[i]
-            e_type = type(entity)
-            if e_type is Player:
-                self.render_player(entity)
-            if e_type is Carrot:
-                self.render_carrot(entity)
-
         target.blit(self.main_surface, (0, 0), Rect((x, y), DISPLAY_RESOLUTION))
 
 
@@ -138,7 +154,7 @@ if __name__ == "__main__":
         next(redraw_counter)
 
         DEFAULT_RENDERER.paint_square((randint(0, 19), randint(0, 19)), randint(0, 3))
-        # DEFAULT_RENDERER.screen_shake_current = (random() * 2 - 1, random() * 2 - 1)
+        DEFAULT_RENDERER.screen_shake_current = (random() * 2 - 1, random() * 2 - 1)
         DEFAULT_RENDERER.render(screen.render_target, game_world)
 
         # draw
