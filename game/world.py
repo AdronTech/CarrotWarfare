@@ -1,6 +1,7 @@
 from game.input import get_input
 from game.input import lock_input
 from game.tile import Tile
+from random import random, randint
 
 WORLD_DIMENSION = {"width": 27, "height": 17}
 SPAWN_POSITIONS = [(1, 1),
@@ -35,5 +36,6 @@ def new_game() -> World:
     for i in range(world.player_count):
         world.entities.append(Player(world, i, Vector2() + SPAWN_POSITIONS[i]))
 
-    world.entities.append(Carrot(world, 0, Vector2(10, 10)))
+    # for i in range(50):
+    #     world.entities.append(Carrot(world, randint(0, 3), Vector2(random()*WORLD_DIMENSION["width"], random() * WORLD_DIMENSION["height"])))
     return world

@@ -2,7 +2,7 @@ from enum import Enum
 from pygame import *
 import timing
 from game.entity import Entity
-from game.world import World
+from game.world import *
 from game.player import Player
 
 
@@ -23,12 +23,16 @@ class Carrot(Entity):
 
     def update(self, events=None, input=None):
 
+        # print(self.state)
+
         # seeking
         if self.state is CarrotState.seek_pos or self.state is CarrotState.seek_enemy:
             dir = self.target.pos - self.pos  # type: math.Vector2
-            dir.scale_to_length(self.speed * timing.delta_time)
 
-            self.set_pos(self.pos + dir)
+            if dir.length() > 0.1:
+                dir.scale_to_length(self.speed * timing.delta_time)
+
+                self.set_pos(self.pos + dir)
 
         # idle
         if self.state is CarrotState.idle:
@@ -40,9 +44,14 @@ class Carrot(Entity):
                     self.state = CarrotState.seek_enemy
         # seek enemy
         elif self.state is CarrotState.seek_enemy:
+            self.look_around()
+
+            if self.enemy_nearby():
+                self.target = self.get_nearest_enemy()
+
             if self.target:
                 if self.target.pos.distance_squared_to(self.pos) <= self.enemy_range:
-                    self.state = CarrotState.attack
+                    self.state = CarrotState.idle
             else:
                 self.state = CarrotState.idle
 
@@ -69,7 +78,10 @@ class Carrot(Entity):
                 if x - my_x + y - my_y > self.sight_range:
                     continue
 
-                t = self.world.grid[my_x][my_y]
+                if x < 0 or y < 0 or x >= WORLD_DIMENSION["width"] or y >= WORLD_DIMENSION["height"]:
+                    continue
+
+                t = self.world.grid[x][y]
                 self.entities_in_sight.extend(t.entities)
 
     def enemy_nearby(self):
@@ -78,7 +90,7 @@ class Carrot(Entity):
                 return True
 
     def get_nearest_enemy(self) -> Entity:
-        enemies_in_sight =[]
+        enemies_in_sight = []
 
         # get all enemies
         for e in self.entities_in_sight:
