@@ -2,6 +2,8 @@ from pygame import Surface, Rect, draw
 from rendering.constants import *
 from game.tile import Tile
 from game.world import World
+from game.entity import Entity
+from game.player import Player
 
 
 class AbstractRenderer:
@@ -45,9 +47,23 @@ class PerfectRenderer(AbstractRenderer):
         self.sub_surface.fill(COLOR_PLAYERS[player], Rect((square[0] * TILE_SIZE, square[1] * TILE_SIZE),
                                                           (TILE_SIZE, TILE_SIZE)))
 
+    def render_player(self, player: Player):
+        pass
+
+    # def render_plant_melee(self, plant: PlantMelee):
+    #     pass
+
+    # def render_plant_ranged(self, plant: PlantRanged):
+    #     pass
+
     def render(self, target: Surface, world: World):
         x = SCREEN_SHAKE_OFFSET[0] * (1 + self.screen_shake_current[0])
         y = SCREEN_SHAKE_OFFSET[1] * (1 + self.screen_shake_current[1])
+
+        for entity in world.entities:
+            if entity is Player:
+                render_player(entity)
+
         target.blit(self.main_surface, (0, 0), Rect((x, y), DISPLAY_RESOLUTION))
 
 
@@ -57,11 +73,14 @@ if __name__ == "__main__":
     from pygame.time import Clock
     from timing import redraw_counter, updates_per_sec
     from display import PyGameWindow
+    from pygame.display import set_mode
     from pygame.locals import *
     from random import randint, random
 
     pygame_init()
-    display = PyGameWindow()
+    screen = PyGameWindow()
+    # set_mode(DISPLAY_RESOLUTION, RESIZABLE)
+
     DEFAULT_RENDERER = PerfectRenderer()
 
     game_world = World()
@@ -70,17 +89,21 @@ if __name__ == "__main__":
     clock = Clock()
     while True:
         # event
-        for e in pygame_events.get(QUIT):
+        for e in pygame_events.get():
             if e.type is QUIT:
                 quit()
+            if e.type is VIDEORESIZE:
+                DISPLAY_RESOLUTION = e.size
         pygame_events.pump()
         # update
         game_world.update()
         # render
         next(redraw_counter)
+
         DEFAULT_RENDERER.paint_square((randint(0, 19), randint(0, 19)), randint(0, 3))
-        DEFAULT_RENDERER.screen_shake_current = (random() * 2 - 1, random() * 2 - 1)
-        DEFAULT_RENDERER.render(display.render_target, game_world)
+        # DEFAULT_RENDERER.screen_shake_current = (random() * 2 - 1, random() * 2 - 1)
+        DEFAULT_RENDERER.render(screen.render_target, game_world)
+
         # draw
-        display.flip()
+        screen.flip()
         clock.tick(updates_per_sec)
