@@ -1,42 +1,114 @@
+from enum import Enum
+
 from game.entity import Entity
 from game.commands import Commands
-from game.world import WORLD_DIMENSION as DIM
 from game.world import World
+from timing import *
+from pygame import *
 
 
-def get_player():
-    player = Entity()
-    player.type = "player"
-    player.dump = {"input": [], "seed_mode": "melee"}
-    player.update_function = player_update
-    return player
+class SeedMode(Enum):
+    melee = 0
+    ranged = 1
 
 
-def player_update(self: Entity):
-    input_commands = self.dump.get("input")
-    for input_command in input_commands:
-        command = input_command[0]
-        if command == Commands.directional:
-            World.grid[int(self.pos.x)][int(self.pos.y)].unregister(self)
-            self.pos += (input_command[1], input_command[2])  # scale input values?
-            if self.pos.x > DIM[0]:
-                self.pos.x = DIM[0]
-            elif self.pos.x < 0:
-                self.pos.x = 0
-            if self.pos.y > DIM[1]:
-                self.pos.y = DIM[1]
-            elif self.pos.y < 0:
-                self.pos.y = 0
-            World.grid[int(self.pos.x)][int(self.pos.y)].register(self)
-        elif command == Commands.attack:
-            # cast attack on current position
-            pass
-        elif command == Commands.plant:
-            # if seed available: plant player-colored seed on current tile (mind seed_mode?)
-            pass
-        elif command == Commands.call:
-            # trigger homing of player's carrots
-            pass
-        elif command == Commands.swap:
-            # swap player's seed_mode
-            pass
+class Player(Entity):
+
+    def __init__(self, world: World):
+        super().__init__(world)
+
+        self.seed_mode = SeedMode.melee  # type: SeedMode
+        self.seeds = [0 for i in range(len(list(SeedMode)))]
+        # self.seeds[SeedMode.melee.value] = 20
+        # self.seeds[SeedMode.ranged.value] = 10
+        self.speed = 10
+
+    def update(self, events=None, input=None):
+
+        self.events = []
+
+        for input_command in input:
+            command = input_command["command"]
+            if command == Commands.directional:
+                self.move(input_command["value"])
+
+            elif command == Commands.attack:
+                self.attack()
+
+            elif command == Commands.plant:
+                self.plant()
+
+            elif command == Commands.call:
+                self.call()
+
+            elif command == Commands.swap:
+                self.swap()
+
+    def move(self, input: math.Vector2):
+        # calc delta pos
+        d_pos = input * self.speed * delta_time
+
+        # move
+        self.set_pos(self.pos + d_pos)
+
+        #log
+        self.events.append({"name": "move",
+                            "delta": d_pos,
+                            "pos": self.pos})
+
+    def attack(self):
+
+        # TODO: attack enemy
+
+        # log
+        self.events.append({"name": "attack"})
+
+    def plant(self):
+        if self.get_seeds() > 0:
+            plant_pos = {"x": int(self.pos.x), "y": int(self.pos.y)}
+
+            # TODO: plant the plant
+
+            # log
+            self.events.append({"name": "plant",
+                                "pos": plant_pos,
+                                "type": self.seed_mode,
+                                "remaining": self.get_seeds()})
+
+    def call(self):
+
+        # TODO: call carrots
+
+        # log
+        self.events.append({"name": "call"})
+
+    def swap(self):
+
+        next = self.seed_mode.value
+        while True:
+            next = (next + 1) % len(list(SeedMode))
+            if next == self.seed_mode.value or self.seeds[next] != 0:
+                break
+
+        self.seed_mode = SeedMode(next)
+
+        # log
+        self.events.append({"name": "swap",
+                            "mode": self.seed_mode,
+                            "amount": self.get_seeds()})
+
+    def get_seeds(self, type: SeedMode = None):
+        if not type:
+            type = self.seed_mode
+
+        return self.seeds[type.value]
+
+if __name__ == "__main__":
+    world = World()
+
+    player = Player(world)
+    player.update(input=[{"command": Commands.directional, "value": math.Vector2(10, 20)},
+                         {"command": Commands.swap},
+                         {"command": Commands.swap}])
+
+    print(player.events)

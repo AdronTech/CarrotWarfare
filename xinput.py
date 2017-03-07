@@ -3,7 +3,7 @@ from enum import Enum
 from time import sleep
 from time import time as time_now
 
-# XINPUT ACESS #
+# XINPUT ACCESS #
 # Constants
 NOT_CONNECTED = 1167
 UBYTE = 255
@@ -17,7 +17,6 @@ class XINPUTGAMEPAD(ctypes.Structure):
                 ("bLeftTrigger", ctypes.c_ubyte),
                 ("bRightTrigger", ctypes.c_ubyte),
                 ("sThumbLX", ctypes.c_short),
-
                 ("sThumbLY", ctypes.c_short),
                 ("sThumbRX", ctypes.c_short),
                 ("sThumbRY", ctypes.c_short)]
@@ -37,6 +36,7 @@ try:
     _xinput = ctypes.windll.xinput9_1_0
 except:
     raise ImportError
+
 # getState
 _XInputGetState = _xinput.XInputGetState
 _XInputGetState.argtypes = [ctypes.c_uint, ctypes.POINTER(XINPUTSTATE)]
@@ -313,79 +313,3 @@ class Gamepad(Enum):
             # inauguration
             new_state["event"] = events
             self.input_state = new_state
-
-
-if __name__ == "__main__":
-    def controller_test(pad: Gamepad):
-        state = XINPUTSTATE()
-        print("{} test trigger".format(pad))
-        while pad.connected:
-            was_pressed = pad.button_back
-            pad.get_state(state)
-            if pad.button_back and not was_pressed:
-                break
-            pad.set_vibration(pad.trigger_left, pad.trigger_right)
-            yield
-        print("{} test analog left {}".format(pad, pad.analog_left))
-        while pad.connected:
-            was_pressed = pad.button_back
-            pad.get_state(state)
-            if pad.button_back and not was_pressed:
-                break
-            print
-            pad.set_vibration(abs(pad.analog_left[0]), abs(pad.analog_left[1]))
-            yield
-        pad.set_vibration()
-        print("{} test analog right {}".format(pad, pad.analog_right))
-        while pad.connected:
-            was_pressed = pad.button_back
-            pad.get_state(state)
-            if pad.button_back and not was_pressed:
-                break
-            pad.set_vibration(abs(pad.analog_right[0]), abs(pad.analog_right[1]))
-            yield
-        pad.set_vibration()
-        print("{} test buttons".format(pad))
-        while pad.connected:
-            was_pressed = pad.button_back
-            pad.get_state(state)
-            if pad.button_back and not was_pressed:
-                break
-            if pad.button_a:
-                print("{} pressed A".format(pad))
-            if pad.button_b:
-                print("{} pressed B".format(pad))
-            if pad.button_x:
-                print("{} pressed X".format(pad))
-            if pad.button_y:
-                print("{} pressed Y".format(pad))
-            if pad.stick_left:
-                print("{} pressed left_stick".format(pad))
-            if pad.stick_right:
-                print("{} pressed right_stick".format(pad))
-            if pad.shoulder_left:
-                print("{} pressed left_shoulder".format(pad))
-            if pad.shoulder_right:
-                print("{} pressed right_shoulder".format(pad))
-            if pad.button_back:
-                print("{} pressed back".format(pad))
-            if pad.button_start:
-                print("{} pressed start".format(pad))
-            yield
-        print("{} end of test".format(pad))
-    test = []
-    running = True
-    test_start_time = time_now()
-    while running and test_start_time + 360 > time_now():
-        for pad in Gamepad:
-            if not pad.connected:
-                pad.get_state()
-                if pad.connected:
-                    test.append(controller_test(pad))
-        for t in test:
-            try:
-                next(t)
-            except StopIteration:
-                test = [x for x in test if x is not t]
-        sleep(0.05)
-    print("test exit: 360 seconds passed")
