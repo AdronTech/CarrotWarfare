@@ -76,11 +76,9 @@ class Gamepad(Enum):
         t_now = time_now()
         state = XINPUTSTATE()
         for gamepad in Gamepad:
-            if gamepad.connected:
-                gamepad.get_state(state)
-            else:
-                if gamepad.disabled:
-                    pass
+            if not gamepad.disabled:
+                if gamepad.connected:
+                    gamepad.get_state(state)
                 elif t_now - gamepad.last_update > 5:
                     print("XGamepad checking up on {}".format(gamepad))
                     gamepad.get_state(state)
