@@ -53,24 +53,38 @@ class Player(Entity):
 
         #log
         self.events.append({"name": "move",
-                            "delta": d_pos})
+                            "delta": d_pos,
+                            "pos": self.pos})
 
     def attack(self):
+
+        # TODO: attack enemy
+
         # log
         self.events.append({"name": "attack"})
 
     def plant(self):
-        # log
-        self.events.append({"name": "plant"})
+        if self.get_seeds() > 0:
+            plant_pos = {"x": int(self.pos.x), "y": int(self.pos.y)}
+
+            # TODO: plant the plant
+
+            # log
+            self.events.append({"name": "plant",
+                                "pos": plant_pos,
+                                "type": self.seed_mode,
+                                "remaining": self.get_seeds()})
 
     def call(self):
+
+        # TODO: call carrots
+
         # log
         self.events.append({"name": "call"})
 
     def swap(self):
 
         next = self.seed_mode.value
-
         while True:
             next = (next + 1) % len(list(SeedMode))
             if next == self.seed_mode.value or self.seeds[next] != 0:
@@ -81,7 +95,13 @@ class Player(Entity):
         # log
         self.events.append({"name": "swap",
                             "mode": self.seed_mode,
-                            "amount": self.seeds[self.seed_mode.value]})
+                            "amount": self.get_seeds()})
+
+    def get_seeds(self, type: SeedMode = None):
+        if not type:
+            type = self.seed_mode
+
+        return self.seeds[type.value]
 
 if __name__ == "__main__":
     world = World()
