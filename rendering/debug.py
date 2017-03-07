@@ -1,18 +1,30 @@
-from game.tile import Tile,TileState
+from game.tile import Tile, TileState
 from game.world import World
 from game.player import Player
 from game.carrot import Carrot
 from rendering.constants import *
 from rendering.renderer import AbstractRenderer
 from pygame import Surface, Rect, draw
-
+from cmath import pi
 
 CLR = {"white": (255, 255, 255), "black": (0, 0, 0)}
 
 
 class DebugRenderer(AbstractRenderer):
-
     def render_player(self, target, player: Player):
+        angle = -player.dir.as_polar()[1]
+        draw.arc(target,
+                 COLOR_PLAYERS[player.alliance],
+                 Rect(int((player.pos.x - player.attack_range) * TILE_SIZE),
+                      int((player.pos.y - player.attack_range) * TILE_SIZE),
+                      int(player.attack_range * TILE_SIZE * 2),
+                      int(player.attack_range * TILE_SIZE * 2)),
+                 (angle - player.attack_angle/2)*pi/180,
+                 (angle + player.attack_angle/2)*pi/180,
+                 5)
+
+        print(angle)
+
         draw.circle(target, COLOR_PLAYERS[player.alliance],
                     (int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE)),
                     int(TILE_SIZE / 2))
@@ -31,10 +43,11 @@ class DebugRenderer(AbstractRenderer):
             for y in range(WORLD_DIMENSION["height"]):
                 t = world.grid[x][y]
                 if t.state and t.state["name"] == TileState.growing:
-                    size = t.state["g_state"]/4 * TILE_SIZE
+                    size = t.state["g_state"] / 4 * TILE_SIZE
                     draw.rect(target, COLOR_PLAYERS[t.state["alliance"]],
-                                Rect((int(x * TILE_SIZE + (TILE_SIZE - size)/2), int(y * TILE_SIZE + (TILE_SIZE - size)/2)),
-                              (size, size)))
+                              Rect((int(x * TILE_SIZE + (TILE_SIZE - size) / 2),
+                                    int(y * TILE_SIZE + (TILE_SIZE - size) / 2)),
+                                   (size, size)))
 
         for e in world.entities:
             if type(e) is Player:

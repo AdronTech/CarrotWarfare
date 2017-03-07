@@ -24,7 +24,7 @@ class Player(Entity):
         self.seeds[SeedMode.ranged.value] = 200
 
         self.attack_range = 1.5
-        self.attack_angle = 45
+        self.attack_angle = 90
         self.damage = 10
         self.speed = 5
 
@@ -39,7 +39,7 @@ class Player(Entity):
         for input_command in input:
             command = input_command["command"]
             if command == Commands.directional:
-                self.move(input_command["value"])
+                self.move(input_command["dir"], input_command["hold_position"])
 
             elif command == Commands.attack:
                 self.attack()
@@ -60,11 +60,15 @@ class Player(Entity):
         self.set_pos(self.spawnpoint)
         self.hp = 40
 
-    def move(self, input: math.Vector2):
-        # calc delta pos
-        d_pos = input * self.speed * delta_time  # type: math.Vector2
+    def move(self, dir: math.Vector2, hold_pos: bool):
 
-        self.dir = input
+        self.dir = dir
+
+        if hold_pos:
+            return
+
+        # calc delta pos
+        d_pos = dir * self.speed * delta_time  # type: math.Vector2
 
         # move
         self.set_pos(self.pos + d_pos)

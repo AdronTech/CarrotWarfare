@@ -12,7 +12,12 @@ def get_input():
             x = gamepads[i].input_state["analog_left"].x
             y = gamepads[i].input_state["analog_left"].y
             if x != 0 or y != 0:
-                commands[i].append({"command": Commands.directional, "value": Vector2(x, -y)})
+                commands[i].append({
+                    "command": Commands.directional,
+                    "dir": Vector2(x, -y),
+                    "hold_position": gamepads[i].input_state["trigger_right"] > 0.5
+                })
+
             events = gamepads[i].input_state["event"]
             if "button_a" in events and events["button_a"]:
                 commands[i].append({"command": Commands.attack})
@@ -22,6 +27,7 @@ def get_input():
                 commands[i].append({"command": Commands.call})
             if "button_y" in events and events["button_y"]:
                 commands[i].append({"command": Commands.swap})
+
     return commands
 
 

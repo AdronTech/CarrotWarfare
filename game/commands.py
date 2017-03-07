@@ -7,3 +7,4 @@ class Commands (Enum):
     plant = 2
     call = 3
     swap = 4
+    look = 5
