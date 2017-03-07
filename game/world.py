@@ -2,7 +2,11 @@ from game.input import get_input
 from game.input import lock_input
 from game.tile import Tile
 
-WORLD_DIMENSION = {"width": 20, "height": 20}
+WORLD_DIMENSION = {"width": 27, "height": 17}
+SPAWN_POSITIONS = [(1, 1),
+                   (WORLD_DIMENSION["width"] - 1, 1),
+                   (1, WORLD_DIMENSION["height"] - 1),
+                   (WORLD_DIMENSION["width"] - 1, WORLD_DIMENSION["height"] - 1)]
 
 
 class World:
@@ -10,7 +14,7 @@ class World:
         self.player_count = 0
         w = WORLD_DIMENSION["width"]
         h = WORLD_DIMENSION["height"]
-        self.grid = [[Tile() for i in range(w)] for j in range(h)]  # type: [[Tile]]
+        self.grid = [[Tile() for i in range(h)] for j in range(w)]  # type: [[Tile]]
         self.entities = []
         self.events = []
 
@@ -28,5 +32,5 @@ def new_game() -> World:
     world = World()
     world.player_count = lock_input()
     for i in range(world.player_count):
-        world.entities.append(Player(world, i, Vector2()))
+        world.entities.append(Player(world, i, Vector2() + SPAWN_POSITIONS[i]))
     return world
