@@ -7,6 +7,7 @@ class Entity:
         self.pos = math.Vector2()
         self.events = []
         self.world = world
+        self.render_flags = {}
 
     def update(self, events=None, input=None):
         pass
