@@ -9,8 +9,8 @@ if __name__ == "__main__":
     display = PyGameWindow()
     from rendering.renderer import PerfectRenderer as Renderer
     DEFAULT_RENDERER = Renderer()
-    from game.world import World
-    game_world = World()
+    from game.world import new_game
+    game_world = new_game()
 
     # main loop
     next_update = now()
