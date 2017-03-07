@@ -1,8 +1,7 @@
 from game.input import get
 from game.tile import Tile
 
-WORLD_DIMENSION = (20, 20)
-
+WORLD_DIMENSION = {"width": 20, "height": 20}
 
 class World:
     def __init__(self):
