@@ -28,7 +28,7 @@ def get_input():
 def lock_input():
     Gamepad.update()
     gamepads = list(Gamepad)
-    player_count = 0
+    player_count = 4
     for i in range(len(gamepads)):
         if not gamepads[i].connected:
             player_count = i
