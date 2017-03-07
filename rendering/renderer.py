@@ -47,8 +47,10 @@ class PerfectRenderer(AbstractRenderer):
         self.sub_surface.fill(COLOR_PLAYERS[player], Rect((square[0] * TILE_SIZE, square[1] * TILE_SIZE),
                                                           (TILE_SIZE, TILE_SIZE)))
 
-    def render_player(self, player: Player):
-        pass
+    def render_player(self, player: Player, player_id: int):
+        draw.circle(self.sub_surface, COLOR_PLAYERS[player_id],
+                    (int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE)),
+                    TILE_SIZE / 2)
 
     # def render_plant_melee(self, plant: PlantMelee):
     #     pass
@@ -59,10 +61,10 @@ class PerfectRenderer(AbstractRenderer):
     def render(self, target: Surface, world: World):
         x = SCREEN_SHAKE_OFFSET[0] * (1 + self.screen_shake_current[0])
         y = SCREEN_SHAKE_OFFSET[1] * (1 + self.screen_shake_current[1])
-
-        for entity in world.entities:
+        for i in range(len(world.entities)):
+            entity = world.entities[i]
             if entity is Player:
-                render_player(entity)
+                self.render_player(entity, i)
 
         target.blit(self.main_surface, (0, 0), Rect((x, y), DISPLAY_RESOLUTION))
 
