@@ -2,6 +2,7 @@ from pygame import math
 from game.world import *
 from game.tile import *
 
+
 class Entity:
     def __init__(self, world: World, alliance, pos: math.Vector2 = math.Vector2()):
         self.pos = pos
@@ -14,7 +15,7 @@ class Entity:
         t = self.world.grid[int(self.pos.x)][int(self.pos.y)]  # type: Tile
         t.register(self)
 
-    def update(self, events=None, input=None):
+    def update(self, input=None):
         pass
 
     def set_pos(self, pos: math.Vector2):

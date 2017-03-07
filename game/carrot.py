@@ -24,7 +24,7 @@ class Carrot(Entity):
 
         self.look_timer = gen_timer(1)
 
-    def update(self, events=None, input=None):
+    def update(self, input=None):
 
         # seeking
         if self.state is CarrotState.seek_pos or self.state is CarrotState.seek_enemy:

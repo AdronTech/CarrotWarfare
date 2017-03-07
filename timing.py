@@ -22,7 +22,7 @@ def protocol_update(log: bool):
         if log:
             print(">update_rate: {:.2f}\tcount:{}\terror: {:.2f}".format(avg_update_delay, count, avg_update_delay - updates_per_sec))
 
-update_counter = protocol_update(True)
+update_counter = protocol_update(False)
 update_counter.send(None)
 
 
@@ -39,5 +39,5 @@ def protocol_redraw(log: bool):
         if log:
             print("]redraw_rate: {:.2f}\tcount:{}".format(avg_redraw_rate, count))
 
-redraw_counter = protocol_redraw(True)
+redraw_counter = protocol_redraw(False)
 redraw_counter.send(None)

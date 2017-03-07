@@ -3,6 +3,7 @@ from enum import Enum
 from game.entity import Entity
 from game.commands import Commands
 from game.world import World
+from game.tile import Tile
 from timing import *
 from pygame import *
 
@@ -13,17 +14,19 @@ class SeedMode(Enum):
 
 
 class Player(Entity):
-
     def __init__(self, world: World, alliance, pos: math.Vector2):
         super().__init__(world, alliance, pos)
 
         self.seed_mode = SeedMode.melee  # type: SeedMode
+
         self.seeds = [0 for i in range(len(list(SeedMode)))]
-        # self.seeds[SeedMode.melee.value] = 20
-        # self.seeds[SeedMode.ranged.value] = 10
+        self.seeds[SeedMode.melee.value] = 20
+        self.seeds[SeedMode.ranged.value] = 10
+
+
         self.speed = 10
 
-    def update(self, events=None, input=None):
+    def update(self, input=None):
 
         self.events = []
 
@@ -43,6 +46,8 @@ class Player(Entity):
 
             elif command == Commands.swap:
                 self.swap()
+        if self.events:
+            print(self.events)
 
     def move(self, input: math.Vector2):
         # calc delta pos
@@ -51,7 +56,7 @@ class Player(Entity):
         # move
         self.set_pos(self.pos + d_pos)
 
-        #log
+        # log
         self.events.append({"name": "move",
                             "delta": d_pos,
                             "pos": self.pos})
@@ -67,11 +72,17 @@ class Player(Entity):
         if self.get_seeds() > 0:
             plant_pos = {"x": int(self.pos.x), "y": int(self.pos.y)}
 
-            # log
-            self.events.append({"name": "plant",
-                                "pos": plant_pos,
-                                "type": self.seed_mode,
-                                "remaining": self.get_seeds()})
+            t = self.world.grid[plant_pos["x"]][plant_pos["y"]]  # type: Tile
+            if not t.state:
+                # log
+                self.events.append({"name": "plant",
+                                    "pos": plant_pos,
+                                    "type": self.seed_mode,
+                                    "remaining": self.get_seeds()})
+                self.world.events.append({"name": "plant",
+                                          "pos": plant_pos,
+                                          "type": self.seed_mode,
+                                          "alliance": self.alliance})
 
     def call(self):
 
@@ -79,6 +90,9 @@ class Player(Entity):
 
         # log
         self.events.append({"name": "call"})
+        self.world.events.append({"name": "call",
+                                  "pos": self.pos,
+                                  "alliance": self.pos})
 
     def swap(self):
 
@@ -100,6 +114,7 @@ class Player(Entity):
             type = self.seed_mode
 
         return self.seeds[type.value]
+
 
 if __name__ == "__main__":
     world = World()
