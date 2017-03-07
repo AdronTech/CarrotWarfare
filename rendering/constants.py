@@ -22,21 +22,22 @@ SUB_SURFACE_BORDER = ((DISPLAY_RESOLUTION[0] - SUB_SURFACE_SIZE[0]) / 2,
 SUB_SURFACE_POSITION = (SUB_SURFACE_BORDER[0] + SCREEN_SHAKE_OFFSET[0],
                         SUB_SURFACE_BORDER[1] + SCREEN_SHAKE_OFFSET[1])
 
+IMAGE_RESOURCE = {
+    "entities": {
+        "player0": {},
+        "player1": {},
+        "player2": {},
+        "player3": {},
 
-def test():
-    SCREEN_SHAKE_OFFSET = (min(DISPLAY_RESOLUTION[0], DISPLAY_RESOLUTION[1]) / 20,
-                           min(DISPLAY_RESOLUTION[0], DISPLAY_RESOLUTION[1]) / 20)
-    SCREEN_SHAKE_COUNT = 3
+        "carrot0": {},
+        "carrot1": {},
+        "carrot2": {},
+        "carrot3": {}
+    },
+    "tiles": {
 
-    TILE_SIZE = min(DISPLAY_RESOLUTION[0] / float(WORLD_DIMENSION["width"]),
-                    DISPLAY_RESOLUTION[1] / float(WORLD_DIMENSION["height"]))
-    MAIN_SURFACE_SIZE = (DISPLAY_RESOLUTION[0] + SCREEN_SHAKE_OFFSET[0] * 2,
-                         DISPLAY_RESOLUTION[1] + SCREEN_SHAKE_OFFSET[1] * 2)
-    SUB_SURFACE_SIZE = (TILE_SIZE * WORLD_DIMENSION["width"],
-                        TILE_SIZE * WORLD_DIMENSION["height"])
-    SUB_SURFACE_BORDER = ((DISPLAY_RESOLUTION[0] - SUB_SURFACE_SIZE[0]) / 2,
-                          (DISPLAY_RESOLUTION[1] - SUB_SURFACE_SIZE[1]) / 2)
-    SUB_SURFACE_POSITION = (SUB_SURFACE_BORDER[0] + SCREEN_SHAKE_OFFSET[0],
-                            SUB_SURFACE_BORDER[1] + SCREEN_SHAKE_OFFSET[1])
+    },
+    "juice": {
 
-test()
+    }
+}

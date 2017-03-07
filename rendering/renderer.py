@@ -1,5 +1,5 @@
-from pygame import Surface, Rect, draw
-from pygame.gfxdraw import aacircle, aatrigon
+from pygame import Surface, draw
+from pygame.gfxdraw import aacircle, aatrigon, filled_circle, filled_trigon
 from rendering.constants import *
 from game.tile import Tile
 from game.world import World
@@ -48,10 +48,21 @@ class PerfectRenderer(AbstractRenderer):
                                                           (TILE_SIZE, TILE_SIZE)))
 
     def render_player(self, player: Player):
-        aacircle(self.sub_surface, (int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE)),
+        # self.sub_surface.blit(IMAGE_RESOURCE["entities"]["player"+player.alliance]["resource"])
+        filled_circle(self.sub_surface, int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE),
+                      int(TILE_SIZE / 2), COLOR_PLAYERS[player.alliance])
+        aacircle(self.sub_surface, int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE),
                  int(TILE_SIZE / 2), COLOR_PLAYERS[player.alliance])
 
     def render_carrot(self, carrot: Carrot):
+        filled_trigon(self.sub_surface,
+                      int(carrot.pos.x * TILE_SIZE),
+                      int(carrot.pos.y * TILE_SIZE),
+                      int((carrot.pos.x + 0.3) * TILE_SIZE),
+                      int((carrot.pos.y - 1) * TILE_SIZE),
+                      int((carrot.pos.x - 0.3) * TILE_SIZE),
+                      int((carrot.pos.y - 1) * TILE_SIZE),
+                      COLOR_PLAYERS[carrot.alliance])
         aatrigon(self.sub_surface,
                  int(carrot.pos.x * TILE_SIZE),
                  int(carrot.pos.y * TILE_SIZE),
