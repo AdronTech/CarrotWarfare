@@ -1,5 +1,7 @@
-from game.input import get
+from game.input import get_input
+from game.input import lock_input
 from game.tile import Tile
+from game.player import Player
 
 WORLD_DIMENSION = {"width": 20, "height": 20}
 
@@ -14,7 +16,16 @@ class World:
         self.events = []
 
     def update(self):
-        commands = get()  # type: [[][][][]]
-        # update each entity
-        for e in self.entities:
-            e.update()
+        commands = get_input()  # type: [[], [], [], []]
+        for i in range(self.player_count):
+            self.entities[i].update(events=self.events, input=commands[i])
+        for i in range(self.player_count, len(self.entities)):
+            self.entities[i].update(events=self.events)
+
+
+def new_game():
+    world = World()
+    world.player_count = lock_input()
+    for i in range(world.player_count):
+        world.entities[i] = Player()
+    return world
