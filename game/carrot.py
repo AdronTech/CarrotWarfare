@@ -1,37 +1,60 @@
-from game.entity import Entity
 from enum import Enum
+from pygame import *
+import timing
+from game.entity import Entity
 from game.world import World
 from game.player import Player
 
 
 class Carrot(Entity):
 
-    def __init__(self, world: World, player: Player, pos):
-        super().__init__(world, pos)
+    def __init__(self, world: World, alliance, pos):
+        super().__init__(world, alliance, pos)
         self.state = CarrotState.idle
-        self.player = player
 
         self.sight_range = 4
         self.player_range = 1
         self.enemy_range = 1
 
-        self.entities_in_sight = []  # type: list[Entity]
         self.target = self  # type: Entity
+        self.entities_in_sight = []  # type: list[Entity]
 
     def update(self, events=None, input=None):
-        if self.state is CarrotState.idle:
 
+        # seeking
+        if self.state is CarrotState.seek_pos or self.state is CarrotState.seek_enemy:
+            dir = self.target.pos - self.pos  # type: math.Vector2
+            dir.scale_to_length(self.speed * timing.delta_time)
+
+            self.set_pos(self.pos + dir)
+
+        # idle
+        if self.state is CarrotState.idle:
             self.look_around()
 
             if self.enemy_nearby():
                 self.target = self.get_nearest_enemy()
                 if self.target:
                     self.state = CarrotState.seek_enemy
-
+        # seek enemy
         elif self.state is CarrotState.seek_enemy:
             if self.target:
-                self.target.
+                if self.target.pos.distance_squared_to(self.pos) <= self.enemy_range:
+                    self.state = CarrotState.attack
+            else:
+                self.state = CarrotState.idle
 
+        elif self.state is CarrotState.seek_pos:
+            if self.target:
+                if self.target.pos.distance_squared_to(self.pos) <= self.player_range:
+                    self.state = CarrotState.idle
+            else:
+                self.state = CarrotState.idle
+
+        # attack
+        elif self.state is CarrotState.attack:
+            if not self.target:
+                self.state = CarrotState.idle
 
     def look_around(self):
         self.entities_in_sight = []
@@ -52,7 +75,7 @@ class Carrot(Entity):
             if e is Carrot or (e is Player and e != self.player):
                 return True
 
-    def get_nearest_enemy(self):
+    def get_nearest_enemy(self) -> Entity:
         if not self.entities_in_sight:
             return None
 
@@ -63,13 +86,13 @@ class Carrot(Entity):
 
         return index
 
-    def call(self):
-        self.target = self.player
-        self.state = CarrotState.seek_player
+    def call(self, target: Entity):
+        self.target = target
+        self.state = CarrotState.seek_pos
 
 
 class CarrotState(Enum):
     idle = 0
     seek_enemy = 1
-    seek_player = 2
+    seek_pos = 2
     attack = 3
