@@ -27,10 +27,13 @@ class World:
 
 
 def new_game() -> World:
+    from game.carrot import Carrot
     from game.player import Player
     from pygame.math import Vector2
     world = World()
     world.player_count = lock_input()
     for i in range(world.player_count):
         world.entities.append(Player(world, i, Vector2() + SPAWN_POSITIONS[i]))
+
+    world.entities.append(Carrot(world, 0, Vector2(10, 10)))
     return world
