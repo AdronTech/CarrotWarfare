@@ -2,7 +2,7 @@ from pygame import Surface, Rect, draw
 from rendering.constants import *
 from game.tile import Tile
 from game.world import World
-from game.entity import Entity
+from game.carrot import Carrot
 from game.player import Player
 
 
@@ -46,10 +46,18 @@ class PerfectRenderer(AbstractRenderer):
         self.sub_surface.fill(COLOR_PLAYERS[player], Rect((square[0] * TILE_SIZE, square[1] * TILE_SIZE),
                                                           (TILE_SIZE, TILE_SIZE)))
 
-    def render_player(self, player: Player, player_id: int):
-        draw.circle(self.sub_surface, COLOR_PLAYERS[player_id],
+    def render_player(self, player: Player):
+        draw.circle(self.sub_surface, COLOR_PLAYERS[player.alliance],
                     (int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE)),
                     int(TILE_SIZE / 2))
+
+    def render_carrot(self, carrot: Carrot):
+        draw.polygon(self.sub_surface, COLOR_PLAYERS[carrot.alliance],
+                     [(int(carrot.pos.x * TILE_SIZE), int(carrot.pos.y * TILE_SIZE)),
+                      (int((carrot.pos.x + 0.3) * TILE_SIZE),
+                       int((carrot.pos.y - 1) * TILE_SIZE)),
+                      (int((carrot.pos.x - 0.3) * TILE_SIZE),
+                       int((carrot.pos.y - 1) * TILE_SIZE))])
 
     # def render_plant_melee(self, plant: PlantMelee):
     #     pass
@@ -65,7 +73,9 @@ class PerfectRenderer(AbstractRenderer):
             entity = world.entities[i]
             e_type = type(entity)
             if e_type is Player:
-                self.render_player(entity, i)
+                self.render_player(entity)
+            if e_type is Carrot:
+                self.render_carrot(entity)
 
         target.blit(self.main_surface, (0, 0), Rect((x, y), DISPLAY_RESOLUTION))
 
