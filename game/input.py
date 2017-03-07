@@ -28,7 +28,11 @@ def get_input():
 def lock_input():
     Gamepad.update()
     gamepads = list(Gamepad)
+    player_count = 0
     for i in range(len(gamepads)):
         if not gamepads[i].connected:
-            return i
-    return len(gamepads)
+            player_count = i
+            break
+    for i in range(player_count, len(gamepads)):
+        gamepads[i].disabled = True
+    return player_count
