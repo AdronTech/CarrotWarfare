@@ -1,14 +1,6 @@
 from pygame import Surface, Rect, draw
-from game.world import WORLD_DIMENSION
-from rendering.constants import DISPLAY_RESOLUTION, COLOR_PLAYERS, COLOR_BACKGROUND, COLOR_BACKGROUND_SECONDARY
+from rendering.constants import *
 from game.tile import Tile
-
-TILE_SIZE = min(DISPLAY_RESOLUTION[0] / WORLD_DIMENSION[0],
-                DISPLAY_RESOLUTION[1] / WORLD_DIMENSION[1])
-sub_surface_size = (TILE_SIZE * WORLD_DIMENSION[0],
-                    TILE_SIZE * WORLD_DIMENSION[1])
-sub_surface_border = ((DISPLAY_RESOLUTION[0] - sub_surface_size[0]) / 2,
-                      (DISPLAY_RESOLUTION[1] - sub_surface_size[1]) / 2)
 
 
 class AbstractRenderer:
@@ -39,12 +31,24 @@ class TestRenderer(AbstractRenderer):
                 #     draw.line(target, CLR["white"], (0, y * TILESIZE[1]), (RESOLUTION[0], y * TILESIZE[1]))
 
 
-class PerfectRenderer (AbstractRenderer):
+class PerfectRenderer(AbstractRenderer):
     def __init__(self):
         self.main_surface = Surface(DISPLAY_RESOLUTION)
-        self.sub_surface = self.main_surface.subsurface(Rect(sub_surface_border, sub_surface_size))
+        self.sub_surface = self.main_surface.subsurface(Rect(SUB_SURFACE_BORDER, SUB_SURFACE_SIZE))
+
+    def paint_square(self, square: (int, int), player: int):
+        self.sub_surface.fill(COLOR_PLAYERS[player], Rect((square[0] * TILE_SIZE, square[1] * TILE_SIZE),
+                                                          (TILE_SIZE, TILE_SIZE)))
 
     def render(self, target: Surface, world):
         self.main_surface.fill(COLOR_BACKGROUND_SECONDARY)
         self.sub_surface.fill(COLOR_BACKGROUND)
+        self.paint_square((0, 0), 0)
+        self.paint_square((0, 1), 3)
+        self.paint_square((1, 0), 3)
+        self.paint_square((19, 19), 2)
         target.blit(self.main_surface, (0, 0))
+
+
+if __name__ == "__main__":
+    pass
