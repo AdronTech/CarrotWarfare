@@ -28,5 +28,5 @@ def new_game() -> World:
     world = World()
     world.player_count = lock_input()
     for i in range(world.player_count):
-        world.entities.append(Player(world, Vector2()))
+        world.entities.append(Player(world, i, Vector2()))
     return world
