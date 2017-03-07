@@ -40,7 +40,6 @@ class PerfectRenderer(AbstractRenderer):
         self.sub_surface = self.main_surface.subsurface(Rect(SUB_SURFACE_POSITION,
                                                              SUB_SURFACE_SIZE))
         self.main_surface.fill(COLOR_BACKGROUND_SECONDARY)
-        self.sub_surface.fill(COLOR_BACKGROUND)
         self.screen_shake_current = (0, 0)
 
     def paint_square(self, square: (int, int), player: int):
@@ -50,7 +49,7 @@ class PerfectRenderer(AbstractRenderer):
     def render_player(self, player: Player, player_id: int):
         draw.circle(self.sub_surface, COLOR_PLAYERS[player_id],
                     (int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE)),
-                    TILE_SIZE / 2)
+                    int(TILE_SIZE / 2))
 
     # def render_plant_melee(self, plant: PlantMelee):
     #     pass
@@ -59,11 +58,13 @@ class PerfectRenderer(AbstractRenderer):
     #     pass
 
     def render(self, target: Surface, world: World):
+        self.sub_surface.fill(COLOR_BACKGROUND)
         x = SCREEN_SHAKE_OFFSET[0] * (1 + self.screen_shake_current[0])
         y = SCREEN_SHAKE_OFFSET[1] * (1 + self.screen_shake_current[1])
         for i in range(len(world.entities)):
             entity = world.entities[i]
-            if entity is Player:
+            e_type = type(entity)
+            if e_type is Player:
                 self.render_player(entity, i)
 
         target.blit(self.main_surface, (0, 0), Rect((x, y), DISPLAY_RESOLUTION))
@@ -81,7 +82,7 @@ if __name__ == "__main__":
 
     pygame_init()
     screen = PyGameWindow()
-    # set_mode(DISPLAY_RESOLUTION, RESIZABLE)
+    set_mode(DISPLAY_RESOLUTION, RESIZABLE)
 
     DEFAULT_RENDERER = PerfectRenderer()
 
@@ -96,6 +97,9 @@ if __name__ == "__main__":
                 quit()
             if e.type is VIDEORESIZE:
                 DISPLAY_RESOLUTION = e.size
+
+        print(DISPLAY_RESOLUTION)
+
         pygame_events.pump()
         # update
         game_world.update()

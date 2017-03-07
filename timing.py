@@ -4,7 +4,7 @@ from pygame.time import get_ticks as time_ms
 now = time_ms
 updates_per_sec = 30
 update_delay = 1000/updates_per_sec
-delta_time = update_delay
+delta_time = update_delay/1000
 avg_redraw_rate = 0.0
 avg_update_delay = 0.0
 

@@ -1,6 +1,6 @@
 from pygame import init as pygame_init
 from pygame import event as pygame_events
-from timing import update_counter, redraw_counter, update_delay, now
+from timing import *
 from display import PyGameWindow
 from pygame.locals import *
 
@@ -13,19 +13,19 @@ if __name__ == "__main__":
     game_world = new_game()
 
     # main loop
-    next_update = now()
+    last_update = now()
     while True:
 
         # event
-        for e in pygame_events.get(QUIT):
+        for e in pygame_events.get():
             if e.type is QUIT:
                 quit()
         pygame_events.pump()
 
-        if next_update == now():
+        if now() >= last_update + update_delay:
             # update timing
             next(update_counter)
-            next_update += update_delay
+            last_update += update_delay
             game_world.update()
         else:
             # update timing
