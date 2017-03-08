@@ -13,12 +13,12 @@ class Player(Entity):
         self.seed_mode = SeedType.melee  # type: SeedType
 
         self.seeds = [0 for i in range(len(list(SeedType)))]
-        self.seeds[SeedType.melee.value] = 200
-        self.seeds[SeedType.ranged.value] = 200
+        self.seeds[SeedType.melee.value] = 5
+        self.seeds[SeedType.ranged.value] = 5
 
         self.attack_range = 1.5
         self.attack_angle = 90
-        self.damage = 5
+        self.damage = PLAYER_DAMAGE
         self.speed = 5
 
         self.spawnpoint = spawn
@@ -27,12 +27,14 @@ class Player(Entity):
 
     def spawn(self):
         self.set_pos(self.spawnpoint)
-        self.hp = 100
+        self.hp = PLAYER_LIFE
 
     def update(self, input=None):
         super().update()
         if self.hard_lock > 0:
             return
+
+        print(self.get_seeds())
 
         self.events.clear()
 
@@ -54,8 +56,8 @@ class Player(Entity):
                 elif command == Commands.swap:
                     self.swap()
 
-            # if self.events:
-            #     print(self.events)
+                    # if self.events:
+                    #     print(self.events)
 
     def move(self, dir: Vector2, hold_pos: bool):
 
@@ -101,7 +103,7 @@ class Player(Entity):
 
             t = self.world.grid[plant_pos["x"]][plant_pos["y"]]  # type: Tile
             if not t.state:
-                self.seeds[self.seed_mode.value] -= 1
+                self.set_seeds(self.get_seeds() - 1)
 
                 # log
                 self.events.append({
@@ -154,6 +156,12 @@ class Player(Entity):
 
         return self.seeds[type.value]
 
+    def set_seeds(self, amount, type: SeedType = None):
+        if not type:
+            type = self.seed_mode
+
+        self.seeds[type.value] = amount
+
     def death(self):
         self.world.events.append({
             "name": "player_death",
@@ -162,13 +170,20 @@ class Player(Entity):
             "author": self
         })
 
-    def pickup(self, seed_mode: SeedType):
-        self.seeds[seed_mode] += 1
-        # log
-        self.events.append({
-            "name": "pick_up",
-            "seed": seed_mode
-        })
+    def pickup(self, seed_mode: SeedType, amount) -> bool:
+        if self.get_seeds(seed_mode) + 1 <= PLAYER_SEED_POUCH:
+            self.set_seeds(min(self.get_seeds(seed_mode) + amount, PLAYER_SEED_POUCH), seed_mode)
+
+            # log
+            self.events.append({
+                "name": "pick_up",
+                "seed": seed_mode,
+                "amount": self.get_seeds(seed_mode),
+                "delta": amount
+            })
+            return True
+        else:
+            return False
 
 
 if __name__ == "__main__":

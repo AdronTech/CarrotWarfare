@@ -15,8 +15,8 @@ class SimpleRenderer(AbstractRenderer):
                       int((player.pos.y - player.attack_range) * TILE_SIZE),
                       int(player.attack_range * TILE_SIZE * 2),
                       int(player.attack_range * TILE_SIZE * 2)),
-                 (angle - player.attack_angle/2)*pi/180,
-                 (angle + player.attack_angle/2)*pi/180,
+                 (angle - player.attack_angle / 2) * pi / 180,
+                 (angle + player.attack_angle / 2) * pi / 180,
                  5)
 
         # print(angle)
@@ -56,6 +56,19 @@ class SimpleRenderer(AbstractRenderer):
                               Rect((int(x * TILE_SIZE + (TILE_SIZE - size) / 2),
                                     int(y * TILE_SIZE + (TILE_SIZE - size) / 2)),
                                    (size, size)))
+                elif t.state and t.state["name"] == TileState.pick_up:
+                    size = TILE_SIZE * 0.7
+                    draw.ellipse(target, (0, 0, 0),
+                                 Rect((int(x * TILE_SIZE + (TILE_SIZE - size) / 2),
+                                       int(y * TILE_SIZE + (TILE_SIZE - size) / 2)),
+                                      (size, size)))
+
+                    draw.polygon(target, (255, 255, 255),
+                                 [(int((x + 0.5) * TILE_SIZE), int(((y + 0.5) + 0.2) * TILE_SIZE)),
+                                  (int(((x + 0.5) + 0.1) * TILE_SIZE),
+                                   int(((y + 0.5) - 0.2) * TILE_SIZE)),
+                                  (int(((x + 0.5) - 0.1) * TILE_SIZE),
+                                   int(((y + 0.5) - 0.2) * TILE_SIZE))])
 
         for e in world.entities:
             if type(e) is Player:

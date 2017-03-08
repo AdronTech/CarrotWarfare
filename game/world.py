@@ -4,6 +4,7 @@ from timing import *
 from random import random, randint
 from rendering import debugger as Debug
 from pygame import Color
+from game.constants import *
 
 WORLD_DIMENSION = {"width": 27, "height": 17}
 
@@ -146,7 +147,7 @@ class World:
 
 
 def new_game() -> World:
-    from game.player import Player
+    from game.player import Player, SeedType
     from game.carrot import Carrot
 
     world = World()
@@ -160,6 +161,11 @@ def new_game() -> World:
         world.entities.append(Carrot(world, randint(0, 3),
                                      Vector2(random() * WORLD_DIMENSION["width"],
                                              random() * WORLD_DIMENSION["height"])))
+
+    for i in range(5):
+
+            world.get_tile(                           Vector2(random() * WORLD_DIMENSION["width"],
+                                             random() * WORLD_DIMENSION["height"])).set_pickup(SeedType.melee, 5)
 
     return world
 
