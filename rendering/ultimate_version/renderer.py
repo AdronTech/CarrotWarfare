@@ -28,7 +28,7 @@ class UltimateRenderer(AbstractRenderer):
             self.main_surface.subsurface(((ui_x_left, ui_y_bottom), UI_SUBSURFACE_SIZE)),
             self.main_surface.subsurface(((ui_x_right, ui_y_bottom), UI_SUBSURFACE_SIZE))]
         self.ui_layer = UILayer(self, player_ui_sub_surfaces)
-        self.screen_shake = ScreenShaker(SCREEN_SHAKE_OFFSET)
+        self.screen_shake = ScreenShaker()
 
     def render(self, target: Surface, world: World):
         self.ground_layer.render(world)

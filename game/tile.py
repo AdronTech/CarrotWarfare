@@ -31,15 +31,16 @@ class Tile:
     def register(self, entity):
         self.entities.append(entity)
         from game.player import Player
-        if type(entity) is Player and self.state["name"] == TileState.pick_up:
-            entity.pickup(self.state["seed"])
-            self.worldevents.append({
-                "name": "pick_up",
-                "type": self.state["seed"],
-                "alliance": entity.alliance,
-                "tile": self
-            })
-            self.state = None
+        if type(entity) is Player:
+            if self.state and self.state["name"] == TileState.pick_up:
+                entity.pickup(self.state["seed"])
+                self.worldevents.append({
+                    "name": "pick_up",
+                    "type": self.state["seed"],
+                    "alliance": entity.alliance,
+                    "tile": self
+                })
+                self.state = None
 
     def unregister(self, entity):
         if entity in self.entities:
