@@ -17,6 +17,7 @@ class ScreenShaker:
         self.pos = 1
         self.pos_last = Vector2()
         self.pos_next = Vector2()
+        self.pos_current = Vector2()
         # timing
         self.last_update = now()
 
@@ -49,12 +50,12 @@ class ScreenShaker:
             self.set_next_position()
 
         if self.remaining_force > 0:
-            position = self.pos_last + (self.pos_next - self.pos_last) * self.pos
-            x = SCREEN_SHAKE_OFFSET[0] * (1 + position.x)
-            y = SCREEN_SHAKE_OFFSET[1] * (1 + position.y)
+            self.pos_current = position = self.pos_last + (self.pos_next - self.pos_last) * self.pos
+            x = SCREEN_SHAKE_OFFSET[0] * (1 + self.pos_current.x)
+            y = SCREEN_SHAKE_OFFSET[1] * (1 + self.pos_current.y)
         else:
-            x = 0
-            y = 0
+            x = SCREEN_SHAKE_OFFSET[0]
+            y = SCREEN_SHAKE_OFFSET[1]
         self.last_update = now()
         return x, y
 
