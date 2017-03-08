@@ -31,6 +31,9 @@ class UltimateRenderer(AbstractRenderer):
         self.screen_shake = ScreenShaker()
 
     def render(self, target: Surface, world: World):
+        for e in world.events:
+            if e["name"] == "player_death":
+                self.screen_shake.impulse(0.5)
         self.ground_layer.render(world)
         self.overlay_layer.render(world)
         self.entity_layer.render(world)

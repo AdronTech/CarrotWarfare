@@ -4,8 +4,8 @@ from rendering.constants import *
 from math import pi, sin, cos
 from random import random
 
-DAMP_PERCENT = 0.2
-NOISE_PERCENT = 0.2
+DAMP_PERCENT = 0.05
+NOISE_PERCENT = 0.5
 
 
 class ScreenShaker:
