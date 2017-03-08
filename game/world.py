@@ -22,6 +22,7 @@ class World:
         self.entities = []
         self.events = []  # type: [{}]
         self.growing = []  # type: [Tile]
+        self.players = [None] * 4
         self.grid = [[Tile(self.events, x, y) for y in range(h)] for x in range(w)]  # type: [[Tile]]
 
     def radius_gen(self, pos, r):
@@ -50,11 +51,12 @@ class World:
         for i in range(len(self.growing)):
             self.growing[i].update()
 
-        for i in range(self.player_count):
-            ent = self.entities[i]  # type: Entity
-            ent.update(commands[i])
-            if ent.death_stamp and now() - ent.death_stamp > 1000:
-                ent.death_stamp = None
+        for i in range(4):
+            if self.players[i]:
+                player = self.players[i]  # type: Player
+                player.update(commands[i])
+                if player.death_stamp and now() - player.death_stamp > 1000:
+                    player.death_stamp = None
 
         for i in range(self.player_count, len(self.entities)):
             ent = self.entities[i]  # type: Entity
@@ -148,9 +150,11 @@ def new_game() -> World:
     from game.carrot import Carrot
 
     world = World()
-    world.player_count = lock_input()
-    for i in range(world.player_count):
-        world.entities.append(Player(world, i, Vector2(SPAWN_POSITIONS[i])))
+    players = lock_input()
+    world.player_count = len(players)
+    for i in players:
+        world.players[i] = Player(world, i, Vector2(SPAWN_POSITIONS[i]))
+        world.entities.append(world.players[i])
 
     for i in range(0):
         world.entities.append(Carrot(world, randint(0, 3),
