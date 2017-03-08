@@ -2,8 +2,11 @@ from game.input import *
 from game.tile import *
 from timing import *
 from random import random, randint
+from rendering import debugger as Debug
+from pygame import Color
 
 WORLD_DIMENSION = {"width": 27, "height": 17}
+
 SPAWN_POSITIONS = [(1, 1),
                    (WORLD_DIMENSION["width"] - 1, 1),
                    (1, WORLD_DIMENSION["height"] - 1),
@@ -50,13 +53,13 @@ class World:
         for i in range(self.player_count):
             ent = self.entities[i]  # type: Entity
             ent.update(commands[i])
-            if ent.death_stamp and now() - ent.death_stamp> 1000:
+            if ent.death_stamp and now() - ent.death_stamp > 1000:
                 ent.death_stamp = None
 
         for i in range(self.player_count, len(self.entities)):
             ent = self.entities[i]  # type: Entity
             ent.update()
-            if ent.death_stamp and now() - ent.death_stamp > 1000:
+            if ent.death_stamp and now() - ent.death_stamp > 0:
                 deaths.append(ent)
 
         for e in deaths:

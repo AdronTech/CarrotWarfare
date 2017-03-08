@@ -1,16 +1,12 @@
-from game.tile import Tile, TileState
-from game.world import World
-from game.player import Player
-from game.carrot import Carrot
-from rendering.constants import *
-from rendering.renderer import AbstractRenderer
+from game.tile import TileState
+from rendering.abstract_renderer import *
 from pygame import Surface, Rect, draw
 from cmath import pi
 
 CLR = {"white": (255, 255, 255), "black": (0, 0, 0)}
 
 
-class DebugRenderer(AbstractRenderer):
+class SimpleRenderer(AbstractRenderer):
     def render_player(self, target, player: Player):
         angle = -player.dir.as_polar()[1]
         draw.arc(target,

@@ -1,4 +1,3 @@
-from game.world import WORLD_DIMENSION
 
 # Blue, Red, Green, Amber @ Material Palette
 COLOR_PLAYERS = [(33, 150, 243), (244, 67, 54), (76, 175, 80), (255, 193, 7)]
@@ -6,6 +5,8 @@ COLOR_BACKGROUND = (250, 250, 250)
 COLOR_BACKGROUND_SECONDARY = (224, 224, 224)
 
 DISPLAY_RESOLUTION = (1280, 720)
+
+WORLD_DIMENSION = {"width": 27, "height": 17}
 
 SCREEN_SHAKE_OFFSET = (min(DISPLAY_RESOLUTION[0], DISPLAY_RESOLUTION[1]) / 20,
                        min(DISPLAY_RESOLUTION[0], DISPLAY_RESOLUTION[1]) / 20)
@@ -22,6 +23,7 @@ SUB_SURFACE_BORDER = ((DISPLAY_RESOLUTION[0] - SUB_SURFACE_SIZE[0]) / 2,
 SUB_SURFACE_POSITION = (SUB_SURFACE_BORDER[0] + SCREEN_SHAKE_OFFSET[0],
                         SUB_SURFACE_BORDER[1] + SCREEN_SHAKE_OFFSET[1])
 
+
 def get_ultimate_surface():
     from pygame import Surface
     srf = Surface(MAIN_SURFACE_SIZE)
@@ -34,6 +36,7 @@ def get_ultimate_surface():
     srf.fill(COLOR_PLAYERS[3], ((MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2),
                                 (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
     return srf
+
 
 IMAGE_RESOURCE = {
     "entities": {

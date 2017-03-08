@@ -6,7 +6,8 @@ from pygame import event as pygame_events
 from pygame import init as pygame_init
 from display import *
 # own imports
-from rendering.debug import DebugRenderer as Renderer
+from rendering.simple_renderer import SimpleRenderer as Renderer
+from rendering import debugger as Debug
 from game.world import new_game
 from timing import *
 
@@ -48,6 +49,8 @@ class Application:
         game_render = renderer.render
         game_update = world.update
 
+        Debug.gen_debug_surface(self.display.render_target)
+
         # start of main loop
         last_update = now()
         while True:
@@ -58,9 +61,8 @@ class Application:
                 if e.type is QUIT:
                     return ExitCode.EXIT
             pygame_events.pump()
-
-            # update or render
             if time_since_update >= update_delay:
+                Debug.clear()
                 game_update()
                 for e in world.events:
                     if e["name"] is "main_menu":
@@ -71,10 +73,13 @@ class Application:
                 last_update += update_delay
             else:
                 game_render(self.display.render_target, world)
+                Debug.render(self.display.render_target)
                 self.display.flip()
 
                 # update timing
                 next(redraw_counter)
+                # update or render
+
 
 
 if __name__ == "__main__":
