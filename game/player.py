@@ -99,22 +99,20 @@ class Player(Entity):
 
     def plant(self):
         if self.get_seeds() > 0:
-            plant_pos = {"x": int(self.pos.x), "y": int(self.pos.y)}
-
-            t = self.world.grid[plant_pos["x"]][plant_pos["y"]]  # type: Tile
+            t = self.world.get_tile(self.pos)  # type: Tile
             if not t.state:
                 self.set_seeds(self.get_seeds() - 1)
 
                 # log
                 self.events.append({
                     "name": "plant",
-                    "pos": plant_pos,
+                    "pos": self.world.int_vec(self.pos),
                     "type": self.seed_mode,
                     "remaining": self.get_seeds()
                 })
                 self.world.events.append({
                     "name": "plant",
-                    "pos": plant_pos,
+                    "tile": t,
                     "type": self.seed_mode,
                     "alliance": self.alliance,
                     "author": self
