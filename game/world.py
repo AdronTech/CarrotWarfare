@@ -24,10 +24,10 @@ class World:
         self.growing = []  # type: [Tile]
         self.grid = [[Tile(self.events, x, y) for y in range(h)] for x in range(w)]  # type: [[Tile]]
 
-    def tile_radius(self, pos, r):
+    def radius_gen(self, pos, r):
         for dx in range(-r, r + 1):
             for dy in range(-(r - abs(dx)), r - abs(dx) + 1):
-                yield self.get_tile(Vector2(pos) + Vector2(dx, dy))
+                yield Vector2(pos) + Vector2(dx, dy)
 
     def get_tile(self, pos):
         x, y = pos
@@ -65,6 +65,11 @@ class World:
         for e in deaths:
             self.entities.remove(e)
 
+        # for col in self.grid:
+        #     for t in col:
+        #         if [(e.death_stamp) for e in t.entities if e.death_stamp]:
+        #             Debug.circle((0, 0, 0, 255), (t.x + 0.5, t.y + 0.5), 0.2)
+
         self.check_events()
 
         # print(self.events)
@@ -87,6 +92,8 @@ class World:
                 r = e["range"]
                 h_angle = e["angle"] / 2
 
+                possible_enemies = []  # type: Entity
+
                 for x in range(int(e["pos"].x - r), int(e["pos"].x + r + 1)):
                     for y in range(int(e["pos"].y - r), int(e["pos"].y + r + 1)):
                         if x < 0 or y < 0 or x >= WORLD_DIMENSION["width"] or y >= WORLD_DIMENSION["height"]:
@@ -101,16 +108,26 @@ class World:
                                 if dist.angle_to(dir) > h_angle:
                                     continue
 
-                                ent.hit(e["damage"])
+                                possible_enemies.append((dist.length_squared(), ent))
+
+                possible_enemies = sorted(possible_enemies, key = lambda entity: entity[0])  # sort by distance
+                for i in range(min(e["count"], len(possible_enemies))):
+                    possible_enemies[i][1].hit(e["damage"])
+                    Debug.circle(Color("blue"),possible_enemies[i][1].pos, 0.2)
 
             elif e["name"] == "call":
-                for ent in self.entities:  # type: Carrot
-                    if type(ent) is not Carrot:
-                        continue
-                    if ent.alliance != e["alliance"]:
-                        continue
+                for coord in self.radius_gen(e["pos"], e["radius"]):  # type: Carrot
+                    t = self.get_tile(coord)
+                    if t:
+                        # Debug.circle(Color("black"), (t.x + 0.5, t.y + 0.5), 0.25)
 
-                    ent.call(e["pos"])
+                        for ent in t.entities:
+                            if type(ent) is not Carrot:
+                                continue
+                            if ent.alliance != e["alliance"]:
+                                continue
+
+                            ent.call(e["pos"])
 
             elif e["name"] == "player_death":
                 e["author"].spawn()
@@ -135,7 +152,7 @@ def new_game() -> World:
     for i in range(world.player_count):
         world.entities.append(Player(world, i, Vector2(SPAWN_POSITIONS[i])))
 
-    for i in range(100):
+    for i in range(0):
         world.entities.append(Carrot(world, randint(0, 3),
                                      Vector2(random() * WORLD_DIMENSION["width"],
                                              random() * WORLD_DIMENSION["height"])))

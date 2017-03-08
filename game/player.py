@@ -18,12 +18,16 @@ class Player(Entity):
 
         self.attack_range = 1.5
         self.attack_angle = 90
-        self.damage = 10
+        self.damage = 5
         self.speed = 5
 
         self.spawnpoint = spawn
 
         self.spawn()
+
+    def spawn(self):
+        self.set_pos(self.spawnpoint)
+        self.hp = 100
 
     def update(self, input=None):
         super().update()
@@ -37,24 +41,21 @@ class Player(Entity):
             if command == Commands.directional:
                 self.move(input_command["dir"], input_command["hold_position"])
 
-            elif command == Commands.attack:
-                self.attack()
+            elif self.soft_lock <= 0:
+                if command == Commands.attack:
+                    self.attack()
 
-            elif command == Commands.plant:
-                self.plant()
+                elif command == Commands.plant:
+                    self.plant()
 
-            elif command == Commands.call:
-                self.call()
+                elif command == Commands.call:
+                    self.call()
 
-            elif command == Commands.swap:
-                self.swap()
+                elif command == Commands.swap:
+                    self.swap()
 
-                # if self.events:
-                #     print(self.events)
-
-    def spawn(self):
-        self.set_pos(self.spawnpoint)
-        self.hp = 40
+            # if self.events:
+            #     print(self.events)
 
     def move(self, dir: Vector2, hold_pos: bool):
 
@@ -90,6 +91,7 @@ class Player(Entity):
             "angle": self.attack_angle,
             "alliance": self.alliance,
             "damage": self.damage,
+            "count": 5,
             "author": self
         })
 
@@ -125,6 +127,7 @@ class Player(Entity):
             "name": "call",
             "pos": self.pos,
             "alliance": self.alliance,
+            "radius": 7,
             "author": self
         })
 
