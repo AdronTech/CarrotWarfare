@@ -9,7 +9,7 @@ class Entity:
         self.world = world
         self.render_flags = {}
         self.alliance = alliance
-        self.dir = Vector2(1, 0)
+        self.dir = Vector2(1, 0)  # type: Vector2
         self.hp = hp
         self.death_stamp = None
 
@@ -32,8 +32,9 @@ class Entity:
         # constrain
         self.world.constrain_vector(pos)
 
-        # register
-        self.register()
+        if not self.death_stamp:
+            # register
+            self.register()
 
     def register(self):
         t = self.world.get_tile(self.pos)   # type: Tile
