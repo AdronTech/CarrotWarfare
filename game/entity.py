@@ -1,52 +1,50 @@
-from pygame import math
 from game.world import *
-from game.tile import *
 
 
 class Entity:
-    def __init__(self, world: World, alliance, pos: math.Vector2 = math.Vector2(), hp=0):
+    def __init__(self, world, alliance, pos: Vector2 = Vector2(), hp=0):
         self.pos = pos
 
         self.events = []
         self.world = world
         self.render_flags = {}
         self.alliance = alliance
-        self.dir = math.Vector2(1, 0);
+        self.dir = Vector2(1, 0)
         self.hp = hp
+        self.death_stamp = None
 
-        t = self.world.grid[int(self.pos.x)][int(self.pos.y)]  # type: Tile
-        t.register(self)
+        self.soft_lock = 0
+        self.hard_lock = 0
+
+        self.register()
 
     def update(self, input=None):
-        pass
+        self.soft_lock -= delta_time
+        self.hard_lock -= delta_time
 
-    def set_pos(self, pos: math.Vector2):
+    def set_pos(self, pos: Vector2):
 
         # unregister
-        t = self.world.grid[int(self.pos.x)][int(self.pos.y)]  # type: Tile
-        t.unregister(self)
+        self.unregister()
 
         self.pos = pos
 
         # constrain
-        if pos.x < 0:
-            pos.x = 0
-        if pos.y < 0:
-            pos.y = 0
-        if pos.x >= WORLD_DIMENSION["width"]:
-            pos.x = WORLD_DIMENSION["width"] - 0.001
-        if pos.y >= WORLD_DIMENSION["height"]:
-            pos.y = WORLD_DIMENSION["height"] - 0.001
+        self.world.constrain_vector(pos)
 
         # register
-        t = self.world.grid[int(self.pos.x)][int(self.pos.y)]  # type: Tile
+        self.register()
+
+    def register(self):
+        t = self.world.get_tile(self.pos)   # type: Tile
         t.register(self)
+
+    def unregister(self):
+        t = self.world.get_tile(self.pos)  # type: Tile
+        t.unregister(self)
 
     def hit(self, damage):
         self.hp -= damage
-
-        print("hit", self)
-        # TODO: hit and death log
 
         self.events.append({
             "name": "hit",
@@ -56,7 +54,17 @@ class Entity:
 
         if self.hp < 0:
             self.hp = 0
-            self.world.events.append({
+            self.death()
+
+            self.unregister()
+            self.death_stamp = now()
+
+            self.events.append({
                 "name": "death",
-                "author": self
+                "stamp": self.death_stamp
             })
+
+    def death(self):
+        pass
+
+

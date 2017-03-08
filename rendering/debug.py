@@ -23,13 +23,25 @@ class DebugRenderer(AbstractRenderer):
                  (angle + player.attack_angle/2)*pi/180,
                  5)
 
-        print(angle)
+        # print(angle)
 
         draw.circle(target, COLOR_PLAYERS[player.alliance],
                     (int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE)),
                     int(TILE_SIZE / 2))
 
     def render_carrot(self, target, carrot: Carrot):
+
+        angle = -carrot.dir.as_polar()[1]
+        draw.arc(target,
+                 COLOR_PLAYERS[carrot.alliance],
+                 Rect(int((carrot.pos.x - carrot.attack_range) * TILE_SIZE),
+                      int((carrot.pos.y - carrot.attack_range) * TILE_SIZE),
+                      int(carrot.attack_range * TILE_SIZE * 2),
+                      int(carrot.attack_range * TILE_SIZE * 2)),
+                 (angle - carrot.attack_angle / 2) * pi / 180,
+                 (angle + carrot.attack_angle / 2) * pi / 180,
+                 5)
+
         draw.polygon(target, COLOR_PLAYERS[carrot.alliance],
                      [(int(carrot.pos.x * TILE_SIZE), int(carrot.pos.y * TILE_SIZE)),
                       (int((carrot.pos.x + 0.3) * TILE_SIZE),

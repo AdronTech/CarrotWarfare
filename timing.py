@@ -15,7 +15,7 @@ def protocol_update(log: bool):
     while True:
         count = 0
         while time_s() < next_push:
-            yield
+            yield avg_update_delay
             count += 1
         next_push += 1
         avg_update_delay = (avg_update_delay + count) / 2
@@ -32,7 +32,7 @@ def protocol_redraw(log: bool):
     while True:
         count = 0
         while time_s() < next_push:
-            yield
+            yield avg_redraw_rate
             count += 1
         next_push += 1
         avg_redraw_rate = (avg_redraw_rate + count) / 2

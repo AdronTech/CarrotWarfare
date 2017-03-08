@@ -1,11 +1,4 @@
-from enum import Enum
-
-from game.entity import Entity
-from game.commands import Commands
-from game.world import World
-from game.tile import Tile
-from timing import *
-from pygame import *
+from game.entity import *
 
 
 class SeedMode(Enum):
@@ -14,7 +7,7 @@ class SeedMode(Enum):
 
 
 class Player(Entity):
-    def __init__(self, world: World, alliance, spawn: math.Vector2):
+    def __init__(self, world: World, alliance, spawn: Vector2):
         super().__init__(world, alliance)
 
         self.seed_mode = SeedMode.melee  # type: SeedMode
@@ -33,8 +26,11 @@ class Player(Entity):
         self.spawn()
 
     def update(self, input=None):
+        super().update()
+        if self.hard_lock > 0:
+            return
 
-        self.events = []
+        self.events.clear()
 
         for input_command in input:
             command = input_command["command"]
@@ -60,7 +56,7 @@ class Player(Entity):
         self.set_pos(self.spawnpoint)
         self.hp = 40
 
-    def move(self, dir: math.Vector2, hold_pos: bool):
+    def move(self, dir: Vector2, hold_pos: bool):
 
         self.dir = dir
 
@@ -68,7 +64,7 @@ class Player(Entity):
             return
 
         # calc delta pos
-        d_pos = dir * self.speed * delta_time  # type: math.Vector2
+        d_pos = dir * self.speed * delta_time  # type: Vector2
 
         # move
         self.set_pos(self.pos + d_pos)
@@ -81,8 +77,6 @@ class Player(Entity):
         })
 
     def attack(self):
-
-        # TODO: attack enemy
 
         # log
         self.events.append({
@@ -123,9 +117,6 @@ class Player(Entity):
                 })
 
     def call(self):
-
-        # TODO: call carrots
-
         # log
         self.events.append({
             "name": "call"
@@ -133,7 +124,7 @@ class Player(Entity):
         self.world.events.append({
             "name": "call",
             "pos": self.pos,
-            "alliance": self.pos,
+            "alliance": self.alliance,
             "author": self
         })
 
@@ -160,12 +151,20 @@ class Player(Entity):
 
         return self.seeds[type.value]
 
+    def death(self):
+        self.world.events.append({
+            "name": "player_death",
+            "alliance": self.alliance,
+            "stamp": self.death_stamp,
+            "author": self
+        })
+
 
 if __name__ == "__main__":
     world = World()
 
     player = Player(world)
-    player.update(input=[{"command": Commands.directional, "value": math.Vector2(10, 20)},
+    player.update(input=[{"command": Commands.directional, "value": Vector2(10, 20)},
                          {"command": Commands.swap},
                          {"command": Commands.swap}])
 

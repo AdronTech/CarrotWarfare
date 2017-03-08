@@ -1,7 +1,7 @@
-from game.input import get_input
-from game.input import lock_input
+from game.input import *
+from game.tile import *
+from timing import *
 from random import random, randint
-from pygame.math import Vector2
 
 WORLD_DIMENSION = {"width": 27, "height": 17}
 SPAWN_POSITIONS = [(1, 1),
@@ -11,27 +11,56 @@ SPAWN_POSITIONS = [(1, 1),
 
 
 class World:
-
     def __init__(self):
-        from game.tile import Tile
 
         self.player_count = 0
         w = WORLD_DIMENSION["width"]
         h = WORLD_DIMENSION["height"]
-        self.grid = [[Tile(self, x, y) for y in range(h)] for x in range(w)]  # type: [[Tile]]
         self.entities = []
-        self.events = []
+        self.events = []  # type: [{}]
         self.growing = []  # type: [Tile]
+        self.grid = [[Tile(self.events, x, y) for y in range(h)] for x in range(w)]  # type: [[Tile]]
+
+    def tile_radius(self, pos, r):
+        for dx in range(-r, r + 1):
+            for dy in range(-(r - abs(dx)), r - abs(dx) + 1):
+                yield self.get_tile(Vector2(pos) + Vector2(dx, dy))
+
+    def get_tile(self, pos):
+        x, y = pos
+
+        x = int(x)
+        y = int(y)
+
+        if x < 0 or y < 0 or x >= WORLD_DIMENSION["width"] or y >= WORLD_DIMENSION["height"]:
+            return None
+
+        return self.grid[x][y]
 
     def update(self):
-        self.events = []
+
+        self.events.clear()
         commands = get_input()  # type: [[], [], [], []]
+
+        deaths = []
+
         for i in range(len(self.growing)):
             self.growing[i].update()
+
         for i in range(self.player_count):
-            self.entities[i].update(commands[i])
+            ent = self.entities[i]  # type: Entity
+            ent.update(commands[i])
+            if ent.death_stamp and now() - ent.death_stamp> 1000:
+                ent.death_stamp = None
+
         for i in range(self.player_count, len(self.entities)):
-            self.entities[i].update()
+            ent = self.entities[i]  # type: Entity
+            ent.update()
+            if ent.death_stamp and now() - ent.death_stamp > 1000:
+                deaths.append(ent)
+
+        for e in deaths:
+            self.entities.remove(e)
 
         self.check_events()
 
@@ -39,7 +68,6 @@ class World:
 
     def check_events(self):
         from game.carrot import Carrot
-        from game.entity import Entity
         from game.player import Player
 
         for e in self.events:  # type: dict
@@ -54,7 +82,7 @@ class World:
                 pos = e["pos"]  # type: Vector2
                 dir = e["dir"]
                 r = e["range"]
-                h_angle = e["angle"]/2
+                h_angle = e["angle"] / 2
 
                 for x in range(int(e["pos"].x - r), int(e["pos"].x + r + 1)):
                     for y in range(int(e["pos"].y - r), int(e["pos"].y + r + 1)):
@@ -64,7 +92,7 @@ class World:
                             if e["alliance"] != ent.alliance and (type(ent) is Carrot or type(ent) is Player):
                                 dist = ent.pos - pos  # type: Vector2
 
-                                if dist.length_squared() > r**2:
+                                if dist.length_squared() > r ** 2:
                                     continue
 
                                 if dist.angle_to(dir) > h_angle:
@@ -72,24 +100,49 @@ class World:
 
                                 ent.hit(e["damage"])
 
-            elif e["name"] == "death":
-                ent = e["author"]
-                if type(ent) is Carrot:
-                    if ent in self.entities:
-                        self.entities.remove(ent)
+            elif e["name"] == "call":
+                for ent in self.entities:  # type: Carrot
+                    if type(ent) is not Carrot:
+                        continue
+                    if ent.alliance != e["alliance"]:
+                        continue
 
-                elif type(ent) is Player:
-                    ent.spawn()  # type: Player
+                    ent.call(e["pos"])
+
+            elif e["name"] == "player_death":
+                e["author"].spawn()
+
+    def constrain_vector(self, pos: Vector2) -> Vector2:
+        if pos.x < 0:
+            pos.x = 0
+        if pos.y < 0:
+            pos.y = 0
+        if pos.x >= WORLD_DIMENSION["width"]:
+            pos.x = WORLD_DIMENSION["width"] - 0.001
+        if pos.y >= WORLD_DIMENSION["height"]:
+            pos.y = WORLD_DIMENSION["height"] - 0.001
+
 
 def new_game() -> World:
-    from game.carrot import Carrot
     from game.player import Player
-    from pygame.math import Vector2
+    from game.carrot import Carrot
+
     world = World()
     world.player_count = lock_input()
     for i in range(world.player_count):
         world.entities.append(Player(world, i, Vector2(SPAWN_POSITIONS[i])))
 
-    # for i in range(100):
-    #     world.entities.append(Carrot(world, randint(0, 3), Vector2(random()*WORLD_DIMENSION["width"], random() * WORLD_DIMENSION["height"])))
+    for i in range(100):
+        world.entities.append(Carrot(world, randint(0, 3),
+                                     Vector2(random() * WORLD_DIMENSION["width"],
+                                             random() * WORLD_DIMENSION["height"])))
+
     return world
+
+
+if __name__ == "__main__":
+
+    world = World()
+
+    for i in world.tile_radius((0, 0), 4):
+        print(i)

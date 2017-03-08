@@ -1,117 +1,133 @@
-from enum import Enum
-from pygame import *
-import timing
-from timer import gen_timer
-from game.entity import Entity
-from game.world import *
-from game.player import Player
-
+from game.entity import *
 
 class Carrot(Entity):
 
     def __init__(self, world: World, alliance, pos):
         super().__init__(world, alliance, pos)
-        self.state = CarrotState.idle
+
+        self.target = None
+        self.state = None
+        self.go_idle()
 
         self.speed = 3
         self.hp = 20
 
+        self.attack_range = 1.5
+        self.attack_angle = 45
+        self.damage = 20
+
         self.sight_range = 4
         self.player_range = 0.1
-        self.enemy_range = 0.1
+        self.enemy_range = self.attack_range * 0.5
 
-        self.target = self  # type: Entity
-        self.entities_in_sight = []  # type: list[Entity]
+        self.enemies_in_sight = []  # type: list[Entity]
 
         self.look_timer = gen_timer(1)
 
     def update(self, input=None):
+        super().update()
+        if self.hard_lock > 0:
+            return
+
+        if self.target:
+            self.dir = (self.target.pos - self.pos).normalize()
+
+            if issubclass(type(self.target), Entity):
+                if self.target.death_stamp:
+                    self.go_idle()
+
+        # print(self.state)
 
         # seeking
         if self.state is CarrotState.seek_pos or self.state is CarrotState.seek_enemy:
-            dir = self.target.pos - self.pos  # type: math.Vector2
 
-            if dir.length() > 0.1:
-                dir.scale_to_length(self.speed * timing.delta_time)
+            dist = self.target.pos - self.pos  # type: Vector2
 
-                self.set_pos(self.pos + dir)
+            if dist.length_squared() > 0.1**2:
+                dist.scale_to_length(self.speed * delta_time)
 
-        # idle and seek enemy
-        if self.state is CarrotState.idle or self.state is CarrotState.seek_enemy:
+                self.set_pos(self.pos + dist)
+
+        # attack
+        if self.state is CarrotState.attack:
+
+            if self.soft_lock < 0:
+                self.world.events.append({
+                    "name": "attack",
+                    "pos": self.pos,
+                    "dir": self.dir,
+                    "range": self.attack_range,
+                    "angle": self.attack_angle,
+                    "alliance": self.alliance,
+                    "damage": self.damage,
+                    "author": self
+                })
+
+            if self.target.death_stamp:
+                self.state = CarrotState.idle
+
+        # idle and seek enemy and attack
+        if self.state is not CarrotState.seek_pos:
             if next(self.look_timer):
                 self.look_around()
 
-                if self.enemy_nearby():
+                if self.enemies_in_sight:
                     self.target = self.get_nearest_enemy()
-                    if self.target:
-                        self.state = CarrotState.seek_enemy
-
-        # seek enemy
-        if self.state is CarrotState.seek_enemy:
 
             if self.target:
-                if self.target.pos.distance_squared_to(self.pos) <= self.enemy_range:
-                    self.state = CarrotState.idle #### ATTACK
+                if self.target.pos.distance_squared_to(self.pos) <= self.enemy_range**2:
+                    self.state = CarrotState.attack
+                else:
+                    self.state = CarrotState.seek_enemy
             else:
-                self.state = CarrotState.idle
+                self.go_idle()
 
-        elif self.state is CarrotState.seek_pos:
+        #seek pos
+        else:
             if self.target:
                 if self.target.pos.distance_squared_to(self.pos) <= self.player_range:
-                    self.state = CarrotState.idle
+                    self.go_idle()
             else:
-                self.state = CarrotState.idle
+                self.go_idle()
 
-        # attack
-        elif self.state is CarrotState.attack:
-            if not self.target:
-                self.state = CarrotState.idle
+    def go_idle(self):
+        self.target = None
+        self.state = CarrotState.idle
 
     def look_around(self):
-        self.entities_in_sight = []
+        self.enemies_in_sight = []
 
-        my_x = int(self.pos.x)
-        my_y = int(self.pos.y)
+        for t in self.world.tile_radius(self.pos, self.sight_range):
+            if not t:
+                continue
 
-        for x in range(my_x - self.sight_range, my_x + self.sight_range + 1):
-            for y in range(my_y - self.sight_range, my_y + self.sight_range + 1):
-                if x - my_x + y - my_y > self.sight_range:
-                    continue
-
-                if x < 0 or y < 0 or x >= WORLD_DIMENSION["width"] or y >= WORLD_DIMENSION["height"]:
-                    continue
-
-                t = self.world.grid[x][y]
-                self.entities_in_sight.extend(t.entities)
-
-    def enemy_nearby(self):
-        for e in self.entities_in_sight:
-            if (type(e) is Carrot or type(e) is Player) and e.alliance != self.alliance:
-                return True
+            for e in t.entities:
+                if e.alliance != self.alliance:
+                    if e not in self.enemies_in_sight:
+                        self.enemies_in_sight.append(e)
 
     def get_nearest_enemy(self) -> Entity:
-        enemies_in_sight = []
 
-        # get all enemies
-        for e in self.entities_in_sight:
-            if (type(e) is Carrot or type(e) is Player) and e.alliance != self.alliance:
-                enemies_in_sight.append(e)
-
-        if not enemies_in_sight:
+        if not self.enemies_in_sight:
             return None
 
         index = 0
 
-        for i in range(1, len(enemies_in_sight)):
+        for i in range(1, len(self.enemies_in_sight)):
 
-            if enemies_in_sight[i].pos.distance_squared_to(self.pos) < enemies_in_sight[index].pos.distance_squared_to(self.pos):
+            if self.enemies_in_sight[i].pos.distance_squared_to(self.pos) < self.enemies_in_sight[index].pos.distance_squared_to(self.pos):
                 index = i
 
-        return enemies_in_sight[index]
+        return self.enemies_in_sight[index]
 
-    def call(self, target: Entity):
-        self.target = target
+    def call(self, target: Vector2):
+        self.target = TargetPosition(target)
         self.state = CarrotState.seek_pos
+
+
+class TargetPosition:
+     def __init__(self, pos: Vector2):
+        self.pos = pos
 
 
 class CarrotState(Enum):

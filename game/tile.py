@@ -1,16 +1,16 @@
 from enum import Enum
+
+from pygame.math import Vector2
 from timer import gen_timer
-from game.world import World
-from pygame import *
 
 
 class Tile:
-    def __init__(self, world: World, x, y):
+    def __init__(self, worldevents, x, y):
         self.entities = []
         self.state = None  # TileState
         self.render_flags = {}
         self.timer = None
-        self.world = world
+        self.worldevents = worldevents
         self.x = x
         self.y = y
 
@@ -19,9 +19,9 @@ class Tile:
             self.state["g_state"] += 1
 
             if self.state["g_state"] == 5:
-                self.world.events.append({
+                self.worldevents.append({
                     "name": "full_grown",
-                    "pos": math.Vector2(self.x + 0.5, self.y + 0.5),
+                    "pos": Vector2(self.x + 0.5, self.y + 0.5),
                     "type": self.state["seed"],
                     "alliance": self.state["alliance"],
                     "tile": self

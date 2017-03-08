@@ -7,7 +7,7 @@ def gen_timer(time_s):
 
     while True:
         if lastcheck + time_s < now():
-            lastcheck += time_s
+            lastcheck = now()
             yield True
         else:
             yield False
