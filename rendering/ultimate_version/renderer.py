@@ -16,8 +16,18 @@ class UltimateRenderer(AbstractRenderer):
         self.overlay_layer = OverlayLayer(self, arena_subsurface)
         self.entity_layer = EntityLayer(self, arena_subsurface)
 
-        player_ui_suburfaces = []  # TODO: create player_ui_subsurfaces
-        self.ui_layer = UILayer(self, player_ui_suburfaces)
+        ui_x_left = SCREEN_SHAKE_OFFSET[0]
+        ui_x_right = SCREEN_SHAKE_OFFSET[0] + SUB_SURFACE_SIZE[0] + UI_SUBSURFACE_SIZE[0]
+        ui_y_top = SCREEN_SHAKE_OFFSET[1]
+        ui_y_bottom = SCREEN_SHAKE_OFFSET[1] + UI_SUBSURFACE_SIZE[1]
+
+        player_ui_sub_surfaces = [
+            self.main_surface.subsurface((SCREEN_SHAKE_OFFSET, UI_SUBSURFACE_SIZE)),
+            self.main_surface.subsurface(((ui_x_right, ui_y_top), UI_SUBSURFACE_SIZE)),
+            self.main_surface.subsurface(((ui_x_left, ui_y_bottom), UI_SUBSURFACE_SIZE)),
+            self.main_surface.subsurface(((ui_x_right, ui_y_bottom), UI_SUBSURFACE_SIZE))]
+        self.ui_layer = UILayer(self, player_ui_sub_surfaces)
+
         self.screen_shake_current = (0, 0)
 
     def render(self, target: Surface, world: World):
@@ -50,6 +60,7 @@ if __name__ == "__main__":
     pygame_init()
     display = PyGameWindow()
     from game.world import new_game
+
     DEFAULT_RENDERER = UltimateRenderer()
 
     game_world = new_game()
