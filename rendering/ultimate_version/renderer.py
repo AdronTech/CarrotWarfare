@@ -1,25 +1,10 @@
-from pygame import Surface, draw, Rect
-from pygame.gfxdraw import aacircle, aatrigon, filled_circle, filled_trigon
-from rendering.constants import *
-from game.tile import Tile
-from game.entity import Entity
-from game.world import World
-from game.carrot import Carrot
-from game.player import Player
-from rendering.loader import load_all
-
-
-class AbstractRenderer:
-    def render(self, target: Surface, world):
-        pass
+from rendering.abstract_renderer import *
 
 
 class PerfectRenderer(AbstractRenderer):
     def __init__(self):
         load_all()
         self.main_surface = Surface(MAIN_SURFACE_SIZE)
-
-        print("Hello")
 
         # draw 4 zones
         self.main_surface.fill(COLOR_PLAYERS[0], Rect((0, 0),
@@ -31,22 +16,22 @@ class PerfectRenderer(AbstractRenderer):
         self.main_surface.fill(COLOR_PLAYERS[3], Rect((MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2),
                                                       (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
 
-        self.sub_surface = self.main_surface.subsurface(Rect(SUB_SURFACE_POSITION,
-                                                             SUB_SURFACE_SIZE))
+        self.arena_subsurface = self.main_surface.subsurface(Rect(SUB_SURFACE_POSITION,
+                                                                  SUB_SURFACE_SIZE))
         self.ground_surface = Surface(SUB_SURFACE_SIZE)
         self.ground_surface.fill(COLOR_BACKGROUND)
 
         self.screen_shake_current = (0, 0)
 
     def paint_square(self, square: (int, int), player: int):
-        self.sub_surface.fill(COLOR_PLAYERS[player], Rect((square[0] * TILE_SIZE, square[1] * TILE_SIZE),
-                                                          (TILE_SIZE, TILE_SIZE)))
+        self.arena_subsurface.fill(COLOR_PLAYERS[player], Rect((square[0] * TILE_SIZE, square[1] * TILE_SIZE),
+                                                               (TILE_SIZE, TILE_SIZE)))
 
     def render_player(self, player: Player):
         resources = IMAGE_RESOURCE["entities"]["player" + str(player.alliance)]
         image = resources["resource"]
-        self.sub_surface.blit(image,
-                              (int(player.pos.x *
+        self.arena_subsurface.blit(image,
+                                   (int(player.pos.x *
                                    TILE_SIZE + resources["offset"][0]),
                                int(player.pos.y *
                                    TILE_SIZE + resources["offset"][1])))
@@ -56,7 +41,7 @@ class PerfectRenderer(AbstractRenderer):
         #          int(TILE_SIZE / 2), COLOR_PLAYERS[player.alliance])
 
     def render_carrot(self, carrot: Carrot):
-        filled_trigon(self.sub_surface,
+        filled_trigon(self.arena_subsurface,
                       int(carrot.pos.x * TILE_SIZE),
                       int(carrot.pos.y * TILE_SIZE),
                       int((carrot.pos.x + 0.3) * TILE_SIZE),
@@ -64,7 +49,7 @@ class PerfectRenderer(AbstractRenderer):
                       int((carrot.pos.x - 0.3) * TILE_SIZE),
                       int((carrot.pos.y - 1) * TILE_SIZE),
                       COLOR_PLAYERS[carrot.alliance])
-        aatrigon(self.sub_surface,
+        aatrigon(self.arena_subsurface,
                  int(carrot.pos.x * TILE_SIZE),
                  int(carrot.pos.y * TILE_SIZE),
                  int((carrot.pos.x + 0.3) * TILE_SIZE),
@@ -80,20 +65,24 @@ class PerfectRenderer(AbstractRenderer):
     #     pass
 
     def render(self, target: Surface, world: World):
-        self.sub_surface.blit(self.ground_surface, (0, 0))
+        self.arena_subsurface.blit(self.ground_surface, (0, 0))
 
+        # for every horizontal line
         for y in range(WORLD_DIMENSION["height"]):
 
+            # get all items in tile
             def extract_from_tile(tile: Tile, tx, ty):
-                for entity in tile.entities:
-                    yield entity
+                for e in tile.entities:
+                    yield e
                 if "environment" in tile.render_flags:
                     for env_object in tile.render_flags["environment"]:
                         yield env_object, tx, ty
 
+            # generate rows
             row = [e for x in range(WORLD_DIMENSION["width"])
                    for e in extract_from_tile(world.grid[x][y], x, y)]  # type: list[Entity]
 
+            # depth sort
             def depth_sort(e):
                 if issubclass(type(e), Entity):
                     return e.pos.y
@@ -101,62 +90,69 @@ class PerfectRenderer(AbstractRenderer):
                     return e[2] + 0.5
 
             row = sorted(row, key=depth_sort)
+
+            # draw
             for entity in row:
                 e_type = type(entity)
                 if e_type is Player:
                     self.render_player(entity)
                 elif e_type is Carrot:
                     self.render_carrot(entity)
-                # else:
-                #     surf, x, y = entity
-                #     self.sub_surface.blit(surf, (int(x * TILE_SIZE - surf.get_width() / 2),
-                #                                  int((y + 0.5) * TILE_SIZE - surf.get_height())))
+                else:
+                    surf, x, y = entity
+                    self.arena_subsurface.blit(surf, (int(x * TILE_SIZE - surf.get_width() / 2),
+                                                      int((y + 0.5) * TILE_SIZE - surf.get_height())))
 
+        # blit final image
         x = SCREEN_SHAKE_OFFSET[0] * (1 + self.screen_shake_current[0])
         y = SCREEN_SHAKE_OFFSET[1] * (1 + self.screen_shake_current[1])
         target.blit(self.main_surface, (0, 0), Rect((x, y), DISPLAY_RESOLUTION))
 
 
 if __name__ == "__main__":
-    from pygame import init as pygame_init
     from pygame import event as pygame_events
     from pygame.time import Clock
-    from timing import redraw_counter, updates_per_sec
-    from display import PyGameWindow
-    from pygame.display import set_mode
+    from timing import redraw_counter
     from pygame.locals import *
-    from random import randint, random
+    from game.world import new_game
+    from pygame import init as pygame_init
+    from pygame import event as pygame_events
+    from display import PyGameWindow
+    from timing import *
+    from random import random, randint
 
-    pygame_init()
-    screen = PyGameWindow()
-    set_mode(DISPLAY_RESOLUTION, RESIZABLE)
-
-    DEFAULT_RENDERER = PerfectRenderer()
-
-    game_world = World()
+    game_world = new_game()
 
     # main loop
     clock = Clock()
+    pygame_init()
+    display = PyGameWindow()
+    from game.world import new_game
+    DEFAULT_RENDERER = PerfectRenderer()
+
+    game_world = new_game()
+
+    # main loop
+    last_update = now()
     while True:
+
         # event
         for e in pygame_events.get():
             if e.type is QUIT:
                 quit()
-            if e.type is VIDEORESIZE:
-                DISPLAY_RESOLUTION = e.size
-
-        print(DISPLAY_RESOLUTION)
-
         pygame_events.pump()
-        # update
-        game_world.update()
-        # render
-        next(redraw_counter)
 
-        DEFAULT_RENDERER.paint_square((randint(0, 19), randint(0, 19)), randint(0, 3))
-        DEFAULT_RENDERER.screen_shake_current = (random() * 2 - 1, random() * 2 - 1)
-        DEFAULT_RENDERER.render(screen.render_target, game_world)
+        if now() >= last_update + update_delay:
+            # update timing
+            next(update_counter)
+            last_update += update_delay
+            game_world.update()
+        else:
+            # update timing
+            next(redraw_counter)
+            DEFAULT_RENDERER.render(display.render_target, game_world)
+            display.flip()
 
-        # draw
-        screen.flip()
-        clock.tick(updates_per_sec)
+            DEFAULT_RENDERER.paint_square((randint(0, 19), randint(0, 19)), randint(0, 3))
+            # 1DEFAULT_RENDERER.screen_shake_current = (random() * 2 - 1, random() * 2 - 1)
+            DEFAULT_RENDERER.render(display.render_target, game_world)

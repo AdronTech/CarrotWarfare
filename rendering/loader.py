@@ -14,16 +14,18 @@ def load(path: str) -> Surface:
     return img
 
 
-def load_all():
-    for block in IMAGE_RESOURCE.keys():
-        block_cache = IMAGE_RESOURCE[block]
-        for key in block_cache.keys():
-            block_cache[key]["resource"] = load("playerTest")  # load(key)
-            if block == "entities":
-                ratio = block_cache[key]["resource"].get_width() / float(block_cache[key]["resource"].get_height())
-                block_cache[key]["scale"] = (int(TILE_SIZE * ratio), int(TILE_SIZE))
+def put_values_for_entity(block: dict):
+    block["resource"] = load(block["name"])
+    ratio = block["resource"].get_width() / float(block["resource"].get_height())
+    block["scale"] = (int(TILE_SIZE * ratio), int(TILE_SIZE))
+    block["offset"] = (block["scale"][0] / -2,
+                       block["scale"][1] * -1)
+    block["resource"] = transform.scale(block["resource"],
+                                        block["scale"])
 
-                block_cache[key]["offset"] = (block_cache[key]["scale"][0] / -2,
-                                              block_cache[key]["scale"][1] * -1)
-                block_cache[key]["resource"] = transform.scale(block_cache[key]["resource"],
-                                                               block_cache[key]["scale"])
+
+def load_all():
+    put_values_for_entity(IMAGE_RESOURCE["entities"]["player0"])
+    put_values_for_entity(IMAGE_RESOURCE["entities"]["player1"])
+    put_values_for_entity(IMAGE_RESOURCE["entities"]["player2"])
+    put_values_for_entity(IMAGE_RESOURCE["entities"]["player3"])

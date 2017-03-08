@@ -24,10 +24,18 @@ SUB_SURFACE_POSITION = (SUB_SURFACE_BORDER[0] + SCREEN_SHAKE_OFFSET[0],
 
 IMAGE_RESOURCE = {
     "entities": {
-        "player0": {},
-        "player1": {},
-        "player2": {},
-        "player3": {},
+        "player0": {
+            "name": "player0"
+        },
+        "player1": {
+            "name": "player1"
+        },
+        "player2": {
+            "name": "player2"
+        },
+        "player3": {
+            "name": "player3"
+        },
 
         "carrot0": {},
         "carrot1": {},
