@@ -86,6 +86,6 @@ if __name__ == "__main__":
             DEFAULT_RENDERER.render(display.render_target, game_world)
             display.flip()
 
-            DEFAULT_RENDERER.paint_square((randint(0, 19), randint(0, 19)), randint(0, 3))
+            # DEFAULT_RENDERER.paint_square((randint(0, 19), randint(0, 19)), randint(0, 3))
             # 1DEFAULT_RENDERER.screen_shake_current = (random() * 2 - 1, random() * 2 - 1)
             DEFAULT_RENDERER.render(display.render_target, game_world)
