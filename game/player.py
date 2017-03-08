@@ -159,6 +159,14 @@ class Player(Entity):
             "author": self
         })
 
+    def pickup(self, seed_mode: SeedType):
+        self.seeds[seed_mode] += 1
+        # log
+        self.events.append({
+            "name": "pick_up",
+            "seed": seed_mode
+        })
+
 
 if __name__ == "__main__":
     world = World()
