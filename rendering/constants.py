@@ -22,6 +22,19 @@ SUB_SURFACE_BORDER = ((DISPLAY_RESOLUTION[0] - SUB_SURFACE_SIZE[0]) / 2,
 SUB_SURFACE_POSITION = (SUB_SURFACE_BORDER[0] + SCREEN_SHAKE_OFFSET[0],
                         SUB_SURFACE_BORDER[1] + SCREEN_SHAKE_OFFSET[1])
 
+def get_ultimate_surface():
+    from pygame import Surface
+    srf = Surface(MAIN_SURFACE_SIZE)
+    srf.fill(COLOR_PLAYERS[0], ((0, 0),
+                                (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
+    srf.fill(COLOR_PLAYERS[1], ((MAIN_SURFACE_SIZE[0] / 2, 0),
+                                (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
+    srf.fill(COLOR_PLAYERS[2], ((0, MAIN_SURFACE_SIZE[1] / 2),
+                                (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
+    srf.fill(COLOR_PLAYERS[3], ((MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2),
+                                (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
+    return srf
+
 IMAGE_RESOURCE = {
     "entities": {
         "player0": {

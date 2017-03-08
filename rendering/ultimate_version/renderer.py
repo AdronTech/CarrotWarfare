@@ -1,108 +1,30 @@
 from rendering.abstract_renderer import *
 
 
-class PerfectRenderer(AbstractRenderer):
+class UltimateRenderer(AbstractRenderer):
     def __init__(self):
         load_all()
-        self.main_surface = Surface(MAIN_SURFACE_SIZE)
+        self.main_surface = get_ultimate_surface()
 
-        # draw 4 zones
-        self.main_surface.fill(COLOR_PLAYERS[0], Rect((0, 0),
-                                                      (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
-        self.main_surface.fill(COLOR_PLAYERS[1], Rect((MAIN_SURFACE_SIZE[0] / 2, 0),
-                                                      (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
-        self.main_surface.fill(COLOR_PLAYERS[2], Rect((0, MAIN_SURFACE_SIZE[1] / 2),
-                                                      (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
-        self.main_surface.fill(COLOR_PLAYERS[3], Rect((MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2),
-                                                      (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
+        from rendering.ultimate_version.ground_layer import GroundLayer
+        from rendering.ultimate_version.overlay_layer import OverlayLayer
+        from rendering.ultimate_version.entity_layer import EntityLayer
+        from rendering.ultimate_version.ui_layer import UILayer
 
-        self.arena_subsurface = self.main_surface.subsurface(Rect(SUB_SURFACE_POSITION,
-                                                                  SUB_SURFACE_SIZE))
-        self.ground_surface = Surface(SUB_SURFACE_SIZE)
-        self.ground_surface.fill(COLOR_BACKGROUND)
+        arena_subsurface = self.main_surface.subsurface(Rect(SUB_SURFACE_POSITION, SUB_SURFACE_SIZE))
+        self.ground_layer = GroundLayer(self, arena_subsurface)
+        self.overlay_layer = OverlayLayer(self, arena_subsurface)
+        self.entity_layer = EntityLayer(self, arena_subsurface)
 
+        player_ui_suburfaces = []  # TODO: create player_ui_subsurfaces
+        self.ui_layer = UILayer(self, player_ui_suburfaces)
         self.screen_shake_current = (0, 0)
 
-    def paint_square(self, square: (int, int), player: int):
-        self.arena_subsurface.fill(COLOR_PLAYERS[player], Rect((square[0] * TILE_SIZE, square[1] * TILE_SIZE),
-                                                               (TILE_SIZE, TILE_SIZE)))
-
-    def render_player(self, player: Player):
-        resources = IMAGE_RESOURCE["entities"]["player" + str(player.alliance)]
-        image = resources["resource"]
-        self.arena_subsurface.blit(image,
-                                   (int(player.pos.x *
-                                   TILE_SIZE + resources["offset"][0]),
-                               int(player.pos.y *
-                                   TILE_SIZE + resources["offset"][1])))
-        # filled_circle(self.sub_surface, int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE),
-        #               int(TILE_SIZE / 2), COLOR_PLAYERS[player.alliance])
-        # aacircle(self.sub_surface, int(player.pos.x * TILE_SIZE), int(player.pos.y * TILE_SIZE),
-        #          int(TILE_SIZE / 2), COLOR_PLAYERS[player.alliance])
-
-    def render_carrot(self, carrot: Carrot):
-        filled_trigon(self.arena_subsurface,
-                      int(carrot.pos.x * TILE_SIZE),
-                      int(carrot.pos.y * TILE_SIZE),
-                      int((carrot.pos.x + 0.3) * TILE_SIZE),
-                      int((carrot.pos.y - 1) * TILE_SIZE),
-                      int((carrot.pos.x - 0.3) * TILE_SIZE),
-                      int((carrot.pos.y - 1) * TILE_SIZE),
-                      COLOR_PLAYERS[carrot.alliance])
-        aatrigon(self.arena_subsurface,
-                 int(carrot.pos.x * TILE_SIZE),
-                 int(carrot.pos.y * TILE_SIZE),
-                 int((carrot.pos.x + 0.3) * TILE_SIZE),
-                 int((carrot.pos.y - 1) * TILE_SIZE),
-                 int((carrot.pos.x - 0.3) * TILE_SIZE),
-                 int((carrot.pos.y - 1) * TILE_SIZE),
-                 COLOR_PLAYERS[carrot.alliance])
-
-    # def render_plant_melee(self, plant: PlantMelee):
-    #     pass
-
-    # def render_plant_ranged(self, plant: PlantRanged):
-    #     pass
-
     def render(self, target: Surface, world: World):
-        self.arena_subsurface.blit(self.ground_surface, (0, 0))
-
-        # for every horizontal line
-        for y in range(WORLD_DIMENSION["height"]):
-
-            # get all items in tile
-            def extract_from_tile(tile: Tile, tx, ty):
-                for e in tile.entities:
-                    yield e
-                if "environment" in tile.render_flags:
-                    for env_object in tile.render_flags["environment"]:
-                        yield env_object, tx, ty
-
-            # generate rows
-            row = [e for x in range(WORLD_DIMENSION["width"])
-                   for e in extract_from_tile(world.grid[x][y], x, y)]  # type: list[Entity]
-
-            # depth sort
-            def depth_sort(e):
-                if issubclass(type(e), Entity):
-                    return e.pos.y
-                else:
-                    return e[2] + 0.5
-
-            row = sorted(row, key=depth_sort)
-
-            # draw
-            for entity in row:
-                e_type = type(entity)
-                if e_type is Player:
-                    self.render_player(entity)
-                elif e_type is Carrot:
-                    self.render_carrot(entity)
-                else:
-                    surf, x, y = entity
-                    self.arena_subsurface.blit(surf, (int(x * TILE_SIZE - surf.get_width() / 2),
-                                                      int((y + 0.5) * TILE_SIZE - surf.get_height())))
-
+        self.ground_layer.render(world)
+        self.overlay_layer.render(world)
+        self.entity_layer.render(world)
+        self.ui_layer.render(world)
         # blit final image
         x = SCREEN_SHAKE_OFFSET[0] * (1 + self.screen_shake_current[0])
         y = SCREEN_SHAKE_OFFSET[1] * (1 + self.screen_shake_current[1])
@@ -128,7 +50,7 @@ if __name__ == "__main__":
     pygame_init()
     display = PyGameWindow()
     from game.world import new_game
-    DEFAULT_RENDERER = PerfectRenderer()
+    DEFAULT_RENDERER = UltimateRenderer()
 
     game_world = new_game()
 
