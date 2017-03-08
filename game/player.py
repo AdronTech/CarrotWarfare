@@ -1,7 +1,7 @@
 from game.entity import *
 
 
-class SeedMode(Enum):
+class SeedType(Enum):
     melee = 0
     ranged = 1
 
@@ -10,11 +10,11 @@ class Player(Entity):
     def __init__(self, world: World, alliance, spawn: Vector2):
         super().__init__(world, alliance)
 
-        self.seed_mode = SeedMode.melee  # type: SeedMode
+        self.seed_mode = SeedType.melee  # type: SeedType
 
-        self.seeds = [0 for i in range(len(list(SeedMode)))]
-        self.seeds[SeedMode.melee.value] = 200
-        self.seeds[SeedMode.ranged.value] = 200
+        self.seeds = [0 for i in range(len(list(SeedType)))]
+        self.seeds[SeedType.melee.value] = 200
+        self.seeds[SeedType.ranged.value] = 200
 
         self.attack_range = 1.5
         self.attack_angle = 90
@@ -132,11 +132,11 @@ class Player(Entity):
 
         next = self.seed_mode.value
         while True:
-            next = (next + 1) % len(list(SeedMode))
+            next = (next + 1) % len(list(SeedType))
             if next == self.seed_mode.value or self.seeds[next] != 0:
                 break
 
-        self.seed_mode = SeedMode(next)
+        self.seed_mode = SeedType(next)
 
         # log
         self.events.append({
@@ -145,7 +145,7 @@ class Player(Entity):
             "amount": self.get_seeds()
         })
 
-    def get_seeds(self, type: SeedMode = None):
+    def get_seeds(self, type: SeedType = None):
         if not type:
             type = self.seed_mode
 
@@ -157,6 +157,14 @@ class Player(Entity):
             "alliance": self.alliance,
             "stamp": self.death_stamp,
             "author": self
+        })
+
+    def pickup(self, seed_mode: SeedType):
+        self.seeds[seed_mode] += 1
+        # log
+        self.events.append({
+            "name": "pick_up",
+            "seed": seed_mode
         })
 
 
