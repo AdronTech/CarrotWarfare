@@ -41,6 +41,7 @@ class UltimateRenderer(AbstractRenderer):
         # blit final image
         shake_off = self.screen_shake.get_shake()
         target.blit(self.main_surface, (0, 0), (shake_off, DISPLAY_RESOLUTION))
+        world.events.clear()
 
 
 if __name__ == "__main__":
