@@ -1,4 +1,5 @@
 from rendering.abstract_renderer import *
+from rendering.ultimate_version.screen_shake import *
 
 
 class UltimateRenderer(AbstractRenderer):
@@ -27,8 +28,7 @@ class UltimateRenderer(AbstractRenderer):
             self.main_surface.subsurface(((ui_x_left, ui_y_bottom), UI_SUBSURFACE_SIZE)),
             self.main_surface.subsurface(((ui_x_right, ui_y_bottom), UI_SUBSURFACE_SIZE))]
         self.ui_layer = UILayer(self, player_ui_sub_surfaces)
-
-        self.screen_shake_current = (0, 0)
+        self.screen_shake = ScreenShaker(SCREEN_SHAKE_OFFSET)
 
     def render(self, target: Surface, world: World):
         self.ground_layer.render(world)
@@ -36,9 +36,8 @@ class UltimateRenderer(AbstractRenderer):
         self.entity_layer.render(world)
         self.ui_layer.render(world)
         # blit final image
-        x = SCREEN_SHAKE_OFFSET[0] * (1 + self.screen_shake_current[0])
-        y = SCREEN_SHAKE_OFFSET[1] * (1 + self.screen_shake_current[1])
-        target.blit(self.main_surface, (0, 0), Rect((x, y), DISPLAY_RESOLUTION))
+        shake_off = self.screen_shake.get_shake()
+        target.blit(self.main_surface, (0, 0), (shake_off, DISPLAY_RESOLUTION))
 
 
 if __name__ == "__main__":
@@ -62,7 +61,7 @@ if __name__ == "__main__":
     from game.world import new_game
 
     DEFAULT_RENDERER = UltimateRenderer()
-
+    DEFAULT_RENDERER.screen_shake.impulse(1)
     game_world = new_game()
 
     # main loop
