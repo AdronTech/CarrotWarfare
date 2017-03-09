@@ -39,7 +39,7 @@ class EntityLayer:
                 elif e_type is Carrot:
                     self.render_carrot(entity)
                 elif e_type is Sprout:
-                    pass
+                    self.render_sprout(entity)
                 elif e_type is Bullet:
                     pass
                 else:
@@ -48,8 +48,6 @@ class EntityLayer:
                                                       int((y + 0.5) * TILE_SIZE - surf.get_height())))
 
     def render_player(self, player: Player):
-        # TODO handle player events
-
         events = []
         for e in player.events:
             if e["name"] == "death":
@@ -105,16 +103,97 @@ class EntityLayer:
                                         TILE_SIZE + resources["player_generic"]["offset"][1])))
 
     def render_carrot(self, carrot: Carrot):
-        # TODO handle carrot events
+        events = []
+        for e in carrot.events:
+            if e["name"] == "death":
+                events.append("death")
+            elif e["name"] == "attack":
+                events.append("attack")
+            elif e["name"] == "move":
+                events.append("move")
 
+        if "death" in events:
+            if "animator" in carrot.render_flags:
+                carrot.render_flags["animator"].set_animation("state_die")
+            else:
+                carrot.render_flags["animator"] = EntityAnimator(carrot, "state_die")
+        if "attack" in events:
+            if "animator" in carrot.render_flags:
+                carrot.render_flags["animator"].set_animation("state_attack")
+            else:
+                carrot.render_flags["animator"] = EntityAnimator(carrot, "state_attack")
+        if "move" in events:
+            if "animator" in carrot.render_flags:
+                carrot.render_flags["animator"].set_animation("state_walk", 500, 0)
+            else:
+                carrot.render_flags["animator"] = EntityAnimator(carrot, "state_walk", 500, 0)
+
+        image = None
         resources = IMAGE_RESOURCE["entities"]
-        if carrot.dir.x < 0:
-            image = resources["carrot" + str(carrot.alliance)]["state_stand"]["left"]["frame0"]
-        else:
-            image = resources["carrot" + str(carrot.alliance)]["state_stand"]["right"]["frame0"]
+        if "animator" in carrot.render_flags:
+            if carrot.dir.x < 0:
+                image = carrot.render_flags["animator"].get_frame(True)
+            else:
+                image = carrot.render_flags["animator"].get_frame(False)
+            if not image:
+                del carrot.render_flags["animator"]
+        if not image:
+            if carrot.dir.x < 0:
+                image = resources["carrot" + str(carrot.alliance)]["state_stand"]["left"]["frame0"]
+            else:
+                image = resources["carrot" + str(carrot.alliance)]["state_stand"]["right"]["frame0"]
 
         self.arena_subsurface.blit(image,
                                    (int(carrot.pos.x *
                                         TILE_SIZE + resources["carrot_generic"]["offset"][0]),
                                     int(carrot.pos.y *
                                         TILE_SIZE + resources["carrot_generic"]["offset"][1])))
+        
+    def render_sprout(self, sprout:Sprout):
+        events = []
+        for e in sprout.events:
+            if e["name"] == "death":
+                events.append("death")
+            elif e["name"] == "attack":
+                events.append("attack")
+            elif e["name"] == "move":
+                events.append("move")
+
+        if "death" in events:
+            if "animator" in sprout.render_flags:
+                sprout.render_flags["animator"].set_animation("state_die")
+            else:
+                sprout.render_flags["animator"] = EntityAnimator(sprout, "state_die")
+        if "attack" in events:
+            if "animator" in sprout.render_flags:
+                sprout.render_flags["animator"].set_animation("state_attack")
+            else:
+                sprout.render_flags["animator"] = EntityAnimator(sprout, "state_attack")
+        if "move" in events:
+            if "animator" in sprout.render_flags:
+                sprout.render_flags["animator"].set_animation("state_walk", 500, 0)
+            else:
+                sprout.render_flags["animator"] = EntityAnimator(sprout, "state_walk", 500, 0)
+
+        image = None
+        resources = IMAGE_RESOURCE["entities"]
+        if "animator" in sprout.render_flags:
+            if sprout.dir.x < 0:
+                image = sprout.render_flags["animator"].get_frame(True)
+            else:
+                image = sprout.render_flags["animator"].get_frame(False)
+            if not image:
+                del sprout.render_flags["animator"]
+        if not image:
+            if sprout.dir.x < 0:
+                image = resources["sprout" + str(sprout.alliance)]["state_stand"]["left"]["frame0"]
+            else:
+                image = resources["sprout" + str(sprout.alliance)]["state_stand"]["right"]["frame0"]
+
+        self.arena_subsurface.blit(image,
+                                   (int(sprout.pos.x *
+                                        TILE_SIZE + resources["sprout_generic"]["offset"][0]),
+                                    int(sprout.pos.y *
+                                        TILE_SIZE + resources["sprout_generic"]["offset"][1])))
+            
+
