@@ -63,6 +63,10 @@ class Sprout(Entity):
                 des_vel.scale_to_length(self.speed)
                 self.vel = des_vel
 
+                self.events.append({
+                    "name": "move"
+                })
+
             self.set_pos(self.pos + self.vel * delta_time)
 
         # wait
@@ -95,6 +99,10 @@ class Sprout(Entity):
                         "dir": self.dir,
                         "alliance": self.alliance,
                         "author": self
+                    })
+
+                    self.events.append({
+                        "name": "attack"
                     })
 
                     self.soft_lock = 1

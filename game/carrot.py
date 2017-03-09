@@ -74,12 +74,20 @@ class Carrot(Entity):
                 des_vel.scale_to_length(self.speed)
                 self.vel = des_vel
 
+                self.events.append({
+                    "name": "move"
+                })
+
             self.set_pos(self.pos + self.vel * delta_time)
 
         # attack
         if self.state is CarrotState.attack:
 
             if self.soft_lock < 0:
+                self.events.append({
+                    "name": "attack"
+                })
+
                 self.world.events.append({
                     "name": "attack",
                     "pos": self.pos,
