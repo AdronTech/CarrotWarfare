@@ -48,7 +48,7 @@ class EntityLayer:
     def render_player(self, player: Player):
         # TODO handle player events
         resources = IMAGE_RESOURCE["entities"]["player" + str(player.alliance)]
-        image = resources["resource"]
+        image = resources["state_stand"]["frame0"]
         self.arena_subsurface.blit(image,
                                    (int(player.pos.x *
                                         TILE_SIZE + resources["offset"][0]),
