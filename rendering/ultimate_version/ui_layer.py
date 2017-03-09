@@ -33,7 +33,7 @@ class UILayer:
                 else:
                     self.hp_show[i] = player.hp
                 self.hp_fill(i, self.hp_show[i])
-                # self.draw_hud(i, world.players[i])
+                self.draw_hud(i, world.players[i])
             else:
                 self.hp_fill(i, 0)
 
@@ -60,9 +60,5 @@ class UILayer:
         y_upper = y_lower+h_lower
         h_upper = h-h_lower
         r_upper = (x, y_upper), (w, h_upper)
-        print(h, h_lower, h_upper)
-
-        self.main_surface.fill(color=c_lower,
-                    rect=r_lower)
-        self.main_surface.fill(color=c_upper,
-                    rect=r_upper)
+        self.main_surface.fill(color=c_lower, rect=r_lower)
+        self.main_surface.fill(color=c_upper, rect=r_upper)

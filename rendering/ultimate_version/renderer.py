@@ -58,25 +58,16 @@ if __name__ == "__main__":
     from display import PyGameWindow
     from timing import *
     from random import random, randint
-
-    from xinput import Gamepad
-
-    pad = Gamepad.gamepad_0
-
     game_world = new_game()
-
     # main loop
     clock = Clock()
     pygame_init()
     display = PyGameWindow()
     from game.world import new_game
-
     DEFAULT_RENDERER = UltimateRenderer()
     DEFAULT_RENDERER.screen_shake.impulse(1)
     game_world = new_game()
-
     Debug.gen_debug_surface(DEFAULT_RENDERER.arena_surface)
-
     # main loop
     last_update = now()
     while True:
@@ -93,18 +84,8 @@ if __name__ == "__main__":
             last_update += update_delay
             Debug.clear()
             game_world.update()
-            if pad.input_state["button_y"]:
-                DEFAULT_RENDERER.screen_shake.impulse(1)
-            if pad.input_state["button_b"]:
-                DEFAULT_RENDERER.screen_shake.impulse(0.5)
-            if pad.input_state["button_a"]:
-                DEFAULT_RENDERER.screen_shake.impulse(0.1)
         else:
             # update timing
             next(redraw_counter)
             DEFAULT_RENDERER.render(display.render_target, game_world)
             display.flip()
-
-            # DEFAULT_RENDERER.paint_square((randint(0, 19), randint(0, 19)), randint(0, 3))
-            # 1DEFAULT_RENDERER.screen_shake_current = (random() * 2 - 1, random() * 2 - 1)
-            # DEFAULT_RENDERER.render(display.render_target, game_world)
