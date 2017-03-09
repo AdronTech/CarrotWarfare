@@ -5,12 +5,11 @@ from rendering.constants import IMAGE_RESOURCE
 
 class EntityAnimator:
     # loops if duration == 0
-    def __init__(self, entity, current_animation="state_stand", frame_duration=125, duration=500):
+    def __init__(self, entity, current_animation="state_stand", frame_duration=125, loop=False):
 
+        self.player = None
         self.state = current_animation
-        self.duration = duration
-        self.done = False
-        self.loop = duration == 0
+        self.loop = loop
         self.frame_duration = frame_duration
         self.start = now()
 
@@ -43,9 +42,6 @@ class EntityAnimator:
             self.player.soft_lock = IMAGE_RESOURCE["entities"][self.name][current_animation]["soft_lock"]
 
     def get_frame(self, looking_left: bool):
-        if (not self.loop) and (now() - self.start > self.duration):
-            return None
-
         if self.state == "state_stand":
             return IMAGE_RESOURCE["entities"][self.name][self.state]["frame0"]
 
@@ -54,11 +50,15 @@ class EntityAnimator:
         else:
             dir = "right"
 
-        index = int((now() - self.start) / self.frame_duration) % 4
+        index = int((now() - self.start) / self.frame_duration)
+        if (not self.loop) and index > 3:
+            return None
+
+        index = index % 4
         frame = IMAGE_RESOURCE["entities"][self.name][self.state][dir]["frame" + str(index)]
         return frame
 
-    def set_animation(self, current_animation="state_stand", frame_duration=125, duration=500):
+    def set_animation(self, current_animation="state_stand", frame_duration=125, loop=False):
 
         if current_animation == "state_plant" and self.player:
             self.state = "state_stand"
@@ -82,8 +82,6 @@ class EntityAnimator:
                 self.player.soft_lock = IMAGE_RESOURCE["entities"][self.name][current_animation]["soft_lock"]
             self.priority = priority
             self.state = current_animation
-            self.duration = duration
-            self.done = False
-            self.loop = duration == 0
+            self.loop = loop
             self.frame_duration = frame_duration
             self.start = now()

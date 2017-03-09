@@ -29,23 +29,26 @@ class GroundLayer:
                 return True
         return False
 
-    def splatter(self, alliance: int, pos: (int, int)):
+    def splatter(self, entity: Entity, pos: (int, int)):
 
         count = 3
         for i in range(count):
-            radius = int(random() * 2 * TILE_SIZE)
-            x = int((pos[0] + random()) * TILE_SIZE)
-            y = int((pos[1] + random()) * TILE_SIZE)
-            aacircle(self.ground_surface, x, y, radius, COLOR_PLAYERS_LIGHT[alliance])
-            filled_circle(self.ground_surface, x, y, radius, COLOR_PLAYERS_LIGHT[alliance])
-            aacircle(self.buffer_surface, x, y, radius, COLOR_PLAYERS_LIGHT[alliance])
-            filled_circle(self.buffer_surface, x, y, radius, COLOR_PLAYERS_LIGHT[alliance])
+            if issubclass(type(entity), Bullet):
+                radius = int(random() * TILE_SIZE)
+            else:
+                radius = int(random() * TILE_SIZE + TILE_SIZE / 2)
+            x = int((pos[0] + random() * 2) * TILE_SIZE)
+            y = int((pos[1] + random() * 2) * TILE_SIZE)
+            aacircle(self.ground_surface, x, y, radius, COLOR_PLAYERS_LIGHT[entity.alliance])
+            filled_circle(self.ground_surface, x, y, radius, COLOR_PLAYERS_LIGHT[entity.alliance])
+            aacircle(self.buffer_surface, x, y, radius, COLOR_PLAYERS_LIGHT[entity.alliance])
+            filled_circle(self.buffer_surface, x, y, radius, COLOR_PLAYERS_LIGHT[entity.alliance])
 
     def render(self, world: World):
         for e in world.events:
             if not "rendered" in e:
                 if e["name"] == "death":
-                    self.parent_renderer.ground_layer.splatter(e["author"].alliance, e["author"].pos)
+                    self.parent_renderer.ground_layer.splatter(e["author"], e["author"].pos)
                 if e["name"] == "plant_request":
                     if "allowed" in e:
                         if not self.buffer_contains(e["tile"]):
