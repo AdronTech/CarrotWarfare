@@ -1,4 +1,5 @@
 from game.world import *
+from game.bounding_box import BoundingBox, collision
 
 
 class Entity:
@@ -16,11 +17,15 @@ class Entity:
         self.soft_lock = 0
         self.hard_lock = 0
 
+        self.bb = BoundingBox(self.pos, Vector2(0.999, 0.999))
+
         self.register()
 
     def update(self, input=None):
         self.soft_lock -= delta_time
         self.hard_lock -= delta_time
+
+        Debug.rect((0, 0, 0, 100), ((self.bb.left(), self.bb.top()), self.bb.dim))
 
     def set_pos(self, pos: Vector2):
 
@@ -28,6 +33,7 @@ class Entity:
         self.unregister()
 
         self.pos = pos
+        self.bb.pos = pos
 
         # constrain
         self.world.constrain_vector(pos)
@@ -40,9 +46,19 @@ class Entity:
         t = self.world.get_tile(self.pos)   # type: Tile
         t.register(self)
 
+        for p in self.bb.get_int():
+            t = self.world.get_tile(p)  # type: Tile
+            if t:
+                t.reg_coll(self)
+
     def unregister(self):
         t = self.world.get_tile(self.pos)  # type: Tile
         t.unregister(self)
+
+        for p in self.bb.get_int():
+            t = self.world.get_tile(p)  # type: Tile
+            if t:
+                t.unreg_coll(self)
 
     def hit(self, damage):
         self.hp -= damage

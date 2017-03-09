@@ -7,6 +7,7 @@ from timer import gen_timer
 class Tile:
     def __init__(self, worldevents, x, y):
         self.entities = []
+        self.collider = []
         self.state = None  # TileState
         self.render_flags = {}
         self.timer = None
@@ -29,7 +30,8 @@ class Tile:
                 self.state = None
 
     def register(self, entity):
-        self.entities.append(entity)
+        if entity not in self.entities:
+            self.entities.append(entity)
 
         from game.player import Player
         if type(entity) is Player:
@@ -47,6 +49,14 @@ class Tile:
     def unregister(self, entity):
         if entity in self.entities:
             self.entities.remove(entity)
+
+    def reg_coll(self, entity):
+        if entity not in self.collider:
+            self.collider.append(entity)
+
+    def unreg_coll(self, entity):
+        if entity in self.collider:
+            self.collider.remove(entity)
 
     def block(self, entity):
         self.state = {"name": TileState.blocked,

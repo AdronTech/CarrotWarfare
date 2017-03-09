@@ -22,7 +22,9 @@ class Sprout(Entity):
 
         self.look_timer = gen_timer(0.5)
 
-        self.arrival_radius = 2
+        self.pos_range = 0.1
+
+        self.wait_timer = 0
 
         self.vel = Vector2()
 
@@ -31,7 +33,7 @@ class Sprout(Entity):
         if self.hard_lock > 0:
             return
 
-        Debug.line(Color("black"), self.pos, self.pos + self.vel)
+        # Debug.line(Color("black"), self.pos, self.pos + self.vel)
         # for coord in self.world.radius_gen(self.pos, self.sight_range):
         #     t = self.world.get_tile(coord)  # type: Tile
         #     if t:
@@ -60,6 +62,23 @@ class Sprout(Entity):
                 des_vel.scale_to_length(self.speed)
                 self.vel = des_vel
 
+            self.set_pos(self.pos + self.vel * delta_time)
+
+        # wait
+        if self.state is SproutState.wait:
+            if self.wait_timer >= 0:
+                self.wait_timer -= delta_time
+
+                if self.wait_timer <= 0:
+                    for delta in self.world.spiral_gen():
+                        if abs(int(delta.x)) + abs(int(delta.y)) > self.sight_range:
+                            self.go_wait(1)
+                            break
+
+                        t = self.world.get_tile(self.pos + delta)
+                        if t and not t.state:
+                            self.call(self.pos + delta)
+                            break
 
         # attack
         if self.state is SproutState.attack:
@@ -69,8 +88,8 @@ class Sprout(Entity):
                 shoot_dir = self.target.pos - self.pos  # type: Vector2
 
                 if self.dir.angle_to(shoot_dir) <= self.attack_angle / 2:
-                    # TODO: shoot
                     pass
+                    # TODO: shoot
 
             dx, dy = (self.world.int_vec(self.pos) - self.world.int_vec(self.target.pos))
 
@@ -92,11 +111,8 @@ class Sprout(Entity):
 
         # seek pos
         if self.state is SproutState.seek_pos:
-            if self.target.pos.distance_squared_to(self.pos) <= 0.1 ** 2:
+            if self.target.pos.distance_squared_to(self.pos) <= self.pos_range ** 2:
                 self.sit_down()
-
-        # self.vel = self.vel + self.acc * delta_time
-        self.set_pos(self.pos + self.vel * delta_time)
 
     def stand_up(self):
         self.world.get_tile(self.pos).unblock(self)
@@ -115,12 +131,16 @@ class Sprout(Entity):
             self.events.append({
                 "name": "sit_down"
             })
+        else:
+            self.go_wait(3)
 
     def go_idle(self):
         self.target = None
         self.state = SproutState.idle
-        self.vel = Vector2()
-        self.acc = Vector2()
+
+    def go_wait(self, time=0):
+        self.state = SproutState.wait
+        self.wait_timer = time
 
     def look_around(self):
         self.enemies_in_sight = []
@@ -160,6 +180,8 @@ class Sprout(Entity):
         self.state = SproutState.seek_pos
         self.stand_up()
 
+    def death(self):
+        self.stand_up()
 
 class TargetPosition:
     def __init__(self, pos: Vector2):
@@ -170,3 +192,4 @@ class SproutState(Enum):
     idle = 0
     seek_pos = 1
     attack = 2
+    wait = 3
