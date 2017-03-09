@@ -12,21 +12,21 @@ class UltimateRenderer(AbstractRenderer):
         from rendering.ultimate_version.entity_layer import EntityLayer
         from rendering.ultimate_version.ui_layer import UILayer
 
-        self.arena_subsurface = self.main_surface.subsurface(Rect(SUB_SURFACE_POSITION, SUB_SURFACE_SIZE))
+        self.arena_subsurface = self.main_surface.subsurface(Rect(ARENA_SURFACE_POSITION, ARENA_SURFACE_SIZE))
         self.ground_layer = GroundLayer(self, self.arena_subsurface)
         self.overlay_layer = OverlayLayer(self, self.arena_subsurface)
         self.entity_layer = EntityLayer(self, self.arena_subsurface)
 
         ui_x_left = SCREEN_SHAKE_OFFSET[0]
-        ui_x_right = SCREEN_SHAKE_OFFSET[0] + SUB_SURFACE_SIZE[0] + UI_SUBSURFACE_SIZE[0]
+        ui_x_right = SCREEN_SHAKE_OFFSET[0] + ARENA_SURFACE_SIZE[0] + HUD_AREA[0]
         ui_y_top = SCREEN_SHAKE_OFFSET[1]
-        ui_y_bottom = SCREEN_SHAKE_OFFSET[1] + UI_SUBSURFACE_SIZE[1]
+        ui_y_bottom = SCREEN_SHAKE_OFFSET[1] + HUD_AREA[1]
 
         player_ui_sub_surfaces = [
-            self.main_surface.subsurface((SCREEN_SHAKE_OFFSET, UI_SUBSURFACE_SIZE)),
-            self.main_surface.subsurface(((ui_x_right, ui_y_top), UI_SUBSURFACE_SIZE)),
-            self.main_surface.subsurface(((ui_x_left, ui_y_bottom), UI_SUBSURFACE_SIZE)),
-            self.main_surface.subsurface(((ui_x_right, ui_y_bottom), UI_SUBSURFACE_SIZE))]
+            self.main_surface.subsurface((SCREEN_SHAKE_OFFSET, HUD_AREA)),
+            self.main_surface.subsurface(((ui_x_right, ui_y_top), HUD_AREA)),
+            self.main_surface.subsurface(((ui_x_left, ui_y_bottom), HUD_AREA)),
+            self.main_surface.subsurface(((ui_x_right, ui_y_bottom), HUD_AREA))]
         self.ui_layer = UILayer(self, player_ui_sub_surfaces)
         self.screen_shake = ScreenShaker()
 
@@ -41,7 +41,7 @@ class UltimateRenderer(AbstractRenderer):
         Debug.render(DEFAULT_RENDERER.arena_subsurface)
         # blit final image
         shake_off = self.screen_shake.get_shake()
-        target.blit(self.main_surface, (0, 0), (shake_off, DISPLAY_RESOLUTION))
+        target.blit(self.main_surface, (0, 0), (shake_off, RENDER_RESOLUTION))
         world.events.clear()
 
 

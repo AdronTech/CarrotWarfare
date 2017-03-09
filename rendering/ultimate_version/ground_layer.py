@@ -17,8 +17,8 @@ class Pop(object):
 class GroundLayer:
     def __init__(self, renderer: UltimateRenderer, arena_subsurface: Surface):
         self.parent_renderer = renderer  # type: UltimateRenderer
-        self.ground_surface = Surface(SUB_SURFACE_SIZE)
-        self.buffer_surface = Surface(SUB_SURFACE_SIZE)
+        self.ground_surface = Surface(ARENA_SURFACE_SIZE)
+        self.buffer_surface = Surface(ARENA_SURFACE_SIZE)
         self.ground_surface.fill(COLOR_BACKGROUND)
         self.arena_subsurface = arena_subsurface
         self.buffer = []
