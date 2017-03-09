@@ -13,25 +13,37 @@ class Player(Entity):
         self.seed_mode = SeedType.melee  # type: SeedType
 
         self.seeds = [0 for i in range(len(list(SeedType)))]
-        self.seeds[SeedType.melee.value] = 200
-        self.seeds[SeedType.ranged.value] = 200
+        self.seeds[SeedType.melee.value] = 5
+        self.seeds[SeedType.ranged.value] = 5
 
         self.attack_range = 1.5
         self.attack_angle = 90
-        self.damage = 5
+        self.damage = PLAYER_DAMAGE
         self.speed = 5
 
         self.spawnpoint = spawn
+        self.respawn_timer = 0
+        self.can_respawn = True
 
         self.spawn()
 
-    def spawn(self):
-        self.set_pos(self.spawnpoint)
-        self.hp = 100
+    def spawn(self, time=0):
+        self.can_respawn = not time < 0
+        self.respawn_timer = time
 
     def update(self, input=None):
         super().update()
         if self.hard_lock > 0:
+            return
+
+        if self.respawn_timer >= 0:
+            self.respawn_timer -= delta_time
+
+            if self.respawn_timer <= 0:
+                self.death_stamp = None
+                self.hp = PLAYER_LIFE
+                self.set_pos(self.spawnpoint)
+
             return
 
         self.events.clear()
@@ -54,8 +66,8 @@ class Player(Entity):
                 elif command == Commands.swap:
                     self.swap()
 
-            # if self.events:
-            #     print(self.events)
+                    # if self.events:
+                    #     print(self.events)
 
     def move(self, dir: Vector2, hold_pos: bool):
 
@@ -97,22 +109,20 @@ class Player(Entity):
 
     def plant(self):
         if self.get_seeds() > 0:
-            plant_pos = {"x": int(self.pos.x), "y": int(self.pos.y)}
-
-            t = self.world.grid[plant_pos["x"]][plant_pos["y"]]  # type: Tile
+            t = self.world.get_tile(self.pos)  # type: Tile
             if not t.state:
-                self.seeds[self.seed_mode.value] -= 1
+                self.set_seeds(self.get_seeds() - 1)
 
                 # log
                 self.events.append({
                     "name": "plant",
-                    "pos": plant_pos,
+                    "pos": self.world.int_vec(self.pos),
                     "type": self.seed_mode,
                     "remaining": self.get_seeds()
                 })
                 self.world.events.append({
                     "name": "plant",
-                    "pos": plant_pos,
+                    "tile": t,
                     "type": self.seed_mode,
                     "alliance": self.alliance,
                     "author": self
@@ -128,6 +138,7 @@ class Player(Entity):
             "pos": self.pos,
             "alliance": self.alliance,
             "radius": 7,
+            "type": self.seed_mode,
             "author": self
         })
 
@@ -154,21 +165,26 @@ class Player(Entity):
 
         return self.seeds[type.value]
 
-    def death(self):
-        self.world.events.append({
-            "name": "player_death",
-            "alliance": self.alliance,
-            "stamp": self.death_stamp,
-            "author": self
-        })
+    def set_seeds(self, amount, type: SeedType = None):
+        if not type:
+            type = self.seed_mode
 
-    def pickup(self, seed_mode: SeedType):
-        self.seeds[seed_mode] += 1
-        # log
-        self.events.append({
-            "name": "pick_up",
-            "seed": seed_mode
-        })
+        self.seeds[type.value] = amount
+
+    def pickup(self, seed_mode: SeedType, amount) -> bool:
+        if self.get_seeds(seed_mode) + 1 <= PLAYER_SEED_POUCH:
+            self.set_seeds(min(self.get_seeds(seed_mode) + amount, PLAYER_SEED_POUCH), seed_mode)
+
+            # log
+            self.events.append({
+                "name": "pick_up",
+                "seed": seed_mode,
+                "amount": self.get_seeds(seed_mode),
+                "delta": amount
+            })
+            return True
+        else:
+            return False
 
 
 if __name__ == "__main__":

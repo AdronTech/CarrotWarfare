@@ -5,6 +5,7 @@ from game.tile import Tile
 from game.world import World
 from game.entity import Entity
 from game.carrot import Carrot
+from game.sprout import Sprout, SproutState
 from game.player import Player, SeedType
 from rendering.loader import load_all
 

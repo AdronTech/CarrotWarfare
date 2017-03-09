@@ -4,6 +4,14 @@ from timing import *
 from random import random, randint
 from rendering import debugger as Debug
 from pygame import Color
+from game.constants import *
+from math import floor
+
+if False:
+    from game.player import Player, SeedType
+    from game.carrot import Carrot
+    from game.sprout import Sprout
+    from game.entity import Entity
 
 WORLD_DIMENSION = {"width": 27, "height": 17}
 
@@ -22,12 +30,36 @@ class World:
         self.entities = []
         self.events = []  # type: [{}]
         self.growing = []  # type: [Tile]
-        self.grid = [[Tile(self.events, x, y) for y in range(h)] for x in range(w)]  # type: [[Tile]]
+        self.players = [None] * 4
+        self.grid = [[Tile(self.events, x, y) for y in range(h)] for x in range(w)]  # type: [
+        self.respawn_time = 2.5
 
     def radius_gen(self, pos, r):
         for dx in range(-r, r + 1):
             for dy in range(-(r - abs(dx)), r - abs(dx) + 1):
                 yield Vector2(pos) + Vector2(dx, dy)
+
+    def spiral_gen(self):
+        r = 0
+        yield Vector2(0, 0)
+        while True:
+            r += 1
+            x, y = (0, r)
+            while x < r:
+                yield Vector2(x, y)
+                yield Vector2(-x, -y)
+                yield Vector2(y, -x)
+                yield Vector2(-y, x)
+                y -= 1
+                x += 1
+
+    def int_vec(self, pos):
+        x, y = pos
+
+        x = int(x)
+        y = int(y)
+
+        return Vector2(x, y)
 
     def get_tile(self, pos):
         x, y = pos
@@ -45,25 +77,17 @@ class World:
         self.events.clear()
         commands = get_input()  # type: [[], [], [], []]
 
-        deaths = []
-
         for i in range(len(self.growing)):
             self.growing[i].update()
 
-        for i in range(self.player_count):
-            ent = self.entities[i]  # type: Entity
-            ent.update(commands[i])
-            if ent.death_stamp and now() - ent.death_stamp > 1000:
-                ent.death_stamp = None
+        for i in range(4):
+            if self.players[i]:
+                player = self.players[i]  # type: Player
+                player.update(commands[i])
 
         for i in range(self.player_count, len(self.entities)):
             ent = self.entities[i]  # type: Entity
             ent.update()
-            if ent.death_stamp and now() - ent.death_stamp > 0:
-                deaths.append(ent)
-
-        for e in deaths:
-            self.entities.remove(e)
 
         # for col in self.grid:
         #     for t in col:
@@ -76,30 +100,39 @@ class World:
 
     def check_events(self):
         from game.carrot import Carrot
-        from game.player import Player
+        from game.sprout import Sprout
+        from game.player import Player, SeedType
 
         for e in self.events:  # type: dict
             if e["name"] == "plant":
-                t = self.grid[e["pos"]["x"]][e["pos"]["y"]]
+                t = e["tile"]
                 self.growing.append(t)
                 t.plant(e["type"], e["alliance"])
+
             elif e["name"] == "full_grown":
                 self.growing.remove(e["tile"])
-                self.entities.append(Carrot(self, e["alliance"], e["pos"]))
+
+                if e["type"] is SeedType.melee:
+                    self.entities.append(Carrot(self, e["alliance"], e["pos"]))
+                elif e["type"] is SeedType.ranged:
+                    self.entities.append(Sprout(self, e["alliance"], e["pos"]))
+
             elif e["name"] == "attack":
                 pos = e["pos"]  # type: Vector2
                 dir = e["dir"]
                 r = e["range"]
                 h_angle = e["angle"] / 2
 
-                possible_enemies = []  # type: Entity
+                possible_enemies = []  # type: [Entity]
 
                 for x in range(int(e["pos"].x - r), int(e["pos"].x + r + 1)):
                     for y in range(int(e["pos"].y - r), int(e["pos"].y + r + 1)):
-                        if x < 0 or y < 0 or x >= WORLD_DIMENSION["width"] or y >= WORLD_DIMENSION["height"]:
+                        t = self.get_tile((x, y))
+                        if not t:
                             continue
-                        for ent in self.grid[x][y].entities:  # type: Entity
-                            if e["alliance"] != ent.alliance and (type(ent) is Carrot or type(ent) is Player):
+
+                        for ent in t.entities:  # type: Entity
+                            if e["alliance"] != ent.alliance:
                                 dist = ent.pos - pos  # type: Vector2
 
                                 if dist.length_squared() > r ** 2:
@@ -110,27 +143,51 @@ class World:
 
                                 possible_enemies.append((dist.length_squared(), ent))
 
-                possible_enemies = sorted(possible_enemies, key = lambda entity: entity[0])  # sort by distance
+                possible_enemies = sorted(possible_enemies, key=lambda entity: entity[0])  # sort by distance
                 for i in range(min(e["count"], len(possible_enemies))):
                     possible_enemies[i][1].hit(e["damage"])
-                    Debug.circle(Color("blue"),possible_enemies[i][1].pos, 0.2)
 
             elif e["name"] == "call":
-                for coord in self.radius_gen(e["pos"], e["radius"]):  # type: Carrot
+                melee = []  # type: [Carrot]
+                ranged = []  # type: [Sprout]
+                pos = e["pos"]
+
+                for coord in self.radius_gen(pos, e["radius"]):  # type: Carrot
                     t = self.get_tile(coord)
-                    if t:
-                        # Debug.circle(Color("black"), (t.x + 0.5, t.y + 0.5), 0.25)
+                    if not t:
+                        continue
+                    # Debug.circle(Color("black"), (t.x + 0.5, t.y + 0.5), 0.25)
 
-                        for ent in t.entities:
-                            if type(ent) is not Carrot:
-                                continue
-                            if ent.alliance != e["alliance"]:
-                                continue
+                    for ent in t.entities:
+                        if ent.alliance != e["alliance"]:
+                            continue
 
-                            ent.call(e["pos"])
+                        dist = ent.pos - pos  # type: Vector2
 
-            elif e["name"] == "player_death":
-                e["author"].spawn()
+                        if type(ent) is Carrot:
+                            melee.append(ent)
+                        elif e["type"] is SeedType.ranged and type(ent) is Sprout:
+                            ranged.append(ent)
+
+                counter = 0
+                for delta in self.spiral_gen():
+
+                    if counter >= len(ranged):
+                        break
+
+                    t = self.get_tile(pos + delta)
+
+                    if t and (not t.state or (t.state["name"] is TileState.blocked and t.state["entity"] in ranged)):
+                        ranged[counter].call(pos + delta)
+                        counter += 1
+
+            elif e["name"] == "death":
+                ent = e["author"]  # type: Entity
+
+                if type(ent) is Player:
+                    ent.spawn(self.respawn_time)
+                else:
+                    self.entities.remove(ent)
 
     def constrain_vector(self, pos: Vector2) -> Vector2:
         if pos.x < 0:
@@ -144,18 +201,25 @@ class World:
 
 
 def new_game() -> World:
-    from game.player import Player
+    from game.player import Player, SeedType
     from game.carrot import Carrot
+    from game.sprout import Sprout
 
     world = World()
-    world.player_count = lock_input()
-    for i in range(world.player_count):
-        world.entities.append(Player(world, i, Vector2(SPAWN_POSITIONS[i])))
+    players = lock_input()
+    world.player_count = len(players)
+    for i in players:
+        world.players[i] = Player(world, i, Vector2(SPAWN_POSITIONS[i]))
+        world.entities.append(world.players[i])
 
-    for i in range(0):
-        world.entities.append(Carrot(world, randint(0, 3),
+    for i in range(20):
+        world.entities.append(Sprout(world, 0,
                                      Vector2(random() * WORLD_DIMENSION["width"],
                                              random() * WORLD_DIMENSION["height"])))
+
+    for i in range(5):
+        world.get_tile(Vector2(random() * WORLD_DIMENSION["width"],
+                               random() * WORLD_DIMENSION["height"])).set_pickup(SeedType.melee, 5)
 
     return world
 
@@ -164,5 +228,8 @@ if __name__ == "__main__":
 
     world = World()
 
-    for i in world.tile_radius((0, 0), 4):
-        print(i)
+    for v in world.spiral_gen():  # type: Vector2
+        print(v)
+
+        if v.length_squared() > 100:
+            break
