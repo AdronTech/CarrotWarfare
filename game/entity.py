@@ -25,8 +25,6 @@ class Entity:
         self.soft_lock -= delta_time
         self.hard_lock -= delta_time
 
-        Debug.rect((0, 0, 0, 100), ((self.bb.left(), self.bb.top()), self.bb.dim))
-
     def set_pos(self, pos: Vector2):
 
         # unregister
@@ -71,9 +69,7 @@ class Entity:
 
         if self.hp <= 0:
             self.hp = 0
-            self.death()
 
-            self.unregister()
             self.death_stamp = now()
 
             self.world.events.append({
@@ -82,7 +78,7 @@ class Entity:
                 "author": self
             })
 
-    def death(self):
-        pass
+    def kill(self):
+        self.unregister()
 
 

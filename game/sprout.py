@@ -9,7 +9,7 @@ class Sprout(Entity):
         self.state = None
         self.call(self.pos)
 
-        self.speed = 2
+        self.speed = 1.3
         self.hp = 30
 
         self.turn_speed = 5
@@ -51,6 +51,7 @@ class Sprout(Entity):
                 des_dir = (self.target.pos - self.pos).normalize()  # type: Vector2
 
             self.dir += (des_dir - self.dir) * delta_time * self.turn_speed
+            self.dir.normalize_ip()
 
         # seeking
         if self.state is SproutState.seek_pos:
@@ -87,9 +88,16 @@ class Sprout(Entity):
 
                 shoot_dir = self.target.pos - self.pos  # type: Vector2
 
-                if self.dir.angle_to(shoot_dir) <= self.attack_angle / 2:
-                    pass
-                    # TODO: shoot
+                if abs(self.dir.angle_to(shoot_dir)) <= self.attack_angle / 2:
+                    self.world.events.append({
+                        "name": "shoot",
+                        "pos": self.pos,
+                        "dir": self.dir,
+                        "alliance": self.alliance,
+                        "author": self
+                    })
+
+                    self.soft_lock = 1
 
             dx, dy = (self.world.int_vec(self.pos) - self.world.int_vec(self.target.pos))
 
@@ -180,7 +188,8 @@ class Sprout(Entity):
         self.state = SproutState.seek_pos
         self.stand_up()
 
-    def death(self):
+    def kill(self):
+        super().kill()
         self.stand_up()
 
 class TargetPosition:

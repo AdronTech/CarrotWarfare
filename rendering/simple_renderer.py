@@ -45,7 +45,7 @@ class SimpleRenderer(AbstractRenderer):
                       (int((carrot.pos.x - 0.3) * TILE_SIZE),
                        int((carrot.pos.y - 1) * TILE_SIZE))])
 
-    def render_sprout(self, target, sprout: Carrot):
+    def render_sprout(self, target, sprout: Sprout):
 
         angle = -sprout.dir.as_polar()[1]
         r = 1
@@ -72,6 +72,10 @@ class SimpleRenderer(AbstractRenderer):
                          ((sprout.pos.x - 0.2) * TILE_SIZE, (sprout.pos.y - h) * TILE_SIZE)
                      ])
 
+    def render_bullet(self, target, bullet: Bullet):
+
+        draw.circle(target, COLOR_PLAYERS_LIGHT[bullet.alliance], (int(bullet.pos.x * TILE_SIZE), int(bullet.pos.y * TILE_SIZE)), int(0.25 * TILE_SIZE))
+
     def render(self, target: Surface, world: World):
         target.fill(CLR["white"])
         for x in range(WORLD_DIMENSION["width"]):
@@ -80,12 +84,12 @@ class SimpleRenderer(AbstractRenderer):
                 if t.state and t.state["name"] is TileState.growing:
                     size = t.state["g_state"] / 4 * TILE_SIZE
                     if t.state["seed"] is SeedType.melee:
-                        draw.rect(target, COLOR_PLAYERS_SECONDARY[t.state["alliance"]],
+                        draw.rect(target, COLOR_PLAYERS_DARK[t.state["alliance"]],
                                   Rect((int(x * TILE_SIZE + (TILE_SIZE - size) / 2),
                                         int(y * TILE_SIZE + (TILE_SIZE - size) / 2)),
                                        (size, size)))
                     elif t.state["seed"] is SeedType.ranged:
-                        draw.ellipse(target, COLOR_PLAYERS_SECONDARY[t.state["alliance"]],
+                        draw.ellipse(target, COLOR_PLAYERS_DARK[t.state["alliance"]],
                                      Rect((int(x * TILE_SIZE + (TILE_SIZE - size) / 2),
                                            int(y * TILE_SIZE + (TILE_SIZE - size) / 2)),
                                           (size, size)))
@@ -112,3 +116,5 @@ class SimpleRenderer(AbstractRenderer):
                     self.render_carrot(target, e)
                 elif type(e) is Sprout:
                     self.render_sprout(target, e)
+                elif type(e) is Bullet:
+                    self.render_bullet(target, e)
