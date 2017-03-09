@@ -89,10 +89,6 @@ class Player(Entity):
             "pos": self.pos
         })
 
-        for p in self.bb.get_int():
-            t = self.world.get_tile(p)  # type: Tile
-
-
     def attack(self):
 
         # log
