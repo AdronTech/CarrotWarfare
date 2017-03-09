@@ -22,6 +22,7 @@ class UILayer:
 
     # call once for each player
     def render(self, world: World):
+        self.main_surface.fill((0,0,0))
         return
         for i in range(4):
             p = world.players[i]
