@@ -13,46 +13,56 @@ class UILayer:
         self.fill_origins = (
             (0, 0), (self.hp_area[0], 0), (0, self.hp_area[1]), (self.hp_area[0], self.hp_area[1])
         )
+        self.hp_show = [0] * 4
         self.main_surface = main_surface
         self.parent_renderer = renderer
         self.current_health = 1.0
         self.current_seed_count_melee = 1.0
         self.current_seed_count_ranged = 1.0
 
-
-    # call once for each player
-    def render(self, world: World):
-        self.main_surface.fill((0,0,0))
-        return
         for i in range(4):
-            p = world.players[i]
-            self.draw_ui_for_player(i, self.main_surface, p)
+            self.hp_fill(i, self.hp_show[i])
 
-    def draw_ui_for_player(self, i: int, target: Surface, player: Player):
-        # Health
-        health_percent = player.hp / PLAYER_LIFE
+    def render(self, world: World):
+        for i in range(4):
+            player = world.players[i]  # type: Player
+            if player:
+                diff = (player.hp - self.hp_show[i])
+                if abs(diff) > 1:
+                    self.hp_show[i] += diff*0.1
+                else:
+                    self.hp_show[i] = player.hp
+                self.hp_fill(i, self.hp_show[i])
+                # self.draw_hud(i, world.players[i])
+            else:
+                self.hp_fill(i, 0)
 
+    def draw_hud(self, i: int, player: Player):
         # Seeds
         self.current_seed_count_melee = player.get_seeds(SeedType.melee) / self.max_seeds
         self.current_seed_count_ranged = player.get_seeds(SeedType.ranged) / self.max_seeds
-        target.fill(COLOR_PLAYERS[i], (self.fill_origins[i], (target.get_width(), target.get_height() * self.current_health)))
-        target.fill(COLOR_BACKGROUND_SECONDARY, (self.fill_origins[i], self.hp_area))
 
-    def hp_fill(self, target: Surface, i: int, percent: float):
-        flip = i < 2
-        ox, oy = self.fill_origins[i]
+    def hp_fill(self, i: int, hp: int):
+        lower_hud = i < 2
+        x, oy = self.fill_origins[i]
         w, h = self.hp_area
-        if flip:
-            upper_color = COLOR_BACKGROUND_SECONDARY
-            lower_color = COLOR_PLAYERS[i]
-            percent = 1 - percent
+        if lower_hud:
+            c_lower = COLOR_PLAYERS[i]
+            c_upper = COLOR_BACKGROUND_SECONDARY
+            percent = hp/PLAYER_LIFE
         else:
-            upper_color = COLOR_PLAYERS[i]
-            lower_color = COLOR_BACKGROUND_SECONDARY
+            c_lower = COLOR_BACKGROUND_SECONDARY
+            c_upper = COLOR_PLAYERS[i]
+            percent = 1 - hp/PLAYER_LIFE
+        y_lower = oy
+        h_lower = int(h*percent)
+        r_lower = (x, y_lower), (w, h_lower)
+        y_upper = y_lower+h_lower
+        h_upper = h-h_lower
+        r_upper = (x, y_upper), (w, h_upper)
+        print(h, h_lower, h_upper)
 
-        target.fill(color=upper_color,
-                    rect=((ox, oy),
-                          (w, h * percent)))
-        target.fill(color=lower_color,
-                    rect=((ox, oy),
-                          (w, h * (1-percent))))
+        self.main_surface.fill(color=c_lower,
+                    rect=r_lower)
+        self.main_surface.fill(color=c_upper,
+                    rect=r_upper)
