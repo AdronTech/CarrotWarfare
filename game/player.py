@@ -109,24 +109,20 @@ class Player(Entity):
 
     def plant(self):
         if self.get_seeds() > 0:
-            t = self.world.get_tile(self.pos)  # type: Tile
-            if not t.state:
-                self.set_seeds(self.get_seeds() - 1)
-
-                # log
-                self.events.append({
-                    "name": "plant",
-                    "pos": self.world.int_vec(self.pos),
-                    "type": self.seed_mode,
-                    "remaining": self.get_seeds()
-                })
-                self.world.events.append({
-                    "name": "plant",
-                    "tile": t,
-                    "type": self.seed_mode,
-                    "alliance": self.alliance,
-                    "author": self
-                })
+            # log
+            self.events.append({
+                "name": "plant_request",
+                "pos": self.world.int_vec(self.pos),
+                "type": self.seed_mode,
+                "remaining": self.get_seeds()
+            })
+            self.world.events.append({
+                "name": "plant_request",
+                "tile": self.world.get_tile(self.pos),
+                "type": self.seed_mode,
+                "alliance": self.alliance,
+                "author": self
+            })
 
     def call(self):
         # log
@@ -145,10 +141,10 @@ class Player(Entity):
     def swap(self):
 
         next = self.seed_mode.value
-        while True:
-            next = (next + 1) % len(list(SeedType))
-            if next == self.seed_mode.value or self.seeds[next] != 0:
-                break
+        # while True:
+        next = (next + 1) % len(list(SeedType))
+            # if next == self.seed_mode.value or self.seeds[next] != 0:
+            #     break
 
         self.seed_mode = SeedType(next)
 
@@ -170,6 +166,23 @@ class Player(Entity):
             type = self.seed_mode
 
         self.seeds[type.value] = amount
+
+    def increase_seeds(self, amount=1, type: SeedType = None):
+        if not type:
+            type = self.seed_mode
+
+            self.set_seeds(min(self.get_seeds(type) + amount, PLAYER_SEED_POUCH), type)
+
+    def consume_seeds(self, amount=1, type: SeedType = None):
+
+        if amount > self.get_seeds(type):
+            return False
+
+        if not type:
+            type = self.seed_mode
+
+        self.set_seeds(self.get_seeds(type) - amount, type)
+        return True
 
     def pickup(self, seed_mode: SeedType, amount) -> bool:
         if self.get_seeds(seed_mode) + 1 <= PLAYER_SEED_POUCH:

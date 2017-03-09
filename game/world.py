@@ -64,8 +64,8 @@ class World:
     def get_tile(self, pos):
         x, y = pos
 
-        x = int(x)
-        y = int(y)
+        x = floor(x)
+        y = floor(y)
 
         if x < 0 or y < 0 or x >= WORLD_DIMENSION["width"] or y >= WORLD_DIMENSION["height"]:
             return None
@@ -88,10 +88,10 @@ class World:
         for i in range(self.player_count, len(self.entities)):
             ent = self.entities[i]  # type: Entity
             ent.update()
-
+        #
         # for col in self.grid:
         #     for t in col:
-        #         if [(e.death_stamp) for e in t.entities if e.death_stamp]:
+        #         if t.collider:
         #             Debug.circle((0, 0, 0, 255), (t.x + 0.5, t.y + 0.5), 0.2)
 
         self.check_events()
@@ -104,10 +104,13 @@ class World:
         from game.player import Player, SeedType
 
         for e in self.events:  # type: dict
-            if e["name"] == "plant":
+            if e["name"] == "plant_request":
                 t = e["tile"]
-                self.growing.append(t)
-                t.plant(e["type"], e["alliance"])
+                if not t.state:
+                    if e["author"].consume_seeds(1, e["type"]):
+                        self.growing.append(t)
+                        t.plant(e["type"], e["alliance"])
+                        e["allowed"] = None
 
             elif e["name"] == "full_grown":
                 self.growing.remove(e["tile"])
@@ -148,9 +151,10 @@ class World:
                     possible_enemies[i][1].hit(e["damage"])
 
             elif e["name"] == "call":
-                melee = []  # type: [Carrot]
-                ranged = []  # type: [Sprout]
+                scale = [0.5, 1]
+                entities = []  # type: [Entity]
                 pos = e["pos"]
+                e_type = e["type"]
 
                 for coord in self.radius_gen(pos, e["radius"]):  # type: Carrot
                     t = self.get_tile(coord)
@@ -162,23 +166,22 @@ class World:
                         if ent.alliance != e["alliance"]:
                             continue
 
-                        dist = ent.pos - pos  # type: Vector2
-
-                        if type(ent) is Carrot:
-                            melee.append(ent)
-                        elif e["type"] is SeedType.ranged and type(ent) is Sprout:
-                            ranged.append(ent)
+                        if e_type is SeedType.melee and type(ent) is Carrot:
+                            entities.append(ent)
+                        elif e_type is SeedType.ranged and type(ent) is Sprout:
+                            entities.append(ent)
 
                 counter = 0
                 for delta in self.spiral_gen():
+                    delta *= scale[e_type.value]
 
-                    if counter >= len(ranged):
+                    if counter >= len(entities):
                         break
 
                     t = self.get_tile(pos + delta)
 
-                    if t and (not t.state or (t.state["name"] is TileState.blocked and t.state["entity"] in ranged)):
-                        ranged[counter].call(pos + delta)
+                    if t and (not t.state or (t.state["name"] is TileState.blocked and t.state["entity"] in entities)):
+                        entities[counter].call(pos + delta)
                         counter += 1
 
             elif e["name"] == "death":
@@ -212,7 +215,7 @@ def new_game() -> World:
         world.players[i] = Player(world, i, Vector2(SPAWN_POSITIONS[i]))
         world.entities.append(world.players[i])
 
-    for i in range(20):
+    for i in range(0):
         world.entities.append(Sprout(world, 0,
                                      Vector2(random() * WORLD_DIMENSION["width"],
                                              random() * WORLD_DIMENSION["height"])))
@@ -220,6 +223,10 @@ def new_game() -> World:
     for i in range(5):
         world.get_tile(Vector2(random() * WORLD_DIMENSION["width"],
                                random() * WORLD_DIMENSION["height"])).set_pickup(SeedType.melee, 5)
+    #
+    # for i in range(5):
+    #     world.get_tile(Vector2(random() * WORLD_DIMENSION["width"],
+    #                            random() * WORLD_DIMENSION["height"])).set_pickup(SeedType.ran, 5)
 
     return world
 

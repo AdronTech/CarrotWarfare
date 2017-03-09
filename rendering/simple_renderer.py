@@ -51,7 +51,7 @@ class SimpleRenderer(AbstractRenderer):
         r = 1
         h = 1
 
-        if sprout.state is not SproutState.seek_pos:
+        if sprout.state in [SproutState.attack, SproutState.idle]:
             h = 0.5
 
         draw.arc(target,
