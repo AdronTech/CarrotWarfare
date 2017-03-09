@@ -44,7 +44,7 @@ class UltimateRenderer(AbstractRenderer):
 
         # blit final image
         # TODO implement scaling to display resolution
-        target.blit(self.main_surface, (0, 0))
+        scale(self.main_surface, target.get_size(), target)
 
 
 if __name__ == "__main__":

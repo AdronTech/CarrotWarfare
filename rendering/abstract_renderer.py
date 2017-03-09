@@ -1,4 +1,5 @@
 from pygame import Surface, draw, Rect
+from pygame.transform import *
 from pygame.gfxdraw import aacircle, aatrigon, filled_circle, filled_trigon
 from rendering.constants import *
 from game.tile import Tile
