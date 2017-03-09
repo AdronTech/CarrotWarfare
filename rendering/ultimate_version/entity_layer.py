@@ -40,6 +40,8 @@ class EntityLayer:
                     self.render_carrot(entity)
                 elif e_type is Sprout:
                     pass
+                elif e_type is Bullet:
+                    pass
                 else:
                     surf, x, y = entity
                     self.arena_subsurface.blit(surf, (int(x * TILE_SIZE - surf.get_width() / 2),
