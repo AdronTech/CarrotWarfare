@@ -6,44 +6,45 @@ from rendering import debugger as Debug
 class UltimateRenderer(AbstractRenderer):
     def __init__(self):
         load_all()
-        self.main_surface = get_ultimate_surface()
 
+        self.main_surface = Surface(RENDER_RESOLUTION)
+        self.arena_surface = Surface(ARENA_SURFACE_SIZE)
+
+        from rendering.ultimate_version.ui_layer import UILayer
         from rendering.ultimate_version.ground_layer import GroundLayer
         from rendering.ultimate_version.overlay_layer import OverlayLayer
         from rendering.ultimate_version.entity_layer import EntityLayer
-        from rendering.ultimate_version.ui_layer import UILayer
 
-        self.arena_subsurface = self.main_surface.subsurface(Rect(ARENA_SURFACE_POSITION, ARENA_SURFACE_SIZE))
-        self.ground_layer = GroundLayer(self, self.arena_subsurface)
-        self.overlay_layer = OverlayLayer(self, self.arena_subsurface)
-        self.entity_layer = EntityLayer(self, self.arena_subsurface)
+        self.ui_layer = UILayer(self, self.main_surface)
+        self.ground_layer = GroundLayer(self, self.arena_surface)
+        self.overlay_layer = OverlayLayer(self, self.arena_surface)
+        self.entity_layer = EntityLayer(self, self.arena_surface)
 
-        ui_x_left = SCREEN_SHAKE_OFFSET[0]
-        ui_x_right = SCREEN_SHAKE_OFFSET[0] + ARENA_SURFACE_SIZE[0] + HUD_AREA[0]
-        ui_y_top = SCREEN_SHAKE_OFFSET[1]
-        ui_y_bottom = SCREEN_SHAKE_OFFSET[1] + HUD_AREA[1]
-
-        player_ui_sub_surfaces = [
-            self.main_surface.subsurface((SCREEN_SHAKE_OFFSET, HUD_AREA)),
-            self.main_surface.subsurface(((ui_x_right, ui_y_top), HUD_AREA)),
-            self.main_surface.subsurface(((ui_x_left, ui_y_bottom), HUD_AREA)),
-            self.main_surface.subsurface(((ui_x_right, ui_y_bottom), HUD_AREA))]
-        self.ui_layer = UILayer(self, player_ui_sub_surfaces)
         self.screen_shake = ScreenShaker()
 
     def render(self, target: Surface, world: World):
         for e in world.events:
             if e["name"] == "death" and type(e["author"]) is Player:
                 self.screen_shake.impulse(0.5)
+        self.ui_layer.render(world)
         self.ground_layer.render(world)
         self.overlay_layer.render(world)
         self.entity_layer.render(world)
-        self.ui_layer.render(world)
-        Debug.render(DEFAULT_RENDERER.arena_subsurface)
-        # blit final image
-        shake_off = self.screen_shake.get_shake()
-        target.blit(self.main_surface, (0, 0), (shake_off, RENDER_RESOLUTION))
+
+        # markus debuggger
+        Debug.render(DEFAULT_RENDERER.arena_surface)
+
+        # blit arena to main surface
+        x, y = ARENA_SURFACE_PADDING
+        s_dx, s_dy = self.screen_shake.get_shake()
+        self.main_surface.blit(self.arena_surface, (x+s_dx, y+s_dy))
+
+        # remove all recent events
         world.events.clear()
+
+        # blit final image
+        # TODO implement scaling to display resolution
+        target.blit(self.main_surface, (0, 0))
 
 
 if __name__ == "__main__":
@@ -58,6 +59,10 @@ if __name__ == "__main__":
     from timing import *
     from random import random, randint
 
+    from xinput import Gamepad
+
+    pad = Gamepad.gamepad_0
+
     game_world = new_game()
 
     # main loop
@@ -70,7 +75,7 @@ if __name__ == "__main__":
     DEFAULT_RENDERER.screen_shake.impulse(1)
     game_world = new_game()
 
-    Debug.gen_debug_surface(DEFAULT_RENDERER.arena_subsurface)
+    Debug.gen_debug_surface(DEFAULT_RENDERER.arena_surface)
 
     # main loop
     last_update = now()
@@ -88,6 +93,12 @@ if __name__ == "__main__":
             last_update += update_delay
             Debug.clear()
             game_world.update()
+            if pad.input_state["button_y"]:
+                DEFAULT_RENDERER.screen_shake.impulse(1)
+            if pad.input_state["button_b"]:
+                DEFAULT_RENDERER.screen_shake.impulse(0.5)
+            if pad.input_state["button_a"]:
+                DEFAULT_RENDERER.screen_shake.impulse(0.1)
         else:
             # update timing
             next(redraw_counter)
