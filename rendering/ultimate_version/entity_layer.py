@@ -49,8 +49,13 @@ class EntityLayer:
 
     def render_player(self, player: Player):
         # TODO handle player events
+
         resources = IMAGE_RESOURCE["entities"]
-        image = resources["player" + str(player.alliance)]["state_stand"]["frame0"]
+        if player.dir.x < 0:
+            image = resources["player" + str(player.alliance)]["state_stand"]["left"]["frame0"]
+        else:
+            image = resources["player" + str(player.alliance)]["state_stand"]["right"]["frame0"]
+
         self.arena_subsurface.blit(image,
                                    (int(player.pos.x *
                                         TILE_SIZE + resources["player_generic"]["offset"][0]),
@@ -61,7 +66,11 @@ class EntityLayer:
         # TODO handle carrot events
 
         resources = IMAGE_RESOURCE["entities"]
-        image = resources["carrot" + str(carrot.alliance)]["state_stand"]["frame0"]
+        if carrot.dir.x < 0:
+            image = resources["carrot" + str(carrot.alliance)]["state_stand"]["left"]["frame0"]
+        else:
+            image = resources["carrot" + str(carrot.alliance)]["state_stand"]["right"]["frame0"]
+
         self.arena_subsurface.blit(image,
                                    (int(carrot.pos.x *
                                         TILE_SIZE + resources["carrot_generic"]["offset"][0]),
