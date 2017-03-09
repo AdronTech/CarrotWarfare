@@ -1,4 +1,4 @@
-from pygame import Surface, error, image,SRCALPHA
+from pygame import Surface, error, image, SRCALPHA
 from os.path import join
 from rendering.constants import IMAGE_RESOURCE, TILE_SIZE
 from pygame import transform
@@ -43,20 +43,26 @@ def put_values_for_entity(block: dict, name: str, alliance: int):
                 source.blit(resource, (0, 0), ((RESOURCE_TILE_SIZE * x, RESOURCE_TILE_SIZE * y), source_size))
                 transform.scale(source, (TILE_SIZE, TILE_SIZE), srf)
 
-                srf.convert_alpha(srf)
-                block[name + str(alliance)][state]["frame0"] = srf
-                block[name + str(alliance)]["state_attack"]["frame" + str(x)] = srf
+                block[name + str(alliance)][state]["left"]["frame0"] = srf
+                block[name + str(alliance)]["state_attack"]["left"]["frame" + str(x)] = srf
+
+                srf = transform.flip(srf, True, False)
+                block[name + str(alliance)][state]["right"]["frame0"] = srf
+                block[name + str(alliance)]["state_attack"]["right"]["frame" + str(x)] = srf
 
                 block[name + "_generic"]["offset"] = (TILE_SIZE / -2, -TILE_SIZE)
             else:
                 source_size = (RESOURCE_TILE_SIZE, RESOURCE_TILE_SIZE)
                 srf_size = (TILE_SIZE, TILE_SIZE)
-                source = Surface(source_size)
-                srf = Surface(srf_size)
+                source = Surface(source_size, SRCALPHA)
+                srf = Surface(srf_size, SRCALPHA)
                 source.blit(resource, (0, 0), ((RESOURCE_TILE_SIZE * x, RESOURCE_TILE_SIZE * y), source_size))
                 transform.scale(source, (TILE_SIZE, TILE_SIZE), srf)
 
-                block[name + str(alliance)][state]["frame" + str(x)] = srf
+                block[name + str(alliance)][state]["left"]["frame" + str(x)] = srf
+
+                srf = transform.flip(srf, True, False)
+                block[name + str(alliance)][state]["right"]["frame" + str(x)] = srf
 
 
 def load_all():

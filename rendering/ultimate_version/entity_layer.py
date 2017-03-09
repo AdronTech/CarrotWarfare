@@ -49,8 +49,55 @@ class EntityLayer:
 
     def render_player(self, player: Player):
         # TODO handle player events
+
+        events = []
+        for e in player.events:
+            if e["name"] == "death":
+                events.append("death")
+            elif e["name"] == "attack":
+                events.append("attack")
+            elif e["name"] == "move":
+                events.append("move")
+            elif e["name"] == "plant_request":
+                if "allowed" in e:
+                    events.append("plant_request")
+
+        if "death" in events:
+            if "animator" in player.render_flags:
+                player.render_flags["animator"].set_animation("state_die")
+            else:
+                player.render_flags["animator"] = EntityAnimator(player, "state_die")
+        if "attack" in events:
+            if "animator" in player.render_flags:
+                player.render_flags["animator"].set_animation("state_attack")
+            else:
+                player.render_flags["animator"] = EntityAnimator(player, "state_attack")
+        if "move" in events:
+            if "animator" in player.render_flags:
+                player.render_flags["animator"].set_animation("state_walk", 500, 0)
+            else:
+                player.render_flags["animator"] = EntityAnimator(player, "state_walk", 500, 0)
+        if "plant_request" in events:
+            if "animator" in player.render_flags:
+                player.render_flags["animator"].set_animation("state_plant")
+            else:
+                player.render_flags["animator"] = EntityAnimator(player, "state_plant")
+
+        image = None
         resources = IMAGE_RESOURCE["entities"]
-        image = resources["player" + str(player.alliance)]["state_stand"]["frame0"]
+        if "animator" in player.render_flags:
+            if player.dir.x < 0:
+                image = player.render_flags["animator"].get_frame(True)
+            else:
+                image = player.render_flags["animator"].get_frame(False)
+            if not image:
+                del player.render_flags["animator"]
+        if not image:
+            if player.dir.x < 0:
+                image = resources["player" + str(player.alliance)]["state_stand"]["left"]["frame0"]
+            else:
+                image = resources["player" + str(player.alliance)]["state_stand"]["right"]["frame0"]
+
         self.arena_subsurface.blit(image,
                                    (int(player.pos.x *
                                         TILE_SIZE + resources["player_generic"]["offset"][0]),
@@ -61,7 +108,11 @@ class EntityLayer:
         # TODO handle carrot events
 
         resources = IMAGE_RESOURCE["entities"]
-        image = resources["carrot" + str(carrot.alliance)]["state_stand"]["frame0"]
+        if carrot.dir.x < 0:
+            image = resources["carrot" + str(carrot.alliance)]["state_stand"]["left"]["frame0"]
+        else:
+            image = resources["carrot" + str(carrot.alliance)]["state_stand"]["right"]["frame0"]
+
         self.arena_subsurface.blit(image,
                                    (int(carrot.pos.x *
                                         TILE_SIZE + resources["carrot_generic"]["offset"][0]),

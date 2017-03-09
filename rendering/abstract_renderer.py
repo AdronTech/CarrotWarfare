@@ -10,6 +10,7 @@ from game.bullet import Bullet
 from game.player import Player, SeedType
 from rendering.loader import load_all
 from game.constants import *
+from rendering.ultimate_version.animator import EntityAnimator
 
 
 class AbstractRenderer:
