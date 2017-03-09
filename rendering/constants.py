@@ -25,6 +25,7 @@ ARENA_SURFACE_PADDING = ((RENDER_RESOLUTION[0] - ARENA_SURFACE_SIZE[0]) / 2,
 HUD_AREA = (ARENA_SURFACE_PADDING[0], ARENA_SURFACE_SIZE[1] / 2)
 
 
+# Growing == Idle for player
 IMAGE_RESOURCE = {
     "entities": {
         "player_generic": {"name": "player",

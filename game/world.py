@@ -12,6 +12,7 @@ if False:
     from game.carrot import Carrot
     from game.sprout import Sprout
     from game.entity import Entity
+    from game.bullet import Bullet
 
 WORLD_DIMENSION = {"width": 27, "height": 17}
 
@@ -102,6 +103,7 @@ class World:
         from game.carrot import Carrot
         from game.sprout import Sprout
         from game.player import Player, SeedType
+        from game.bullet import Bullet
 
         for e in self.events:  # type: dict
             if e["name"] == "plant_request":
@@ -141,7 +143,7 @@ class World:
                                 if dist.length_squared() > r ** 2:
                                     continue
 
-                                if dist.angle_to(dir) > h_angle:
+                                if abs(dist.angle_to(dir)) > h_angle:
                                     continue
 
                                 possible_enemies.append((dist.length_squared(), ent))
@@ -149,6 +151,9 @@ class World:
                 possible_enemies = sorted(possible_enemies, key=lambda entity: entity[0])  # sort by distance
                 for i in range(min(e["count"], len(possible_enemies))):
                     possible_enemies[i][1].hit(e["damage"])
+
+            elif e["name"] == "shoot":
+                self.entities.append(Bullet(self, e["alliance"], e["pos"], e["dir"]))
 
             elif e["name"] == "call":
                 scale = [0.5, 1]
@@ -186,11 +191,13 @@ class World:
 
             elif e["name"] == "death":
                 ent = e["author"]  # type: Entity
+                ent.kill()
 
                 if type(ent) is Player:
                     ent.spawn(self.respawn_time)
                 else:
-                    self.entities.remove(ent)
+                    if ent in self.entities:
+                        self.entities.remove(ent)
 
     def constrain_vector(self, pos: Vector2) -> Vector2:
         if pos.x < 0:

@@ -1,4 +1,4 @@
-from pygame import Surface, error, image
+from pygame import Surface, error, image,SRCALPHA
 from os.path import join
 from rendering.constants import IMAGE_RESOURCE, TILE_SIZE
 from pygame import transform
@@ -24,32 +24,37 @@ def put_values_for_entity(block: dict, name: str, alliance: int):
     PixelArray(resource).replace(REPLACEMENT_COLOR_DARK, COLOR_PLAYERS_DARK[alliance], 0)
     for x in range(4):
         for y in range(4):
-            if x == 0 and y == 0:
+            if x == 3 and y == 1:
                 state = "state_stand"
-            if y == 0:
+            elif y == 0:
                 state = "state_walk"
-            if y == 1:
+            elif y == 1:
                 state = "state_attack"
-            if y == 2:
+            elif y == 2:
                 state = "state_growing"
-            if y == 3:
+            elif y == 3:
                 state = "state_die"
 
             if state == "state_stand":
-                srf_size = (RESOURCE_TILE_SIZE, RESOURCE_TILE_SIZE)
-                srf = Surface(srf_size)
-                srf.blit(resource, (0, 0), ((RESOURCE_TILE_SIZE * x, RESOURCE_TILE_SIZE * y), srf_size))
-                transform.scale(srf, (int(TILE_SIZE), int(TILE_SIZE)))
+                source_size = (RESOURCE_TILE_SIZE, RESOURCE_TILE_SIZE)
+                srf_size = (TILE_SIZE, TILE_SIZE)
+                source = Surface(source_size, SRCALPHA)
+                srf = Surface(srf_size, SRCALPHA)
+                source.blit(resource, (0, 0), ((RESOURCE_TILE_SIZE * x, RESOURCE_TILE_SIZE * y), source_size))
+                transform.scale(source, (TILE_SIZE, TILE_SIZE), srf)
 
-                block[name + str(alliance)][state]["frame" + str(x)] = srf
-                block[name + str(alliance)]["state_walk"]["frame" + str(x)] = srf
+                srf.convert_alpha(srf)
+                block[name + str(alliance)][state]["frame0"] = srf
+                block[name + str(alliance)]["state_attack"]["frame" + str(x)] = srf
 
-                block[name + "_generic"]["offset"] = (int(TILE_SIZE / -2), -int(TILE_SIZE))
+                block[name + "_generic"]["offset"] = (TILE_SIZE / -2, -TILE_SIZE)
             else:
-                srf_size = (RESOURCE_TILE_SIZE, RESOURCE_TILE_SIZE)
+                source_size = (RESOURCE_TILE_SIZE, RESOURCE_TILE_SIZE)
+                srf_size = (TILE_SIZE, TILE_SIZE)
+                source = Surface(source_size)
                 srf = Surface(srf_size)
-                srf.blit(resource, (0, 0), ((RESOURCE_TILE_SIZE * x, RESOURCE_TILE_SIZE * y), srf_size))
-                transform.scale(srf, (int(TILE_SIZE), int(TILE_SIZE)))
+                source.blit(resource, (0, 0), ((RESOURCE_TILE_SIZE * x, RESOURCE_TILE_SIZE * y), source_size))
+                transform.scale(source, (TILE_SIZE, TILE_SIZE), srf)
 
                 block[name + str(alliance)][state]["frame" + str(x)] = srf
 

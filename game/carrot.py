@@ -1,4 +1,5 @@
 from game.entity import *
+from game.bullet import Bullet
 
 
 class Carrot(Entity):
@@ -131,7 +132,7 @@ class Carrot(Entity):
                 continue
 
             for e in t.entities:
-                if e.alliance != self.alliance:
+                if e.alliance != self.alliance and type(e) is not Bullet:
                     if e not in self.enemies_in_sight:
                         self.enemies_in_sight.append(e)
 

@@ -1,4 +1,5 @@
 from pygame.math import Vector2
+from math import floor
 
 
 class BoundingBox:
@@ -19,8 +20,8 @@ class BoundingBox:
         return self.pos.x - self.dim.x / 2
 
     def get_int(self):
-        for x in range(int(self.left()), int(self.right()) + 1):
-            for y in range(int(self.top()), int(self.bottom()) + 1):
+        for x in range(floor(self.left()), floor(self.right()) + 1):
+            for y in range(floor(self.top()), floor(self.bottom()) + 1):
                 yield Vector2(x, y)
 
 
