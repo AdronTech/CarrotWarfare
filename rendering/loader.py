@@ -43,7 +43,6 @@ def put_values_for_entity(block: dict, name: str, alliance: int):
                 source.blit(resource, (0, 0), ((RESOURCE_TILE_SIZE * x, RESOURCE_TILE_SIZE * y), source_size))
                 transform.scale(source, (TILE_SIZE, TILE_SIZE), srf)
 
-                srf.convert_alpha(srf)
                 block[name + str(alliance)][state]["left"]["frame0"] = srf
                 block[name + str(alliance)]["state_attack"]["left"]["frame" + str(x)] = srf
 
@@ -55,8 +54,8 @@ def put_values_for_entity(block: dict, name: str, alliance: int):
             else:
                 source_size = (RESOURCE_TILE_SIZE, RESOURCE_TILE_SIZE)
                 srf_size = (TILE_SIZE, TILE_SIZE)
-                source = Surface(source_size)
-                srf = Surface(srf_size)
+                source = Surface(source_size, SRCALPHA)
+                srf = Surface(srf_size, SRCALPHA)
                 source.blit(resource, (0, 0), ((RESOURCE_TILE_SIZE * x, RESOURCE_TILE_SIZE * y), source_size))
                 transform.scale(source, (TILE_SIZE, TILE_SIZE), srf)
 
