@@ -22,25 +22,10 @@ ARENA_SURFACE_SIZE = (TILE_SIZE * WORLD_DIMENSION["width"],
                       TILE_SIZE * WORLD_DIMENSION["height"])
 ARENA_SURFACE_PADDING = ((RENDER_RESOLUTION[0] - ARENA_SURFACE_SIZE[0]) / 2,
                          (RENDER_RESOLUTION[1] - ARENA_SURFACE_SIZE[1]) / 2)
-ARENA_SURFACE_POSITION = (ARENA_SURFACE_PADDING[0] + SCREEN_SHAKE_OFFSET[0],
-                          ARENA_SURFACE_PADDING[1] + SCREEN_SHAKE_OFFSET[1])
 HUD_AREA = (ARENA_SURFACE_PADDING[0], ARENA_SURFACE_SIZE[1] / 2)
 
 
-def get_ultimate_surface():
-    from pygame import Surface
-    srf = Surface(RENDER_RESOLUTION)
-    srf.fill(COLOR_PLAYERS[0], ((0, 0),
-                                (RENDER_RESOLUTION[0] / 2, RENDER_RESOLUTION[1] / 2)))
-    srf.fill(COLOR_PLAYERS[1], ((RENDER_RESOLUTION[0] / 2, 0),
-                                (RENDER_RESOLUTION[0] / 2, RENDER_RESOLUTION[1] / 2)))
-    srf.fill(COLOR_PLAYERS[2], ((0, RENDER_RESOLUTION[1] / 2),
-                                (RENDER_RESOLUTION[0] / 2, RENDER_RESOLUTION[1] / 2)))
-    srf.fill(COLOR_PLAYERS[3], ((RENDER_RESOLUTION[0] / 2, RENDER_RESOLUTION[1] / 2),
-                                (RENDER_RESOLUTION[0] / 2, RENDER_RESOLUTION[1] / 2)))
-    return srf
-
-
+# Growing == Idle for player
 IMAGE_RESOURCE = {
     "entities": {
         "player_generic": {"name": "player",

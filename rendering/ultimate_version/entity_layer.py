@@ -47,29 +47,21 @@ class EntityLayer:
 
     def render_player(self, player: Player):
         # TODO handle player events
-        resources = IMAGE_RESOURCE["entities"]["player" + str(player.alliance)]
-        image = resources["state_stand"]["frame0"]
+        resources = IMAGE_RESOURCE["entities"]
+        image = resources["player" + str(player.alliance)]["state_stand"]["frame0"]
         self.arena_subsurface.blit(image,
                                    (int(player.pos.x *
-                                        TILE_SIZE + resources["offset"][0]),
+                                        TILE_SIZE + resources["player_generic"]["offset"][0]),
                                     int(player.pos.y *
-                                        TILE_SIZE + resources["offset"][1])))
+                                        TILE_SIZE + resources["player_generic"]["offset"][1])))
 
     def render_carrot(self, carrot: Carrot):
         # TODO handle carrot events
-        filled_trigon(self.arena_subsurface,
-                      int(carrot.pos.x * TILE_SIZE),
-                      int(carrot.pos.y * TILE_SIZE),
-                      int((carrot.pos.x + 0.3) * TILE_SIZE),
-                      int((carrot.pos.y - 1) * TILE_SIZE),
-                      int((carrot.pos.x - 0.3) * TILE_SIZE),
-                      int((carrot.pos.y - 1) * TILE_SIZE),
-                      COLOR_PLAYERS[carrot.alliance])
-        aatrigon(self.arena_subsurface,
-                 int(carrot.pos.x * TILE_SIZE),
-                 int(carrot.pos.y * TILE_SIZE),
-                 int((carrot.pos.x + 0.3) * TILE_SIZE),
-                 int((carrot.pos.y - 1) * TILE_SIZE),
-                 int((carrot.pos.x - 0.3) * TILE_SIZE),
-                 int((carrot.pos.y - 1) * TILE_SIZE),
-                 COLOR_PLAYERS[carrot.alliance])
+
+        resources = IMAGE_RESOURCE["entities"]
+        image = resources["carrot" + str(carrot.alliance)]["state_stand"]["frame0"]
+        self.arena_subsurface.blit(image,
+                                   (int(carrot.pos.x *
+                                        TILE_SIZE + resources["carrot_generic"]["offset"][0]),
+                                    int(carrot.pos.y *
+                                        TILE_SIZE + resources["carrot_generic"]["offset"][1])))

@@ -44,15 +44,15 @@ class ScreenShaker:
 
     def get_shake(self):
         if self.remaining_force == 0:
-            return SCREEN_SHAKE_OFFSET
+            return 0, 0
         else:
             dt = (now() - self.last_update)/1000
             delta = (self.pos_next - self.pos_current)
             if delta.length() <= 0.01:
                 self.set_next_position()
             self.pos_current += delta * SPEED * dt
-            x = SCREEN_SHAKE_OFFSET[0] * (1 + self.pos_current.x)
-            y = SCREEN_SHAKE_OFFSET[1] * (1 + self.pos_current.y)
+            x = SCREEN_SHAKE_OFFSET[0] * self.pos_current.x
+            y = SCREEN_SHAKE_OFFSET[1] * self.pos_current.y
             self.last_update = now()
             return x, y
 
