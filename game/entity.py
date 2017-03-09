@@ -53,16 +53,17 @@ class Entity:
             "remaining": self.hp
         })
 
-        if self.hp < 0:
+        if self.hp <= 0:
             self.hp = 0
             self.death()
 
             self.unregister()
             self.death_stamp = now()
 
-            self.events.append({
+            self.world.events.append({
                 "name": "death",
-                "stamp": self.death_stamp
+                "stamp": self.death_stamp,
+                "author": self
             })
 
     def death(self):

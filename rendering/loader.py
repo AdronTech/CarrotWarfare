@@ -5,10 +5,10 @@ from pygame import transform
 
 
 def load(path: str) -> Surface:
-    try:
-        img = image.load_extended(join('assets/sprites', path + ".png"))
-    except error:
-        raise SystemExit("Could not load image from {}".format(path))
+    # try:
+    img = image.load_extended(join('assets/sprites', path + ".png"))
+    # except error:
+    #     raise SystemExit("Could not load image from {}".format(path))
 
     img.convert_alpha(img)
     return img

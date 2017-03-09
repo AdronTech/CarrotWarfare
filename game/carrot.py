@@ -18,11 +18,13 @@ class Carrot(Entity):
 
         self.sight_range = 4
         self.player_range = 1
-        self.enemy_range = self.attack_range * 0.75
+        self.enemy_range = self.attack_range * 0.85
 
         self.enemies_in_sight = []  # type: list[Entity]
 
         self.look_timer = gen_timer(0.5)
+
+        self.turn_speed = 5
 
         self.vel = Vector2()
         self.acc = Vector2()
@@ -36,7 +38,7 @@ class Carrot(Entity):
         # for coord in self.world.radius_gen(self.pos, self.sight_range):
         #     t = self.world.get_tile(coord)  # type: Tile
         #     if t:
-        #         Debug.rect(Color("black"), ((t.x,t.y), (0.2, 0.2)))
+        #         Debug.rect(Color("black"), ((t.x + 0.4, t.y + 0.4), (0.2, 0.2)))
         #
         # if self.state is CarrotState.idle:
         #     Debug.circle((0, 0, 0), self.pos, 0.5)
@@ -60,12 +62,12 @@ class Carrot(Entity):
             elif self.state is CarrotState.attack:
                 des_dir = (self.target.pos - self.pos).normalize()  # type: Vector2
 
-            self.dir += (des_dir - self.dir) * delta_time * 5
+            self.dir += (des_dir - self.dir) * delta_time * self.turn_speed
 
         # seeking
         if self.state is CarrotState.seek_pos or self.state is CarrotState.seek_enemy:
             des_vel = self.target.pos - self.pos  # type: Vector2
-            des_vel *= 2
+            des_vel *= 0.5
             force = des_vel - self.vel  # type: Vector2
 
             self.acc += force
@@ -100,6 +102,7 @@ class Carrot(Entity):
             if self.target:
                 if self.target.pos.distance_squared_to(self.pos) <= self.enemy_range ** 2:
                     self.state = CarrotState.attack
+                    self.vel = Vector2()
                 else:
                     self.state = CarrotState.seek_enemy
             else:
@@ -108,7 +111,7 @@ class Carrot(Entity):
                 # seek pos
         else:
             if self.target:
-                if self.target.pos.distance_squared_to(self.pos) <= self.player_range:
+                if self.target.pos.distance_squared_to(self.pos) <= self.player_range**2:
                     self.go_idle()
             else:
                 self.go_idle()
@@ -118,12 +121,14 @@ class Carrot(Entity):
 
         if self.vel.length_squared() > self.speed ** 2:
             self.vel.scale_to_length(self.speed)
+
         self.acc = Vector2()
 
     def go_idle(self):
         self.target = None
         self.state = CarrotState.idle
         self.vel = Vector2()
+        self.acc = Vector2()
 
     def look_around(self):
         self.enemies_in_sight = []

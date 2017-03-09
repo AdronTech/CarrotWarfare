@@ -22,19 +22,29 @@ class Player(Entity):
         self.speed = 5
 
         self.spawnpoint = spawn
+        self.respawn_timer = 0
+        self.can_respawn = True
 
         self.spawn()
 
-    def spawn(self):
-        self.set_pos(self.spawnpoint)
-        self.hp = PLAYER_LIFE
+    def spawn(self, time=0):
+        self.can_respawn = not time < 0
+        self.respawn_timer = time
 
     def update(self, input=None):
         super().update()
         if self.hard_lock > 0:
             return
 
-        print(self.get_seeds())
+        if self.respawn_timer >= 0:
+            self.respawn_timer -= delta_time
+
+            if self.respawn_timer <= 0:
+                self.death_stamp = None
+                self.hp = PLAYER_LIFE
+                self.set_pos(self.spawnpoint)
+
+            return
 
         self.events.clear()
 
@@ -128,6 +138,7 @@ class Player(Entity):
             "pos": self.pos,
             "alliance": self.alliance,
             "radius": 7,
+            "type": self.seed_mode,
             "author": self
         })
 
@@ -159,14 +170,6 @@ class Player(Entity):
             type = self.seed_mode
 
         self.seeds[type.value] = amount
-
-    def death(self):
-        self.world.events.append({
-            "name": "player_death",
-            "alliance": self.alliance,
-            "stamp": self.death_stamp,
-            "author": self
-        })
 
     def pickup(self, seed_mode: SeedType, amount) -> bool:
         if self.get_seeds(seed_mode) + 1 <= PLAYER_SEED_POUCH:

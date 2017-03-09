@@ -45,17 +45,51 @@ class SimpleRenderer(AbstractRenderer):
                       (int((carrot.pos.x - 0.3) * TILE_SIZE),
                        int((carrot.pos.y - 1) * TILE_SIZE))])
 
+    def render_sprout(self, target, sprout: Carrot):
+
+        angle = -sprout.dir.as_polar()[1]
+        r = 1
+        h = 1
+
+        if sprout.state is not SproutState.seek_pos:
+            h = 0.5
+
+        draw.arc(target,
+                 COLOR_PLAYERS[sprout.alliance],
+                 Rect(int((sprout.pos.x - r) * TILE_SIZE),
+                      int((sprout.pos.y - r) * TILE_SIZE),
+                      int(r * TILE_SIZE * 2),
+                      int(r * TILE_SIZE * 2)),
+                 (angle - sprout.attack_angle / 2) * pi / 180,
+                 (angle + sprout.attack_angle / 2) * pi / 180,
+                 5)
+
+        draw.polygon(target, COLOR_PLAYERS[sprout.alliance],
+                     [
+                         ((sprout.pos.x - 0.4) * TILE_SIZE, sprout.pos.y * TILE_SIZE),
+                         ((sprout.pos.x + 0.4) * TILE_SIZE, sprout.pos.y * TILE_SIZE),
+                         ((sprout.pos.x + 0.2) * TILE_SIZE, (sprout.pos.y - h) * TILE_SIZE),
+                         ((sprout.pos.x - 0.2) * TILE_SIZE, (sprout.pos.y - h) * TILE_SIZE)
+                     ])
+
     def render(self, target: Surface, world: World):
         target.fill(CLR["white"])
         for x in range(WORLD_DIMENSION["width"]):
             for y in range(WORLD_DIMENSION["height"]):
                 t = world.grid[x][y]
-                if t.state and t.state["name"] == TileState.growing:
+                if t.state and t.state["name"] is TileState.growing:
                     size = t.state["g_state"] / 4 * TILE_SIZE
-                    draw.rect(target, COLOR_PLAYERS[t.state["alliance"]],
-                              Rect((int(x * TILE_SIZE + (TILE_SIZE - size) / 2),
-                                    int(y * TILE_SIZE + (TILE_SIZE - size) / 2)),
-                                   (size, size)))
+                    if t.state["seed"] is SeedType.melee:
+                        draw.rect(target, COLOR_PLAYERS_SECONDARY[t.state["alliance"]],
+                                  Rect((int(x * TILE_SIZE + (TILE_SIZE - size) / 2),
+                                        int(y * TILE_SIZE + (TILE_SIZE - size) / 2)),
+                                       (size, size)))
+                    elif t.state["seed"] is SeedType.ranged:
+                        draw.ellipse(target, COLOR_PLAYERS_SECONDARY[t.state["alliance"]],
+                                     Rect((int(x * TILE_SIZE + (TILE_SIZE - size) / 2),
+                                           int(y * TILE_SIZE + (TILE_SIZE - size) / 2)),
+                                          (size, size)))
+
                 elif t.state and t.state["name"] == TileState.pick_up:
                     size = TILE_SIZE * 0.7
                     draw.ellipse(target, (0, 0, 0),
@@ -70,8 +104,11 @@ class SimpleRenderer(AbstractRenderer):
                                   (int(((x + 0.5) - 0.1) * TILE_SIZE),
                                    int(((y + 0.5) - 0.2) * TILE_SIZE))])
 
-        for e in world.entities:
-            if type(e) is Player:
-                self.render_player(target, e)
-            elif type(e) is Carrot:
-                self.render_carrot(target, e)
+            for e in world.entities:  # type: Entity
+                if type(e) is Player:
+                    if not e.death_stamp:
+                        self.render_player(target, e)
+                elif type(e) is Carrot:
+                    self.render_carrot(target, e)
+                elif type(e) is Sprout:
+                    self.render_sprout(target, e)

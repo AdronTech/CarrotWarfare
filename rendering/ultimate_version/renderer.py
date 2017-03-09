@@ -1,6 +1,6 @@
 from rendering.abstract_renderer import *
 from rendering.ultimate_version.screen_shake import *
-
+from rendering import debugger as Debug
 
 class UltimateRenderer(AbstractRenderer):
     def __init__(self):
@@ -12,10 +12,10 @@ class UltimateRenderer(AbstractRenderer):
         from rendering.ultimate_version.entity_layer import EntityLayer
         from rendering.ultimate_version.ui_layer import UILayer
 
-        arena_subsurface = self.main_surface.subsurface(Rect(SUB_SURFACE_POSITION, SUB_SURFACE_SIZE))
-        self.ground_layer = GroundLayer(self, arena_subsurface)
-        self.overlay_layer = OverlayLayer(self, arena_subsurface)
-        self.entity_layer = EntityLayer(self, arena_subsurface)
+        self.arena_subsurface = self.main_surface.subsurface(Rect(SUB_SURFACE_POSITION, SUB_SURFACE_SIZE))
+        self.ground_layer = GroundLayer(self, self.arena_subsurface)
+        self.overlay_layer = OverlayLayer(self, self.arena_subsurface)
+        self.entity_layer = EntityLayer(self, self.arena_subsurface)
 
         ui_x_left = SCREEN_SHAKE_OFFSET[0]
         ui_x_right = SCREEN_SHAKE_OFFSET[0] + SUB_SURFACE_SIZE[0] + UI_SUBSURFACE_SIZE[0]
@@ -32,12 +32,13 @@ class UltimateRenderer(AbstractRenderer):
 
     def render(self, target: Surface, world: World):
         for e in world.events:
-            if e["name"] == "player_death":
+            if e["name"] == "death" and type(e["author"]) is Player:
                 self.screen_shake.impulse(0.5)
         self.ground_layer.render(world)
         self.overlay_layer.render(world)
         self.entity_layer.render(world)
         self.ui_layer.render(world)
+        Debug.render(DEFAULT_RENDERER.arena_subsurface)
         # blit final image
         shake_off = self.screen_shake.get_shake()
         target.blit(self.main_surface, (0, 0), (shake_off, DISPLAY_RESOLUTION))
@@ -68,6 +69,8 @@ if __name__ == "__main__":
     DEFAULT_RENDERER.screen_shake.impulse(1)
     game_world = new_game()
 
+    Debug.gen_debug_surface(DEFAULT_RENDERER.arena_subsurface)
+
     # main loop
     last_update = now()
     while True:
@@ -82,6 +85,7 @@ if __name__ == "__main__":
             # update timing
             next(update_counter)
             last_update += update_delay
+            Debug.clear()
             game_world.update()
         else:
             # update timing
@@ -91,4 +95,4 @@ if __name__ == "__main__":
 
             # DEFAULT_RENDERER.paint_square((randint(0, 19), randint(0, 19)), randint(0, 3))
             # 1DEFAULT_RENDERER.screen_shake_current = (random() * 2 - 1, random() * 2 - 1)
-            DEFAULT_RENDERER.render(display.render_target, game_world)
+            # DEFAULT_RENDERER.render(display.render_target, game_world)

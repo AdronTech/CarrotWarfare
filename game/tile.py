@@ -44,14 +44,21 @@ class Tile:
                     })
                     self.state = None
 
-
     def unregister(self, entity):
         if entity in self.entities:
             self.entities.remove(entity)
 
-    def plant(self, seed_mode, alliance):
+    def block(self, entity):
+        self.state = {"name": TileState.blocked,
+                      "entity": entity}
+
+    def unblock(self, entity):
+        if self.state and self.state["name"] is TileState.blocked and self.state["entity"] is entity:
+            self.state = None
+
+    def plant(self, seed_type, alliance):
         self.state = {"name": TileState.growing,
-                      "seed": seed_mode,
+                      "seed": seed_type,
                       "alliance": alliance,
                       "g_state": 1}
         self.timer = gen_timer(1)
@@ -65,3 +72,4 @@ class Tile:
 class TileState(Enum):
     pick_up = 0
     growing = 1
+    blocked = 2
