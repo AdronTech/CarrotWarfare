@@ -17,8 +17,8 @@ class Pop(object):
 class GroundLayer:
     def __init__(self, renderer: UltimateRenderer, arena_subsurface: Surface):
         self.parent_renderer = renderer  # type: UltimateRenderer
-        self.ground_surface = Surface(SUB_SURFACE_SIZE)
-        self.buffer_surface = Surface(SUB_SURFACE_SIZE)
+        self.ground_surface = Surface(ARENA_SURFACE_SIZE)
+        self.buffer_surface = Surface(ARENA_SURFACE_SIZE)
         self.ground_surface.fill(COLOR_BACKGROUND)
         self.arena_subsurface = arena_subsurface
         self.buffer = []
@@ -36,27 +36,29 @@ class GroundLayer:
             radius = int(random() * 2 * TILE_SIZE)
             x = int((pos[0] + random()) * TILE_SIZE)
             y = int((pos[1] + random()) * TILE_SIZE)
-            aacircle(self.ground_surface, x, y, radius, COLOR_PLAYERS_SECONDARY[alliance])
-            filled_circle(self.ground_surface, x, y, radius, COLOR_PLAYERS_SECONDARY[alliance])
-            aacircle(self.buffer_surface, x, y, radius, COLOR_PLAYERS_SECONDARY[alliance])
-            filled_circle(self.buffer_surface, x, y, radius, COLOR_PLAYERS_SECONDARY[alliance])
+            aacircle(self.ground_surface, x, y, radius, COLOR_PLAYERS_LIGHT[alliance])
+            filled_circle(self.ground_surface, x, y, radius, COLOR_PLAYERS_LIGHT[alliance])
+            aacircle(self.buffer_surface, x, y, radius, COLOR_PLAYERS_LIGHT[alliance])
+            filled_circle(self.buffer_surface, x, y, radius, COLOR_PLAYERS_LIGHT[alliance])
 
     def render(self, world: World):
         for e in world.events:
             if not "rendered" in e:
                 if e["name"] == "death":
                     self.parent_renderer.ground_layer.splatter(e["author"].alliance, e["author"].pos)
-                if e["name"] == "plant":
-                    if not self.buffer_contains(e["tile"]):
-                        srf = Surface((TILE_SIZE, TILE_SIZE))
-                        target_rect = ((e["tile"].x * TILE_SIZE, e["tile"].y * TILE_SIZE),
-                                       (TILE_SIZE, TILE_SIZE))
-                        srf.blit(self.ground_surface, (0, 0), target_rect)
+                if e["name"] == "plant_request":
+                    if "allowed" in e:
+                        if not self.buffer_contains(e["tile"]):
+                            srf = Surface((TILE_SIZE, TILE_SIZE))
+                            target_rect = ((e["tile"].x * TILE_SIZE, e["tile"].y * TILE_SIZE),
+                                           (TILE_SIZE, TILE_SIZE))
+                            srf.blit(self.ground_surface, (0, 0), target_rect)
 
-                        self.buffer.append(Pop(srf, self.buffer_surface,
-                                               self.ground_surface.subsurface(target_rect), (e["tile"].x, e["tile"].y)))
+                            self.buffer.append(Pop(srf, self.buffer_surface,
+                                                   self.ground_surface.subsurface(target_rect),
+                                                   (e["tile"].x, e["tile"].y)))
 
-                        self.ground_surface.fill(COLOR_BACKGROUND_SECONDARY, target_rect)
+                            self.ground_surface.fill(COLOR_BACKGROUND_SECONDARY, target_rect)
 
                 elif e["name"] == "full_grown":
                     for i in range(len(self.buffer)):

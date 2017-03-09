@@ -1,62 +1,356 @@
 # Blue, Red, Green, Amber @ Material Palette
 COLOR_PLAYERS = [(33, 150, 243), (244, 67, 54), (76, 175, 80), (255, 193, 7)]
-COLOR_PLAYERS_SECONDARY = [(25, 118, 210), (211, 47, 47), (56, 142, 60), (255, 160, 0)]
+COLOR_PLAYERS_DARK = [(25, 118, 210), (211, 47, 47), (56, 142, 60), (255, 160, 0)]
+COLOR_PLAYERS_LIGHT = [(100, 181, 246), (229, 115, 115), (129, 199, 132), (255, 213, 79)]
+REPLACEMENT_COLOR_DARK = (1, 1, 1)
+REPLACEMENT_COLOR_LIGHT = (2, 2, 2)
 COLOR_BACKGROUND = (250, 250, 250)
 COLOR_BACKGROUND_SECONDARY = (224, 224, 224)
 
-DISPLAY_RESOLUTION = (1280, 720)
+RENDER_RESOLUTION = (1280, 720)
 
 WORLD_DIMENSION = {"width": 27, "height": 17}
 
-SCREEN_SHAKE_OFFSET = (min(DISPLAY_RESOLUTION[0], DISPLAY_RESOLUTION[1]) / 20,
-                       min(DISPLAY_RESOLUTION[0], DISPLAY_RESOLUTION[1]) / 20)
-TILE_SIZE = min(DISPLAY_RESOLUTION[0] / float(WORLD_DIMENSION["width"]),
-                DISPLAY_RESOLUTION[1] / float(WORLD_DIMENSION["height"]))
-MAIN_SURFACE_SIZE = (DISPLAY_RESOLUTION[0] + SCREEN_SHAKE_OFFSET[0] * 2,
-                     DISPLAY_RESOLUTION[1] + SCREEN_SHAKE_OFFSET[1] * 2)
-SUB_SURFACE_SIZE = (TILE_SIZE * WORLD_DIMENSION["width"],
-                    TILE_SIZE * WORLD_DIMENSION["height"])
-SUB_SURFACE_BORDER = ((DISPLAY_RESOLUTION[0] - SUB_SURFACE_SIZE[0]) / 2,
-                      (DISPLAY_RESOLUTION[1] - SUB_SURFACE_SIZE[1]) / 2)
-SUB_SURFACE_POSITION = (SUB_SURFACE_BORDER[0] + SCREEN_SHAKE_OFFSET[0],
-                        SUB_SURFACE_BORDER[1] + SCREEN_SHAKE_OFFSET[1])
-UI_SUBSURFACE_SIZE = (SUB_SURFACE_BORDER[0], SUB_SURFACE_SIZE[1] / 2)
-UI_SEED_SURFACE_SIZE = (UI_SUBSURFACE_SIZE[0] / 4, UI_SUBSURFACE_SIZE[1] / 2)
+SCREEN_SHAKE_OFFSET = (min(RENDER_RESOLUTION[0], RENDER_RESOLUTION[1]) / 20,
+                       min(RENDER_RESOLUTION[0], RENDER_RESOLUTION[1]) / 20)
+
+# TODO TILE_SIZE CASTING
+
+TILE_SIZE = int(min(RENDER_RESOLUTION[0] / float(WORLD_DIMENSION["width"]),
+                    RENDER_RESOLUTION[1] / float(WORLD_DIMENSION["height"])))
+ARENA_SURFACE_SIZE = (TILE_SIZE * WORLD_DIMENSION["width"],
+                      TILE_SIZE * WORLD_DIMENSION["height"])
+ARENA_SURFACE_PADDING = ((RENDER_RESOLUTION[0] - ARENA_SURFACE_SIZE[0]) / 2,
+                         (RENDER_RESOLUTION[1] - ARENA_SURFACE_SIZE[1]) / 2)
+ARENA_SURFACE_POSITION = (ARENA_SURFACE_PADDING[0] + SCREEN_SHAKE_OFFSET[0],
+                          ARENA_SURFACE_PADDING[1] + SCREEN_SHAKE_OFFSET[1])
+HUD_AREA = (ARENA_SURFACE_PADDING[0], ARENA_SURFACE_SIZE[1] / 2)
 
 
 def get_ultimate_surface():
     from pygame import Surface
-    srf = Surface(MAIN_SURFACE_SIZE)
+    srf = Surface(RENDER_RESOLUTION)
     srf.fill(COLOR_PLAYERS[0], ((0, 0),
-                                (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
-    srf.fill(COLOR_PLAYERS[1], ((MAIN_SURFACE_SIZE[0] / 2, 0),
-                                (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
-    srf.fill(COLOR_PLAYERS[2], ((0, MAIN_SURFACE_SIZE[1] / 2),
-                                (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
-    srf.fill(COLOR_PLAYERS[3], ((MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2),
-                                (MAIN_SURFACE_SIZE[0] / 2, MAIN_SURFACE_SIZE[1] / 2)))
+                                (RENDER_RESOLUTION[0] / 2, RENDER_RESOLUTION[1] / 2)))
+    srf.fill(COLOR_PLAYERS[1], ((RENDER_RESOLUTION[0] / 2, 0),
+                                (RENDER_RESOLUTION[0] / 2, RENDER_RESOLUTION[1] / 2)))
+    srf.fill(COLOR_PLAYERS[2], ((0, RENDER_RESOLUTION[1] / 2),
+                                (RENDER_RESOLUTION[0] / 2, RENDER_RESOLUTION[1] / 2)))
+    srf.fill(COLOR_PLAYERS[3], ((RENDER_RESOLUTION[0] / 2, RENDER_RESOLUTION[1] / 2),
+                                (RENDER_RESOLUTION[0] / 2, RENDER_RESOLUTION[1] / 2)))
     return srf
 
 
 IMAGE_RESOURCE = {
     "entities": {
+        "player_generic": {"name": "player",
+                           "offset": None},
         "player0": {
-            "name": "player0"
+            "alliance": 0,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
         },
         "player1": {
-            "name": "player1"
+            "alliance": 1,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
         },
         "player2": {
-            "name": "player2"
+            "alliance": 2,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
         },
         "player3": {
-            "name": "player3"
+            "alliance": 3,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
         },
 
-        "carrot0": {},
-        "carrot1": {},
-        "carrot2": {},
-        "carrot3": {}
+        "carrot_generic": {"name": "carrot",
+                           "offset": None},
+        "carrot0": {
+            "alliance": 0,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
+        },
+        "carrot1": {
+            "alliance": 1,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
+        },
+        "carrot2": {
+            "alliance": 2,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
+        },
+        "carrot3": {
+            "alliance": 3,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
+        },
+
+        "sprout_generic": {"name": "sprout",
+                           "offset": None},
+        "sprout0": {
+            "alliance": 0,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
+        },
+        "sprout1": {
+            "alliance": 1,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
+        },
+        "sprout2": {
+            "alliance": 2,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
+        },
+        "sprout3": {
+            "alliance": 3,
+            "state_stand": {"name": "stand",
+                            "frame0": None},
+            "state_die": {"name": "die",
+                          "frame0": None,
+                          "frame1": None,
+                          "frame2": None,
+                          "frame3": None},
+            "state_walk": {"name": "walk",
+                           "frame0": None,
+                           "frame1": None,
+                           "frame2": None,
+                           "frame3": None},
+            "state_attack": {"name": "attack",
+                             "frame0": None,
+                             "frame1": None,
+                             "frame2": None,
+                             "frame3": None},
+            "state_growing": {"name": "growing",
+                              "frame0": None,
+                              "frame1": None,
+                              "frame2": None,
+                              "frame3": None}
+        }
     },
     "tiles": {
 

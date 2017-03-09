@@ -2,6 +2,7 @@ from pygame import Surface, draw, BLEND_RGBA_ADD, SRCALPHA
 from rendering.constants import *
 
 debug_surface = None  # type: Surface
+debug = True
 
 
 def gen_debug_surface(ref: Surface):
@@ -15,7 +16,8 @@ def clear():
 
 
 def render(surf: Surface):
-    surf.blit(debug_surface, (0, 0))
+    if debug:
+        surf.blit(debug_surface, (0, 0))
 
 
 def circle(color, pos, radius, width=0):
@@ -45,7 +47,6 @@ def rect(color, rect, width=0):
 
 
 def polygon(color, pointlist, width=0):
-
     mylist = []
 
     for p in pointlist:

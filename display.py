@@ -5,8 +5,8 @@ from pygame.locals import *
 class PyGameWindow:
     def __init__(self):
         self.fullscreen = False
-        from rendering.constants import DISPLAY_RESOLUTION
-        self.window_resolution = DISPLAY_RESOLUTION
+        from rendering.constants import RENDER_RESOLUTION
+        self.window_resolution = RENDER_RESOLUTION
         self.render_target = None
         self.reset_mode()
 
