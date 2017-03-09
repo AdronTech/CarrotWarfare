@@ -41,7 +41,7 @@ class EntityLayer:
                 elif e_type is Sprout:
                     self.render_sprout(entity)
                 elif e_type is Bullet:
-                    pass
+                    self.render_pea(entity)
                 else:
                     surf, x, y = entity
                     self.arena_subsurface.blit(surf, (int(x * TILE_SIZE - surf.get_width() / 2),
@@ -124,9 +124,9 @@ class EntityLayer:
                 carrot.render_flags["animator"] = EntityAnimator(carrot, "state_attack")
         if "move" in events:
             if "animator" in carrot.render_flags:
-                carrot.render_flags["animator"].set_animation("state_walk", 500, 0)
+                carrot.render_flags["animator"].set_animation("state_walk", 500, True)
             else:
-                carrot.render_flags["animator"] = EntityAnimator(carrot, "state_walk", 500, 0)
+                carrot.render_flags["animator"] = EntityAnimator(carrot, "state_walk", 500, True)
 
         image = None
         resources = IMAGE_RESOURCE["entities"]
@@ -148,8 +148,8 @@ class EntityLayer:
                                         TILE_SIZE + resources["carrot_generic"]["offset"][0]),
                                     int(carrot.pos.y *
                                         TILE_SIZE + resources["carrot_generic"]["offset"][1])))
-        
-    def render_sprout(self, sprout:Sprout):
+
+    def render_sprout(self, sprout: Sprout):
         events = []
         for e in sprout.events:
             if e["name"] == "death":
@@ -195,5 +195,13 @@ class EntityLayer:
                                         TILE_SIZE + resources["sprout_generic"]["offset"][0]),
                                     int(sprout.pos.y *
                                         TILE_SIZE + resources["sprout_generic"]["offset"][1])))
-            
 
+    def render_pea(self, pea: Bullet):
+
+        image = IMAGE_RESOURCE["entities"]["pea" + str(pea.alliance)]["resource"]
+
+        self.arena_subsurface.blit(image,
+                                   (int(pea.pos.x *
+                                        TILE_SIZE + IMAGE_RESOURCE["entities"]["pea_generic"]["offset"][0]),
+                                    int(pea.pos.y *
+                                        TILE_SIZE + IMAGE_RESOURCE["entities"]["pea_generic"]["offset"][1])))

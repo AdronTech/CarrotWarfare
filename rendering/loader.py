@@ -65,6 +65,18 @@ def put_values_for_entity(block: dict, name: str, alliance: int):
                 block[name + str(alliance)][state]["right"]["frame" + str(x)] = srf
 
 
+def load_pea(block: dict, alliance: int):
+    resource = load(block["pea_generic"]["name"])
+    PixelArray(resource).replace(REPLACEMENT_COLOR_LIGHT, COLOR_PLAYERS[alliance], 0)
+    PixelArray(resource).replace(REPLACEMENT_COLOR_DARK, COLOR_PLAYERS_DARK[alliance], 0)
+    srf = Surface((TILE_SIZE / 2, TILE_SIZE / 2), SRCALPHA)
+    transform.scale(resource, (TILE_SIZE // 2, TILE_SIZE // 2), srf)
+
+    block["pea" + str(alliance)]["resource"] = srf
+
+    block["pea_generic"]["offset"] = (TILE_SIZE / -2 + TILE_SIZE / 4, -TILE_SIZE)
+
+
 def load_all():
     put_values_for_entity(IMAGE_RESOURCE["entities"], "player", 0)
     put_values_for_entity(IMAGE_RESOURCE["entities"], "player", 1)
@@ -80,3 +92,8 @@ def load_all():
     put_values_for_entity(IMAGE_RESOURCE["entities"], "sprout", 1)
     put_values_for_entity(IMAGE_RESOURCE["entities"], "sprout", 2)
     put_values_for_entity(IMAGE_RESOURCE["entities"], "sprout", 3)
+
+    load_pea(IMAGE_RESOURCE["entities"], 0)
+    load_pea(IMAGE_RESOURCE["entities"], 1)
+    load_pea(IMAGE_RESOURCE["entities"], 2)
+    load_pea(IMAGE_RESOURCE["entities"], 3)

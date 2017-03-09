@@ -769,7 +769,14 @@ IMAGE_RESOURCE = {
                           "frame0": None,
                           "frame1": None,
                           "frame2": None,
-                          "frame3": None}}}
+                          "frame3": None}}},
+
+        "pea_generic": {"name": "pea",
+                        "offset": None},
+        "pea0": {},
+        "pea1": {},
+        "pea2": {},
+        "pea3": {}
     },
     "tiles": {
 
