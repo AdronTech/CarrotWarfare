@@ -8,6 +8,7 @@ from game.carrot import Carrot
 from game.sprout import Sprout, SproutState
 from game.player import Player, SeedType
 from rendering.loader import load_all
+from game.constants import *
 
 
 class AbstractRenderer:

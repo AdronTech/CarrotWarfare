@@ -2,6 +2,7 @@ from rendering.abstract_renderer import *
 from rendering.ultimate_version.screen_shake import *
 from rendering import debugger as Debug
 
+
 class UltimateRenderer(AbstractRenderer):
     def __init__(self):
         load_all()

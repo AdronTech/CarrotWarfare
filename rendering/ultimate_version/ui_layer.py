@@ -17,26 +17,42 @@ class UILayer:
         self.parent_renderer = renderer
         self.player_ui_surfaces = player_ui_surfaces
 
-        self.max_health = 100.0
-        self.max_seeds = 200.0
-
         self.current_health = 1.0
         self.current_seed_count_melee = 1.0
         self.current_seed_count_ranged = 1.0
 
 
     # call once for each player
+    def render(self, render_target: Surface, world: World):
+        for i in range(4):
+            p = world.players[i]
+            self.draw_ui_for_player(i, render_target, p)
+
     def draw_ui_for_player(self, i: int, target: Surface, player: Player):
         # Health
-        self.current_health = player.hp / self.max_health
+        health_percent = player.hp / PLAYER_LIFE
+
         # Seeds
         self.current_seed_count_melee = player.get_seeds(SeedType.melee) / self.max_seeds
         self.current_seed_count_ranged = player.get_seeds(SeedType.ranged) / self.max_seeds
-        target.fill(COLOR_PLAYERS[i], ((0, 0), (target.get_width(), target.get_height() * self.current_health)))
+        target.fill(COLOR_PLAYERS[i], (self.fill_origins[i], (target.get_width(), target.get_height() * self.current_health)))
+        target.fill(COLOR_BACKGROUND_SECONDARY, (self.fill_origins[i], self.hp_area))
 
-    def render(self, render_target: Surface, world: World):
-        for i in range(2):
-            player = world.entities[i]
-            self.draw_ui_for_player(i, self.player_ui_surfaces[i], player)
-            render_target.fill(COLOR_PLAYERS[i], (self.fill_origins[i], self.hp_area))
-            render
+    def hp_fill(self, target: Surface, i: int, percent: float):
+        flip = i < 2
+        ox, oy = self.fill_origins[i]
+        w, h = self.hp_area
+        if flip:
+            upper_color = COLOR_BACKGROUND_SECONDARY
+            lower_color = COLOR_PLAYERS[i]
+            percent = 1 - percent
+        else:
+            upper_color = COLOR_PLAYERS[i]
+            lower_color = COLOR_BACKGROUND_SECONDARY
+
+        target.fill(color=upper_color,
+                    rect=((ox, oy),
+                          (w, h * percent)))
+        target.fill(color=lower_color,
+                    rect=((ox, oy),
+                          (w, h * (1-percent))))
