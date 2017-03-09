@@ -51,7 +51,10 @@ class Player(Entity):
         for input_command in input:
             command = input_command["command"]
             if command == Commands.directional:
-                self.move(input_command["dir"], input_command["hold_position"])
+                self.move(input_command["dir"])
+
+            if command == Commands.look:
+                self.look(input_command["dir"])
 
             elif self.soft_lock <= 0:
                 if command == Commands.attack:
@@ -69,12 +72,7 @@ class Player(Entity):
                     # if self.events:
                     #     print(self.events)
 
-    def move(self, dir: Vector2, hold_pos: bool):
-
-        self.dir = dir
-
-        if hold_pos:
-            return
+    def move(self, dir: Vector2):
 
         # calc delta pos
         d_pos = dir * self.speed * delta_time  # type: Vector2
@@ -88,6 +86,9 @@ class Player(Entity):
             "delta": d_pos,
             "pos": self.pos
         })
+
+    def look(self, dir: Vector2):
+        self.dir = dir
 
     def attack(self):
 
