@@ -1,13 +1,12 @@
 from rendering.ultimate_version.renderer import *
 
-ICON_BORDER_COLOR = (0, 0, 0)
 AMMO_BAR_COLOR = (0, 0, 0)
 
 
 class UILayer:
     def __init__(self, renderer: UltimateRenderer, main_surface: Surface):
         self.parent_renderer = renderer
-        self.main_surface = main_surface
+        self.draw_target = main_surface
         self.hp_area = (RENDER_RESOLUTION[0]/2, RENDER_RESOLUTION[1]/2)
         self.hp_show = [0] * 4
         self.hp_fill_origins = (
@@ -63,8 +62,8 @@ class UILayer:
         y_upper = y_lower+h_lower
         h_upper = h-h_lower
         r_upper = (x, y_upper), (w, h_upper)
-        self.main_surface.fill(color=c_lower, rect=r_lower)
-        self.main_surface.fill(color=c_upper, rect=r_upper)
+        self.draw_target.fill(color=c_lower, rect=r_lower)
+        self.draw_target.fill(color=c_upper, rect=r_upper)
 
     def draw_hud(self, id: int, seed_mode: int, seeds):
         icon_l = self.hud_center - self.icon_w - self.icon_hpad
@@ -85,6 +84,7 @@ class UILayer:
         self.draw_ammo_icon(id=id,
                             origin=self.hud_origins[id],
                             offset=(icon_l, icon_y),
+                            seed_type="melee",
                             selected=seed_mode is 0)
         # r_r
         self.draw_ammo_bar(origin=self.hud_origins[id],
@@ -95,27 +95,30 @@ class UILayer:
         self.draw_ammo_icon(id=id,
                             origin=self.hud_origins[id],
                             offset=(icon_r, icon_y),
+                            seed_type="ranged",
                             selected=seed_mode is 1)
 
-    def draw_ammo_icon(self, id: int, origin, offset, selected):
+    def draw_ammo_icon(self, id: int, origin, offset, seed_type: str, selected):
         hx, hy = origin
         x, y = offset
         rect = (hx + x, hy + y), (self.icon_w, self.icon_w)
         self.main_surface.fill(COLOR_PLAYERS_DARK[id], rect)
+        self.draw_target.blit(source=IMAGE_RESOURCE["ui"][seed_type]["resource"],
+                              dest=rect[0])
         if selected:
-            draw.rect(self.main_surface, ICON_BORDER_COLOR, rect, self.border_w)
+            draw.rect(self.draw_target, COLOR_PLAYERS_LIGHT[id], rect, self.border_w)
 
     def draw_ammo_bar(self, origin, bar_x, bar_y, width, fill):
         hx, hy = origin
         start, end_max = bar_y
         end = start + (end_max-start) * (fill/PLAYER_SEED_POUCH)
-        draw.line(self.main_surface,
+        draw.line(self.draw_target,
                   AMMO_BAR_COLOR,
                   (hx + bar_x, hy + start),
                   (hx + bar_x, hy + end),
                   width)
-        draw.line(self.main_surface,
+        draw.line(self.draw_target,
                   AMMO_BAR_COLOR,
                   (hx + bar_x - width, hy + end),
                   (hx + bar_x + width, hy + end),
-                  width*2)
+                  width * 2)
