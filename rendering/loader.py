@@ -1,6 +1,6 @@
 from pygame import Surface, error, image, SRCALPHA
 from os.path import join
-from rendering.constants import IMAGE_RESOURCE, TILE_SIZE
+from rendering.constants import IMAGE_RESOURCE, TILE_SIZE, ARENA_SURFACE_PADDING
 from pygame import transform
 from pygame import PixelArray
 from rendering.constants import REPLACEMENT_COLOR_LIGHT, REPLACEMENT_COLOR_DARK, COLOR_PLAYERS, COLOR_PLAYERS_DARK
@@ -77,12 +77,19 @@ def load_pea(block: dict, alliance: int):
 
 
 def load_ui(block: dict):
-    image = load("carrotUI")
-    image = image.convert_alpha(image)
-    block["melee"]["resource"] = image
-    image = load("peaUI")
-    image = image.convert_alpha(image)
-    block["ranged"]["resource"] = image
+    img = load("carrotUI")
+    img = img.convert_alpha(img)
+    size = (ARENA_SURFACE_PADDING[0] // 3, ARENA_SURFACE_PADDING[0] // 3)
+    srf = Surface(size, SRCALPHA)
+    transform.scale(img, size, srf)
+    block["melee"]["resource"] = srf
+    
+    img = load("peaUI")
+    img = img.convert_alpha(img)
+    size = (ARENA_SURFACE_PADDING[0] // 3, ARENA_SURFACE_PADDING[0] // 3)
+    srf = Surface(size, SRCALPHA)
+    transform.scale(img, size, srf)
+    block["ranged"]["resource"] = srf
 
 
 def load_all():
