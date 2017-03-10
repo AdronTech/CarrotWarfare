@@ -79,14 +79,13 @@ def load_pea(block: dict, alliance: int):
 def load_ui(block: dict):
     img = load("carrotUI")
     img = img.convert_alpha(img)
-    size = (ARENA_SURFACE_PADDING[0] // 3, ARENA_SURFACE_PADDING[0] // 3)
+    size = int(ARENA_SURFACE_PADDING[0]/3), int(ARENA_SURFACE_PADDING[0]/3)
     srf = Surface(size, SRCALPHA)
     transform.scale(img, size, srf)
     block["melee"]["resource"] = srf
     
     img = load("peaUI")
     img = img.convert_alpha(img)
-    size = (ARENA_SURFACE_PADDING[0] // 3, ARENA_SURFACE_PADDING[0] // 3)
     srf = Surface(size, SRCALPHA)
     transform.scale(img, size, srf)
     block["ranged"]["resource"] = srf

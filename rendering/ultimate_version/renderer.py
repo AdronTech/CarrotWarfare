@@ -7,7 +7,7 @@ class UltimateRenderer(AbstractRenderer):
     def __init__(self):
         load_all()
 
-        self.main_surface = Surface(RENDER_RESOLUTION)
+        self.buffer_surface = Surface(RENDER_RESOLUTION)
         self.arena_surface = Surface(ARENA_SURFACE_SIZE)
 
         from rendering.ultimate_version.ui_layer import UILayer
@@ -15,7 +15,7 @@ class UltimateRenderer(AbstractRenderer):
         from rendering.ultimate_version.overlay_layer import OverlayLayer
         from rendering.ultimate_version.entity_layer import EntityLayer
 
-        self.ui_layer = UILayer(self, self.main_surface)
+        self.ui_layer = UILayer(self, self.buffer_surface)
         self.ground_layer = GroundLayer(self, self.arena_surface)
         self.overlay_layer = OverlayLayer(self, self.arena_surface)
         self.entity_layer = EntityLayer(self, self.arena_surface)
@@ -37,13 +37,13 @@ class UltimateRenderer(AbstractRenderer):
         # blit arena to main surface
         x, y = ARENA_SURFACE_PADDING
         s_dx, s_dy = self.screen_shake.get_shake()
-        self.main_surface.blit(self.arena_surface, (x+s_dx, y+s_dy))
+        self.buffer_surface.blit(self.arena_surface, (x + s_dx, y + s_dy))
 
         # remove all recent events
         world.events.clear()
 
         # blit final image
-        scale(self.main_surface, target.get_size(), target)
+        target.blit(self.buffer_surface, (0, 0))
 
 
 if __name__ == "__main__":

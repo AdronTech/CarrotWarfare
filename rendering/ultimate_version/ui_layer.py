@@ -70,11 +70,11 @@ class UILayer:
         icon_r = self.hud_center + self.icon_hpad
         if id < 2:
             icon_y = self.icon_vpad
-            bar_y = (icon_y+self.icon_w, HUD_AREA[1]-self.icon_w)
+            bar_y = (icon_y+self.icon_w+self.border_w, HUD_AREA[1]-self.icon_w+self.border_w)
         else:
             icon_r = self.hud_center + self.icon_hpad
             icon_y = HUD_AREA[1]-self.icon_vpad-self.icon_w
-            bar_y = (icon_y, self.icon_vpad)
+            bar_y = (icon_y-self.border_w, self.icon_vpad-self.border_w)
         # r_l
         self.draw_ammo_bar(origin=self.hud_origins[id],
                            bar_x=icon_l + self.icon_w / 2,
@@ -101,12 +101,18 @@ class UILayer:
     def draw_ammo_icon(self, id: int, origin, offset, seed_type: str, selected):
         hx, hy = origin
         x, y = offset
-        rect = (hx + x, hy + y), (self.icon_w, self.icon_w)
-        self.main_surface.fill(COLOR_PLAYERS_DARK[id], rect)
+        pos = (hx + x, hy + y)
+        size = (self.icon_w, self.icon_w)
+        self.draw_target.fill(COLOR_PLAYERS_DARK[id],
+                              ((pos[0]-self.border_w, pos[1]-self.border_w),
+                               (size[0]+self.border_w*2, size[1]+self.border_w*2)))
         self.draw_target.blit(source=IMAGE_RESOURCE["ui"][seed_type]["resource"],
-                              dest=rect[0])
+                              dest=pos)
         if selected:
-            draw.rect(self.draw_target, COLOR_PLAYERS_LIGHT[id], rect, self.border_w)
+            draw.rect(self.draw_target, (0, 0, 0),
+                      ((pos[0]-self.border_w, pos[1]-self.border_w),
+                       (size[0]+self.border_w*2, size[1]+self.border_w*2)),
+                      self.border_w)
 
     def draw_ammo_bar(self, origin, bar_x, bar_y, width, fill):
         hx, hy = origin
