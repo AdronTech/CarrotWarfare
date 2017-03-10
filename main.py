@@ -40,7 +40,7 @@ class Application:
 
     async def _main_menu(self):
         while self.running:
-            self.game = {"world": new_game(), "renderer": Renderer()}
+            self.game = {"world": new_game(), "renderer": Renderer(self.display.native_resolution)}
             # run the process
             exit_code = self._game_loop(**self.game)
             # handle exit

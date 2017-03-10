@@ -5,8 +5,8 @@ from rendering import debugger as Debug
 
 
 class UltimateRenderer(AbstractRenderer):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, target_resolution):
+        super().__init__(target_resolution)
 
         load_all()
 
