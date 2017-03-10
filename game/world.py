@@ -1,4 +1,3 @@
-from game.input import *
 from game.tile import *
 from timing import *
 from random import random, randint
@@ -98,6 +97,7 @@ class World:
 
         # print(self.events)
 
+
     def check_events(self):
         from game.carrot import Carrot
         from game.sprout import Sprout
@@ -112,7 +112,6 @@ class World:
                         self.growing.append(t)
                         t.plant(e["type"], e["alliance"])
                         e["allowed"] = None
-
             elif e["name"] == "full_grown":
                 self.growing.remove(e["tile"])
 
@@ -120,7 +119,6 @@ class World:
                     self.entities.append(Carrot(self, e["alliance"], e["pos"]))
                 elif e["type"] is SeedType.ranged:
                     self.entities.append(Sprout(self, e["alliance"], e["pos"]))
-
             elif e["name"] == "attack":
                 pos = e["pos"]  # type: Vector2
                 dir = e["dir"]
@@ -150,10 +148,8 @@ class World:
                 possible_enemies = sorted(possible_enemies, key=lambda entity: entity[0])  # sort by distance
                 for i in range(min(e["count"], len(possible_enemies))):
                     possible_enemies[i][1].hit(e["damage"])
-
             elif e["name"] == "shoot":
                 self.entities.append(Bullet(self, e["alliance"], e["pos"], e["dir"]))
-
             elif e["name"] == "call":
                 scale = [0.5, 1]
                 entities = []  # type: [Entity]
@@ -187,7 +183,6 @@ class World:
                     if t and (not t.state or (t.state["name"] is TileState.blocked and t.state["entity"] in entities)):
                         entities[counter].call(pos + delta)
                         counter += 1
-
             elif e["name"] == "death":
                 ent = e["author"]  # type: Entity
                 ent.kill()
@@ -210,6 +205,7 @@ class World:
 
 
 def new_game() -> World:
+    from game.input import lock_input
     from game.player import Player, SeedType
     from game.carrot import Carrot
     from game.sprout import Sprout

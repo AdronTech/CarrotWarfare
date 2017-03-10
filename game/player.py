@@ -1,5 +1,5 @@
 from game.entity import *
-
+from game.commands import Commands
 
 class SeedType(Enum):
     melee = 0

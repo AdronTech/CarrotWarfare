@@ -3,12 +3,16 @@ from xinput import Gamepad
 from pygame.math import Vector2
 from pygame import event as pygame_events
 from pygame import *
+from rendering.abstract_renderer import AbstractRenderer
+from game.world import World
+
+if False:
+    pass
 
 key_board_enabled = True
 key_board_player = -1
 
-
-def get_input(pygame_events):
+def get_input(pygame_events, renderer: AbstractRenderer, world: World):
     Gamepad.update()
     gamepads = list(Gamepad)
     commands = [[], [], [], []]
@@ -24,36 +28,47 @@ def get_input(pygame_events):
             look_dir = Vector2()
 
             for e in pygame_events:
-                print(e)
 
                 if e.type is KEYDOWN:
+                    print(e)
                     if e.key is K_SPACE:
+                        commands[i].append({"command": Commands.call})
+                    elif e.key is K_f:
+                        commands[i].append({"command": Commands.attack})
+                    elif e.key is K_d:
+                        commands[i].append({"command": Commands.plant})
+                    elif e.key is K_a:
                         commands[i].append({"command": Commands.swap})
 
-                elif e.type is MOUSEBUTTONDOWN:
-                    if e.button is 1:
-                        commands[i].append({"command": Commands.call})
-                    elif e.button is 2:
-                        commands[i].append({"command": Commands.plant})
-                    elif e.button is 3:
-                        commands[i].append({"command": Commands.attack})
+                        # elif e.type is MOUSEBUTTONDOWN:
+                        #     if e.button is 1:
+                        #         commands[i].append({"command": Commands.call})
+                        #     elif e.button is 2:
+                        #         commands[i].append({"command": Commands.plant})
+                        #     elif e.button is 3:
+                        #         commands[i].append({"command": Commands.attack})
 
-                elif e.type is MOUSEMOTION:
-                    look_dir = -Vector2(e.rel)
+            # pressed = key.get_pressed()
 
-            pressed = key.get_pressed()
+            # if pressed[K_w]:
+            #     move_dir += Vector2(0, -1)
+            #
+            # if pressed[K_a]:
+            #     move_dir += Vector2(-1, 0)
+            #f
+            # if pressed[K_s]:
+            #     move_dir += Vector2(0, 1)
+            #
+            # if pressed[K_d]:
+            #     move_dir += Vector2(1, 0)
 
-            if pressed[K_w]:
-                move_dir += Vector2(0, -1)
+            look_dir = renderer.screen_to_world(Vector2(mouse.get_pos())) - world.entities[i].pos  # type: Vector2
 
-            if pressed[K_a]:
-                move_dir += Vector2(-1, 0)
+            if look_dir.length_squared() < 1:
+                look_dir = Vector2()
 
-            if pressed[K_s]:
-                move_dir += Vector2(0, 1)
-
-            if pressed[K_d]:
-                move_dir += Vector2(1, 0)
+            if mouse.get_pressed()[0]:
+                move_dir = look_dir
 
             if move_dir.x != 0 or move_dir.y != 0:
                 move_dir.normalize_ip()
@@ -63,7 +78,7 @@ def get_input(pygame_events):
                     "dir": move_dir
                 })
 
-            look_dir = move_dir
+            # look_dir = move_dir
 
             if look_dir.x != 0 or look_dir.y != 0:
                 look_dir.normalize_ip()

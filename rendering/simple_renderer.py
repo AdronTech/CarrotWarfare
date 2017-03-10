@@ -2,11 +2,18 @@ from game.tile import TileState
 from rendering.abstract_renderer import *
 from pygame import Surface, Rect, draw
 from cmath import pi
+from rendering import debugger as Debug
 
 CLR = {"white": (255, 255, 255), "black": (0, 0, 0)}
 
 
 class SimpleRenderer(AbstractRenderer):
+
+    def __init__(self):
+        super().__init__()
+        self.arena_surface = Surface(ARENA_SURFACE_SIZE)
+
+        Debug.gen_debug_surface(self.arena_surface)
 
     def render_player(self, target, player: Player):
         angle = -player.dir.as_polar()[1]
@@ -119,3 +126,5 @@ class SimpleRenderer(AbstractRenderer):
                     self.render_sprout(target, e)
                 elif type(e) is Bullet:
                     self.render_bullet(target, e)
+
+        Debug.render(target)

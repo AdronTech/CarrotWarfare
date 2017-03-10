@@ -6,11 +6,16 @@ from pygame import event as pygame_events
 from pygame import init as pygame_init
 from display import *
 # own imports
-from rendering.ultimate_version.renderer import UltimateRenderer as Renderer
+
+if True:
+    from rendering.ultimate_version.renderer import UltimateRenderer as Renderer
+else:
+    from rendering.simple_renderer import SimpleRenderer as Renderer
+
 from rendering import debugger as Debug
 from game.world import new_game
-from game.input import get_input
 from timing import *
+from game.input import get_input
 
 
 class ExitCode(Enum):
@@ -60,9 +65,9 @@ class Application:
             for e in events:
                 if e.type is QUIT or (e.type is KEYDOWN and e.key is K_ESCAPE):
                     return ExitCode.EXIT
-            pygame_events.pump()
 
-            input = get_input(events)
+            input = get_input(events, renderer, world)
+            pygame_events.pump()
 
             if time_since_update >= update_delay:
                 Debug.clear()
