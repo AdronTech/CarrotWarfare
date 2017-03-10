@@ -103,9 +103,10 @@ class World:
 
     # TODO: this is sloppy code
     def spawn_pickup(self):
+        from game.player import SeedType
         if next(self.spawn_timer):
             while True:
-                spawn_tile = choice(self.grid)  # type: Tile
+                spawn_tile = choice(choice(self.grid))  # type: Tile
                 if not spawn_tile.state:
                     break
             spawn_tile.set_pickup(choice(list(SeedType)), 5)  # TODO: hardcoded seed amount
@@ -155,7 +156,8 @@ class World:
                                 if abs(dist.angle_to(dir)) > h_angle:
                                     continue
 
-                                possible_enemies.append((dist.length_squared(), ent))
+                                if not ent.death_stamp:
+                                    possible_enemies.append((dist.length_squared(), ent))
 
                 possible_enemies = sorted(possible_enemies, key=lambda entity: entity[0])  # sort by distance
                 for i in range(min(e["count"], len(possible_enemies))):
