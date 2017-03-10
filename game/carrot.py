@@ -10,7 +10,7 @@ class Carrot(Entity):
         self.state = None
         self.go_idle()
 
-        self.speed = 4
+        self.speed = 3
         self.hp = 30
 
         self.attack_range = 1.5
