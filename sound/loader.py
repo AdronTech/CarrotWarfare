@@ -4,6 +4,7 @@ from os.path import isdir, splitext
 import pygame
 from pygame import mixer
 import random
+from game.world import World
 
 class Sound:
     def __init__(self):
@@ -74,6 +75,31 @@ class Sound:
     def play(self, name):
         if name in self.sounds:
             random.choice(self.sounds[name]).play()
+
+    def update(self, world: World):
+
+        for e in world.events:
+            if e["name"] is "gameover":
+                self.play("victory")
+
+            elif e["name"] is "gamestart":
+                self.play("start")
+
+            elif e["name"] is "gameover":
+                self.play("victory")
+
+        for ent in world.entities:
+            ent_type = type(ent)
+            for e in ent.events:
+                if e["name"] is "gameover":
+                    self.play("victory")
+
+                elif e["name"] is "gamestart":
+                    self.play("start")
+
+                elif e["name"] is "gameover":
+                    self.play("victory")
+
 
 if __name__ == "__main__":
     import time

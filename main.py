@@ -12,6 +12,7 @@ if True:
 else:
     from rendering.simple_version.renderer import SimpleRenderer as Renderer
 
+from sound.loader import Sound
 from rendering import debugger as Debug
 from game.world import new_game
 from timing import *
@@ -40,7 +41,7 @@ class Application:
 
     async def _main_menu(self):
         while self.running:
-            self.game = {"world": new_game(), "renderer": Renderer(self.display.native_resolution)}
+            self.game = {"world": new_game(), "renderer": Renderer(self.display.native_resolution), "sound": Sound()}
             # run the process
             exit_code = self._game_loop(**self.game)
             # handle exit
@@ -50,10 +51,11 @@ class Application:
             elif exit_code is ExitCode.PAUSE:
                 pass
 
-    def _game_loop(self, world, renderer):
+    def _game_loop(self, world, renderer, sound):
         # basic loop fuctions
         game_render = renderer.render
         game_update = world.update
+        game_sound = sound.update
         renderer.screen_shake.impulse(20)
         # start of main loop
         last_update = now()
@@ -70,8 +72,11 @@ class Application:
 
             if time_since_update >= update_delay:
                 Debug.clear()
+
                 input = get_input(events, renderer, world)
                 game_update(input)
+                game_sound(world)
+
                 for e in world.events:
                     if e["name"] is "main_menu":
                         return ExitCode.PAUSE
