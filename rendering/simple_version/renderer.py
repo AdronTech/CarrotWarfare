@@ -4,8 +4,8 @@ from rendering import debugger as Debug
 
 
 class SimpleRenderer(AbstractRenderer):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, target_resolution):
+        super().__init__(target_resolution)
 
         load_all()
 
@@ -50,7 +50,7 @@ class SimpleRenderer(AbstractRenderer):
         world.events.clear()
 
         # blit final image
-        target.blit(self.buffer_surface, (0, 0))
+        scale(self.buffer_surface, target.get_size(), target)
 
 
 if __name__ == "__main__":

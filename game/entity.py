@@ -31,12 +31,12 @@ class Entity:
         self.unregister()
 
         # Saman fix
-        if pos.y < 0.5:
-            self.pos = Vector2()+(pos[0], 0.5)
-            self.bb.pos = Vector2()+(pos[0], 0.5)
-        else:
-            self.pos = pos
-            self.bb.pos = pos
+        # if pos.y < 0.5:
+        #     self.pos = Vector2()+(pos[0], 0.5)
+        #     self.bb.pos = Vector2()+(pos[0], 0.5)
+        # else:
+        self.pos = pos
+        self.bb.pos = pos
 
         # constrain
         self.world.constrain_vector(pos)
@@ -46,7 +46,7 @@ class Entity:
             self.register()
 
     def register(self):
-        t = self.world.get_tile(self.pos)   # type: Tile
+        t = self.world.get_tile(self.pos)  # type: Tile
         t.register(self)
 
         for p in self.bb.get_int():
@@ -85,5 +85,3 @@ class Entity:
 
     def kill(self):
         self.unregister()
-
-

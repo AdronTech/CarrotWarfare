@@ -22,7 +22,7 @@ class TitleAnimationStates(Enum):
 
 def poll_for_players(render_target: Surface):
     cycle_start = now() + FADE_IN_TIME * 1000
-    title_font = Font("assets/fonts/RobotoMono-Regular.ttf", 75)
+    title_font = Font("assets/fonts/RobotoMono-Regular.ttf", 90)
     title = title_font.render(TITLE_TXT, 1, (0, 0, 0))
     title_x = (render_target.get_size()[0] - title.get_size()[0])/2
     title_y = (render_target.get_size()[1] - title.get_size()[1])/2

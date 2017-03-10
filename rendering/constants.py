@@ -7,7 +7,7 @@ REPLACEMENT_COLOR_LIGHT = (2, 2, 2)
 COLOR_BACKGROUND = (250, 250, 250)
 COLOR_BACKGROUND_SECONDARY = (224, 224, 224)
 
-RENDER_RESOLUTION = (1920, 1080)
+RENDER_RESOLUTION = (1600, 900)
 
 WORLD_DIMENSION = {"width": 27, "height": 17}
 
@@ -664,8 +664,14 @@ IMAGE_RESOURCE = {
         "pea2": {},
         "pea3": {}
     },
-    "tiles": {
-
+    "juice": {
+        "shadow": {
+            "offset": None,
+            "0": None,
+            "1": None,
+            "2": None,
+            "3": None
+        }
     },
     "ui": {
         "melee": {"resource": None},

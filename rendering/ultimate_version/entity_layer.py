@@ -15,8 +15,7 @@ class EntityLayer:
                 for e in tile.entities:
                     yield e
                 if "environment" in tile.render_flags:
-                    for env_object in tile.render_flags["environment"]:
-                        yield env_object, tx, ty
+                    yield tile.render_flags["environment"], tx, ty
 
             # generate rows
             row = [e for x in range(WORLD_DIMENSION["width"])
@@ -31,16 +30,29 @@ class EntityLayer:
 
             row = sorted(row, key=depth_sort)
 
+            shadow_block = IMAGE_RESOURCE["juice"]["shadow"]
             # draw
             for entity in row:
                 e_type = type(entity)
                 if e_type is Player:
+                    self.arena_subsurface.blit(shadow_block[str(entity.alliance)],
+                                               (entity.pos.x * TILE_SIZE + shadow_block["offset"][0],
+                                                entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
                     self.render_player(entity)
                 elif e_type is Carrot:
+                    self.arena_subsurface.blit(shadow_block[str(entity.alliance)],
+                                               (entity.pos.x * TILE_SIZE + shadow_block["offset"][0],
+                                                entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
                     self.render_carrot(entity)
                 elif e_type is Sprout:
+                    self.arena_subsurface.blit(shadow_block[str(entity.alliance)],
+                                               (entity.pos.x * TILE_SIZE + shadow_block["offset"][0],
+                                                entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
                     self.render_sprout(entity)
                 elif e_type is Bullet:
+                    # self.arena_subsurface.blit(shadow_block[str(entity.alliance)],
+                    #                            (entity.pos.x * TILE_SIZE + shadow_block["offset"][0],
+                    #                             entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
                     self.render_pea(entity)
                 else:
                     surf, x, y = entity
@@ -69,7 +81,7 @@ class EntityLayer:
             player.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["attack_hard_lock"]
             player.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["attack_soft_lock"]
             if "animator" in player.render_flags:
-                player.render_flags["animator"].set_animation("state_attack", True)
+                player.render_flags["animator"].set_animation("state_attack")
             else:
                 player.render_flags["animator"] = EntityAnimator(player, "state_attack")
         if "move" in events:
@@ -99,6 +111,17 @@ class EntityLayer:
                 image = resources["player" + str(player.alliance)]["state_stand"]["left"]["frame0"]
             else:
                 image = resources["player" + str(player.alliance)]["state_stand"]["right"]["frame0"]
+
+        angle = -player.dir.as_polar()[1]
+        draw.arc(self.arena_subsurface,
+                 COLOR_PLAYERS[player.alliance],
+                 Rect(int((player.pos.x - player.attack_range) * TILE_SIZE),
+                      int((player.pos.y - player.attack_range) * TILE_SIZE),
+                      int(player.attack_range * TILE_SIZE * 2),
+                      int(player.attack_range * TILE_SIZE * 2)),
+                 (angle - player.attack_angle / 2) * pi / 180,
+                 (angle + player.attack_angle / 2) * pi / 180,
+                 5)
 
         self.arena_subsurface.blit(image,
                                    (int(player.pos.x *
