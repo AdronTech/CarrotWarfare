@@ -7,7 +7,7 @@ from pygame import init as pygame_init
 from display import *
 # own imports
 
-if False:
+if True:
     from rendering.ultimate_version.renderer import UltimateRenderer as Renderer
 else:
     from rendering.simple_version.renderer import SimpleRenderer as Renderer
@@ -54,7 +54,7 @@ class Application:
         # basic loop fuctions
         game_render = renderer.render
         game_update = world.update
-
+        renderer.screen_shake.impulse(20)
         # start of main loop
         last_update = now()
         while True:

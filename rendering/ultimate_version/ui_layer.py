@@ -7,7 +7,7 @@ class UILayer:
     def __init__(self, renderer: UltimateRenderer, main_surface: Surface):
         self.parent_renderer = renderer
         self.draw_target = main_surface
-        self.icon_shakers = [(ScreenShaker(), ScreenShaker()) for i in range(4)]
+        self.icon_shakers = [ScreenShaker(damp=0.4, noise=0.25) for i in range(4)]
         self.hp_area = (RENDER_RESOLUTION[0]/2, RENDER_RESOLUTION[1]/2)
         self.hp_show = [0] * 4
         self.hp_fill_origins = (
@@ -68,7 +68,8 @@ class UILayer:
 
     def draw_hud(self, player: Player):
         id = player.alliance
-        swap = bool([e for e in player.events if e["name"] is "swap"])
+        if [e for e in player.events if e["name"] is "swap"]:
+            self.icon_shakers[id].impulse(10)
         icon_l = self.hud_center - self.icon_w - self.icon_hpad
         icon_r = self.hud_center + self.icon_hpad
         if id < 2:
@@ -87,7 +88,6 @@ class UILayer:
                             origin=self.hud_origins[id],
                             offset=(icon_l, icon_y),
                             seed_mode=0,
-                            swap=swap,
                             selected=player.seed_mode.value is 0)
         # r_r
         self.draw_ammo_bar(origin=self.hud_origins[id],
@@ -99,12 +99,13 @@ class UILayer:
                             origin=self.hud_origins[id],
                             offset=(icon_r, icon_y),
                             seed_mode=1,
-                            swap=swap,
                             selected=player.seed_mode.value is 1)
 
-    def draw_ammo_icon(self, id: int, origin: tuple, offset: tuple, seed_mode: int, swap: bool, selected: bool):
-        shaker = self.icon_shakers[id][seed_mode]  # type: ScreenShaker
-        sx, sy = shaker.get_shake()
+    def draw_ammo_icon(self, id: int, origin: tuple, offset: tuple, seed_mode: int, selected: bool):
+        if selected:
+            sx, sy = self.icon_shakers[id].get_shake()
+        else:
+            sx, sy = 0, 0
         hx, hy = origin
         x, y = offset
         pos = (hx + x + sx, hy + y + sy)
@@ -120,8 +121,6 @@ class UILayer:
                       ((pos[0]-self.border_w, pos[1]-self.border_w),
                        (size[0]+self.border_w*2, size[1]+self.border_w*2)),
                       self.border_w)
-            if swap:
-                shaker.impulse(5)
 
     def draw_ammo_bar(self, origin, bar_x, bar_y, width, fill):
         hx, hy = origin
