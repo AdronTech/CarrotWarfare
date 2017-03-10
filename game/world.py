@@ -1,6 +1,7 @@
 from game.tile import *
 from timing import *
-from random import random, randint
+from timer import gen_timer
+from random import random, randint, choice
 from rendering import debugger as Debug
 from pygame import Color
 from game.constants import *
@@ -33,6 +34,7 @@ class World:
         self.players = [None] * 4
         self.grid = [[Tile(self.events, x, y) for y in range(h)] for x in range(w)]  # type: [
         self.respawn_time = 2.5
+        self.spawn_timer = gen_timer(10)
 
     def radius_gen(self, pos, r):
         for dx in range(-r, r + 1):
@@ -76,6 +78,8 @@ class World:
 
         self.events.clear()
 
+        self.spawn_pickup()  # TODO: best position for this call?
+
         for i in range(len(self.growing)):
             self.growing[i].update()
 
@@ -97,6 +101,14 @@ class World:
 
         # print(self.events)
 
+    # TODO: this is sloppy code
+    def spawn_pickup(self):
+        if next(self.spawn_timer):
+            while True:
+                spawn_tile = choice(self.grid)  # type: Tile
+                if not spawn_tile.state:
+                    break
+            spawn_tile.set_pickup(choice(list(SeedType)), 5)  # TODO: hardcoded seed amount
 
     def check_events(self):
         from game.carrot import Carrot
