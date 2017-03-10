@@ -30,16 +30,29 @@ class EntityLayer:
 
             row = sorted(row, key=depth_sort)
 
+            shadow_block = IMAGE_RESOURCE["juice"]["shadow"]
             # draw
             for entity in row:
                 e_type = type(entity)
                 if e_type is Player:
+                    self.arena_subsurface.blit(shadow_block[str(entity.alliance)],
+                                               (entity.pos.x * TILE_SIZE + shadow_block["offset"][0],
+                                                entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
                     self.render_player(entity)
                 elif e_type is Carrot:
+                    self.arena_subsurface.blit(shadow_block[str(entity.alliance)],
+                                               (entity.pos.x * TILE_SIZE + shadow_block["offset"][0],
+                                                entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
                     self.render_carrot(entity)
                 elif e_type is Sprout:
+                    self.arena_subsurface.blit(shadow_block[str(entity.alliance)],
+                                               (entity.pos.x * TILE_SIZE + shadow_block["offset"][0],
+                                                entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
                     self.render_sprout(entity)
                 elif e_type is Bullet:
+                    self.arena_subsurface.blit(shadow_block[str(entity.alliance)],
+                                               (entity.pos.x * TILE_SIZE + shadow_block["offset"][0],
+                                                entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
                     self.render_pea(entity)
                 else:
                     surf, x, y = entity
