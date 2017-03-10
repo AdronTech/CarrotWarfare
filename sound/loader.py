@@ -6,6 +6,13 @@ from pygame import mixer
 import random
 from game.world import World
 
+if False:
+    from game.player import Player, SeedType
+    from game.carrot import Carrot
+    from game.sprout import Sprout
+    from game.entity import Entity
+    from game.bullet import Bullet
+
 class Sound:
     def __init__(self):
 
@@ -77,6 +84,11 @@ class Sound:
             random.choice(self.sounds[name]).play()
 
     def update(self, world: World):
+        from game.player import Player, SeedType
+        from game.carrot import Carrot
+        from game.sprout import Sprout
+        from game.entity import Entity
+        from game.bullet import Bullet
 
         for e in world.events:
             if e["name"] is "gameover":
@@ -90,15 +102,45 @@ class Sound:
 
         for ent in world.entities:
             ent_type = type(ent)
-            for e in ent.events:
-                if e["name"] is "gameover":
-                    self.play("victory")
 
-                elif e["name"] is "gamestart":
-                    self.play("start")
+            if ent_type is Player:
+                for e in ent.events:
+                    if e["name"] is "call":
+                        self.play("player/call")
 
-                elif e["name"] is "gameover":
-                    self.play("victory")
+                    elif e["name"] is "attack":
+                        self.play("player/attack")
+
+                    elif e["name"] is "death":
+                        self.play("scream")
+
+            if ent_type is Carrot:
+                for e in ent.events:
+                    if e["name"] is "attack":
+                        self.play("carrot/attack")
+
+                    elif e["name"] is "death":
+                        self.play("carrot/death")
+
+                    elif e["name"] is "detect":
+                        self.play("carrot/detect")
+
+            if ent_type is Sprout:
+                for e in ent.events:
+                    if e["name"] is "attack":
+                        self.play("sprout/attack")
+
+                    elif e["name"] is "death":
+                        self.play("sprout/death")
+
+                    elif e["name"] is "detect":
+                        self.play("sprout/detect")
+
+
+            if ent_type is Bullet:
+                for e in ent.events:
+                    if e["name"] is "hit":
+                        self.play("explosion")
 
 
 if __name__ == "__main__":
@@ -111,6 +153,6 @@ if __name__ == "__main__":
 
     for i in range(100):
         print("play")
-        s.play("start")
+        s.play("explosion")
 
         time.sleep(1)

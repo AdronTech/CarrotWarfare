@@ -44,7 +44,9 @@ class Application:
             g = poll_for_players(self.display.render_target)
             self.game = {
                 "world": g,
-                "renderer": Renderer()}
+                "renderer": Renderer(self.display.native_resolution),
+                "sound": Sound()
+            }
             # run the process
             exit_code = self._game_loop(**self.game)
             # handle exit

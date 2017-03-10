@@ -77,6 +77,11 @@ class Entity:
 
             self.death_stamp = now()
 
+            self.events.append({
+                "name": "death",
+                "stamp": self.death_stamp
+            })
+
             self.world.events.append({
                 "name": "death",
                 "stamp": self.death_stamp,
