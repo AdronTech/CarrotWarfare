@@ -12,6 +12,8 @@ class UltimateRenderer(AbstractRenderer):
         self.buffer_surface = Surface(RENDER_RESOLUTION)
         self.arena_surface = Surface(ARENA_SURFACE_SIZE)
 
+        Debug.gen_debug_surface(self.arena_surface)
+
         from rendering.ultimate_version.ui_layer import UILayer
         from rendering.ultimate_version.ground_layer import GroundLayer
         from rendering.ultimate_version.overlay_layer import OverlayLayer

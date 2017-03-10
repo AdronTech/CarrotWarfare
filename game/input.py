@@ -8,7 +8,7 @@ key_board_enabled = True
 key_board_player = -1
 
 
-def get_input():
+def get_input(events):
     Gamepad.update()
     gamepads = list(Gamepad)
     commands = [[], [], [], []]
@@ -23,7 +23,7 @@ def get_input():
             move_dir = Vector2()
             look_dir = Vector2()
 
-            for e in pygame_events.get():
+            for e in events:
                 print(e)
 
                 if e.type is KEYDOWN:

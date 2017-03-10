@@ -73,10 +73,9 @@ class World:
 
         return self.grid[x][y]
 
-    def update(self):
+    def update(self, commands):
 
         self.events.clear()
-        commands = get_input()  # type: [[], [], [], []]
 
         for i in range(len(self.growing)):
             self.growing[i].update()

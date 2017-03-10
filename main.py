@@ -9,6 +9,7 @@ from display import *
 from rendering.ultimate_version.renderer import UltimateRenderer as Renderer
 from rendering import debugger as Debug
 from game.world import new_game
+from game.input import get_input
 from timing import *
 
 
@@ -49,21 +50,23 @@ class Application:
         game_render = renderer.render
         game_update = world.update
 
-        Debug.gen_debug_surface(self.display.render_target)
-
         # start of main loop
         last_update = now()
         while True:
             time_since_update = now() - last_update
 
+            events = pygame_events.get()
             # event handling
-            for e in pygame_events.get(QUIT):
-                if e.type is QUIT:
+            for e in events:
+                if e.type is QUIT or (e.type is KEYDOWN and e.key is K_ESCAPE):
                     return ExitCode.EXIT
             pygame_events.pump()
+
+            input = get_input(events)
+
             if time_since_update >= update_delay:
                 Debug.clear()
-                game_update()
+                game_update(input)
                 for e in world.events:
                     if e["name"] is "main_menu":
                         return ExitCode.PAUSE
@@ -73,7 +76,6 @@ class Application:
                 last_update += update_delay
             else:
                 game_render(self.display.render_target, world)
-                Debug.render(self.display.render_target)
                 self.display.flip()
 
                 # update timing
