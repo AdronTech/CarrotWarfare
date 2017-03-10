@@ -109,7 +109,14 @@ class Carrot(Entity):
                 self.look_around()
 
                 if self.enemies_in_sight:
-                    self.target = self.get_nearest_enemy()
+                    possible_target = self.get_nearest_enemy()
+
+                    if self.target is not possible_target:
+                        self.events.append({
+                            "name": "detect"
+                        })
+
+                    self.target = possible_target
 
             if self.target:
                 if self.target.pos.distance_squared_to(self.pos) <= self.enemy_range ** 2:

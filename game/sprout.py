@@ -120,6 +120,10 @@ class Sprout(Entity):
 
             if self.target:
                 self.state = SproutState.attack
+
+                self.events.append({
+                    "name": "detect"
+                })
             else:
                 self.go_idle()
 

@@ -239,10 +239,10 @@ def new_game() -> World:
     for i in range(5):
         world.get_tile(Vector2(random() * WORLD_DIMENSION["width"],
                                random() * WORLD_DIMENSION["height"])).set_pickup(SeedType.melee, 5)
-    #
-    # for i in range(5):
-    #     world.get_tile(Vector2(random() * WORLD_DIMENSION["width"],
-    #                            random() * WORLD_DIMENSION["height"])).set_pickup(SeedType.ran, 5)
+
+    for i in range(5):
+        world.get_tile(Vector2(random() * WORLD_DIMENSION["width"],
+                               random() * WORLD_DIMENSION["height"])).set_pickup(SeedType.ranged, 5)
 
     return world
 

@@ -100,6 +100,22 @@ class Sound:
             elif e["name"] is "gameover":
                 self.play("victory")
 
+            elif e["name"] is "pick_up":
+                self.play("explosion")
+
+            elif e["name"] is "death":
+                ent_type = type(e["author"])
+
+                if ent_type is Player:
+                    self.play("scream")
+                elif ent_type is Carrot:
+                    self.play("carrot/death")
+                elif ent_type is Sprout:
+                    self.play("sprout/death")
+                elif ent_type is Bullet:
+                    self.play("explosion")
+
+
         for ent in world.entities:
             ent_type = type(ent)
 
@@ -111,16 +127,10 @@ class Sound:
                     elif e["name"] is "attack":
                         self.play("player/attack")
 
-                    elif e["name"] is "death":
-                        self.play("scream")
-
             if ent_type is Carrot:
                 for e in ent.events:
                     if e["name"] is "attack":
                         self.play("carrot/attack")
-
-                    elif e["name"] is "death":
-                        self.play("carrot/death")
 
                     elif e["name"] is "detect":
                         self.play("carrot/detect")
@@ -130,17 +140,8 @@ class Sound:
                     if e["name"] is "attack":
                         self.play("sprout/attack")
 
-                    elif e["name"] is "death":
-                        self.play("sprout/death")
-
                     elif e["name"] is "detect":
                         self.play("sprout/detect")
-
-
-            if ent_type is Bullet:
-                for e in ent.events:
-                    if e["name"] is "hit":
-                        self.play("explosion")
 
 
 if __name__ == "__main__":
