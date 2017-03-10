@@ -60,7 +60,8 @@ def poll_for_players(render_target: Surface):
                 if tmp[i]:
                     if not time[i]:
                         time[i] = now()
-                        # TODO insert audio YEAH on connection
+                        from sound.loader import Sound
+                        Sound().play("yay")
                     show[i] = min(1, (now() - time[i]) / (FADE_IN_TIME * 1000))
                 else:
                     if time[i]:
