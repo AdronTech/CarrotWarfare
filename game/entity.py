@@ -30,8 +30,13 @@ class Entity:
         # unregister
         self.unregister()
 
-        self.pos = pos
-        self.bb.pos = pos
+        # Saman fix
+        if pos.y < 0.5:
+            self.pos = Vector2()+(pos[0], 0.5)
+            self.bb.pos = Vector2()+(pos[0], 0.5)
+        else:
+            self.pos = pos
+            self.bb.pos = pos
 
         # constrain
         self.world.constrain_vector(pos)

@@ -1,10 +1,9 @@
 from rendering.abstract_renderer import *
 from rendering.ultimate_version.screen_shake import *
-from rendering.ultimate_version.animator import EntityAnimator
 from rendering import debugger as Debug
 
 
-class UltimateRenderer(AbstractRenderer):
+class SimpleRenderer(AbstractRenderer):
     def __init__(self):
         super().__init__()
 
@@ -18,7 +17,7 @@ class UltimateRenderer(AbstractRenderer):
         from rendering.ultimate_version.ui_layer import UILayer
         from rendering.ultimate_version.ground_layer import GroundLayer
         from rendering.ultimate_version.overlay_layer import OverlayLayer
-        from rendering.ultimate_version.entity_layer import EntityLayer
+        from rendering.simple_version.entity_layer import EntityLayer
 
         self.ui_layer = UILayer(self, self.buffer_surface)
         self.ground_layer = GroundLayer(self, self.arena_surface)
@@ -51,8 +50,8 @@ class UltimateRenderer(AbstractRenderer):
         world.events.clear()
 
         # blit final image
-        #target.blit(self.buffer_surface, (0, 0))
-        scale(self.buffer_surface, target.get_size(), target)
+        target.blit(self.buffer_surface, (0, 0))
+
 
 if __name__ == "__main__":
     from pygame import event as pygame_events
@@ -71,8 +70,8 @@ if __name__ == "__main__":
     pygame_init()
     display = PyGameWindow()
 
-    DEFAULT_RENDERER = UltimateRenderer()
-    DEFAULT_RENDERER.screen_shake.impulse(50)
+    DEFAULT_RENDERER = SimpleRenderer()
+    DEFAULT_RENDERER.screen_shake.impulse(1)
     game_world = new_game()
     Debug.gen_debug_surface(DEFAULT_RENDERER.arena_surface)
     # main loop

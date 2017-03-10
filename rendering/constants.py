@@ -7,12 +7,13 @@ REPLACEMENT_COLOR_LIGHT = (2, 2, 2)
 COLOR_BACKGROUND = (250, 250, 250)
 COLOR_BACKGROUND_SECONDARY = (224, 224, 224)
 
-RENDER_RESOLUTION = (1600, 900)
+RENDER_RESOLUTION = (1920, 1080)
 
 WORLD_DIMENSION = {"width": 27, "height": 17}
 
 SCREEN_SHAKE_OFFSET = (min(RENDER_RESOLUTION[0], RENDER_RESOLUTION[1]) / 20,
                        min(RENDER_RESOLUTION[0], RENDER_RESOLUTION[1]) / 20)
+
 TILE_SIZE = int(min(RENDER_RESOLUTION[0] / float(WORLD_DIMENSION["width"]),
                     RENDER_RESOLUTION[1] / float(WORLD_DIMENSION["height"])))
 ARENA_SURFACE_SIZE = (TILE_SIZE * WORLD_DIMENSION["width"],
@@ -26,23 +27,20 @@ IMAGE_RESOURCE = {
     "entities": {
         "player_generic": {"name": "player",
                            "offset": None,
-                           "planting_hard_lock": 0.5,
-                           "planting_soft_lock": 1,
+                           "call_hard_lock": 0,
+                           "call_soft_lock": 0.5,
 
-                           "call_hard_lock": 2,
-                           "call_soft_lock": 2,
-
-                           "attack_hard_lock": 0.5,
-                           "attack_soft_lock": 1},
+                           "attack_hard_lock": 0.25,
+                           "attack_soft_lock": 0.5},
 
         "carrot_generic": {"name": "carrot",
                            "offset": None,
-                           "attack_hard_lock": 0.5,
-                           "attack_soft_lock": 1},
+                           "attack_hard_lock": 0.2,
+                           "attack_soft_lock": 0.3},
 
         "sprout_generic": {"name": "sprout",
                            "offset": None,
-                           "attack_hard_lock": 0.5,
+                           "attack_hard_lock": 0.25,
                            "attack_soft_lock": 1},
         "player0": {
             "alliance": 0,

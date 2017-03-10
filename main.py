@@ -7,10 +7,10 @@ from pygame import init as pygame_init
 from display import *
 # own imports
 
-if True:
+if False:
     from rendering.ultimate_version.renderer import UltimateRenderer as Renderer
 else:
-    from rendering.simple_renderer import SimpleRenderer as Renderer
+    from rendering.simple_version.renderer import SimpleRenderer as Renderer
 
 from rendering import debugger as Debug
 from game.world import new_game

@@ -4,7 +4,6 @@ from rendering.constants import IMAGE_RESOURCE
 
 
 class EntityAnimator:
-    # loops if duration == 0
     def __init__(self, entity, current_animation="state_stand", frame_duration=125):
 
         self.entity = entity
@@ -42,7 +41,7 @@ class EntityAnimator:
         frame = IMAGE_RESOURCE["entities"][self.name + str(self.entity.alliance)][self.state][dir]["frame" + str(index)]
         return frame
 
-    def set_animation(self, current_animation="state_stand", frame_duration=125):
+    def set_animation(self, current_animation="state_stand", frame_duration=125, override=False):
 
         priority = 0
         if current_animation == "state_idle":
@@ -54,7 +53,7 @@ class EntityAnimator:
         elif current_animation == "state_die":
             priority = 4
 
-        if priority > self.priority:
+        if priority > self.priority or (priority == self.priority and override):
             self.priority = priority
             self.state = current_animation
             self.frame_duration = frame_duration

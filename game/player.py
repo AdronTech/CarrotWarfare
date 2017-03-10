@@ -56,18 +56,17 @@ class Player(Entity):
             if command == Commands.look:
                 self.look(input_command["dir"])
 
+            elif command == Commands.swap:
+                self.swap()
+
             elif self.soft_lock <= 0:
                 if command == Commands.attack:
                     self.attack()
 
                 elif command == Commands.plant:
                     self.plant()
-
                 elif command == Commands.call:
                     self.call()
-
-                elif command == Commands.swap:
-                    self.swap()
 
                     # if self.events:
                     #     print(self.events)
