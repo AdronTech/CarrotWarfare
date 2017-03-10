@@ -13,7 +13,6 @@ else:
     from rendering.simple_version.renderer import SimpleRenderer as Renderer
 
 from rendering import debugger as Debug
-from game.world import new_game
 from timing import *
 from game.input import get_input
 
@@ -40,7 +39,11 @@ class Application:
 
     async def _main_menu(self):
         while self.running:
-            self.game = {"world": new_game(), "renderer": Renderer()}
+            from menu.title_screen import poll_for_players
+            g = poll_for_players(self.display.render_target)
+            self.game = {
+                "world": g,
+                "renderer": Renderer()}
             # run the process
             exit_code = self._game_loop(**self.game)
             # handle exit
@@ -65,12 +68,14 @@ class Application:
             for e in events:
                 if e.type is QUIT or (e.type is KEYDOWN and e.key is K_ESCAPE):
                     return ExitCode.EXIT
+                if e.type is KEYDOWN and e.key is K_TAB:
+                    return ExitCode.PAUSE
 
             pygame_events.pump()
 
             if time_since_update >= update_delay:
                 Debug.clear()
-                input = get_input(events, renderer, world)
+                input = get_input(events, world, renderer)
                 game_update(input)
                 for e in world.events:
                     if e["name"] is "main_menu":

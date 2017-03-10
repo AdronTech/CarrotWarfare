@@ -9,10 +9,11 @@ from game.world import World
 if False:
     pass
 
-key_board_enabled = True
+key_board_enabled = False
 key_board_player = -1
 
-def get_input(pygame_events, renderer: AbstractRenderer, world: World):
+
+def get_input(pygame_events, world: World, renderer: AbstractRenderer=None):
     Gamepad.update()
     gamepads = list(Gamepad)
     commands = [[], [], [], []]
@@ -61,32 +62,32 @@ def get_input(pygame_events, renderer: AbstractRenderer, world: World):
             #
             # if pressed[K_d]:
             #     move_dir += Vector2(1, 0)
+            if renderer:
+                look_dir = renderer.screen_to_world(Vector2(mouse.get_pos())) - world.entities[i].pos  # type: Vector2
 
-            look_dir = renderer.screen_to_world(Vector2(mouse.get_pos())) - world.entities[i].pos  # type: Vector2
+                if look_dir.length_squared() < 1:
+                    look_dir = Vector2()
 
-            if look_dir.length_squared() < 1:
-                look_dir = Vector2()
+                if mouse.get_pressed()[0]:
+                    move_dir = look_dir
 
-            if mouse.get_pressed()[0]:
-                move_dir = look_dir
+                if move_dir.x != 0 or move_dir.y != 0:
+                    move_dir.normalize_ip()
 
-            if move_dir.x != 0 or move_dir.y != 0:
-                move_dir.normalize_ip()
+                    commands[i].append({
+                        "command": Commands.directional,
+                        "dir": move_dir
+                    })
 
-                commands[i].append({
-                    "command": Commands.directional,
-                    "dir": move_dir
-                })
+                # look_dir = move_dir
 
-            # look_dir = move_dir
+                if look_dir.x != 0 or look_dir.y != 0:
+                    look_dir.normalize_ip()
 
-            if look_dir.x != 0 or look_dir.y != 0:
-                look_dir.normalize_ip()
-
-                commands[i].append({
-                    "command": Commands.look,
-                    "dir": look_dir
-                })
+                    commands[i].append({
+                        "command": Commands.look,
+                        "dir": look_dir
+                    })
 
         elif gamepads[i].connected:
             x = gamepads[i].input_state["analog_left"].x
@@ -115,6 +116,8 @@ def get_input(pygame_events, renderer: AbstractRenderer, world: World):
                 commands[i].append({"command": Commands.call})
             if "button_y" in events and events["button_y"]:
                 commands[i].append({"command": Commands.swap})
+            if "button_start" in events and events["button_start"]:
+                commands[i].append({"command": Commands.start})
 
     return commands
 
@@ -135,3 +138,8 @@ def lock_input():
             gamepads[i].disabled = True
 
     return players
+
+
+def poll_connections():
+    Gamepad.update()
+    return [pad.connected for pad in list(Gamepad)]
