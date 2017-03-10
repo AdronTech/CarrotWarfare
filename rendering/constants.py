@@ -7,7 +7,7 @@ REPLACEMENT_COLOR_LIGHT = (2, 2, 2)
 COLOR_BACKGROUND = (250, 250, 250)
 COLOR_BACKGROUND_SECONDARY = (224, 224, 224)
 
-RENDER_RESOLUTION = (1280, 720)
+RENDER_RESOLUTION = (1920, 1080)
 
 WORLD_DIMENSION = {"width": 27, "height": 17}
 
@@ -30,18 +30,18 @@ IMAGE_RESOURCE = {
                            "call_hard_lock": 0,
                            "call_soft_lock": 0.5,
 
-                           "attack_hard_lock": 0.5,
+                           "attack_hard_lock": 0.25,
                            "attack_soft_lock": 0.5},
 
         "carrot_generic": {"name": "carrot",
                            "offset": None,
-                           "attack_hard_lock": 0.25,
-                           "attack_soft_lock": 0.25},
+                           "attack_hard_lock": 0.2,
+                           "attack_soft_lock": 0.3},
 
         "sprout_generic": {"name": "sprout",
                            "offset": None,
                            "attack_hard_lock": 0.25,
-                           "attack_soft_lock": 0.25},
+                           "attack_soft_lock": 1},
         "player0": {
             "alliance": 0,
             "state_stand": {
