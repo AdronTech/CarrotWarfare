@@ -14,7 +14,6 @@ def load(path: str) -> Surface:
     except error:
         raise SystemExit("Could not load image from {}".format(path))
 
-    img.convert_alpha(img)
     return img
 
 
@@ -67,14 +66,23 @@ def put_values_for_entity(block: dict, name: str, alliance: int):
 
 def load_pea(block: dict, alliance: int):
     resource = load(block["pea_generic"]["name"])
-    PixelArray(resource).replace(REPLACEMENT_COLOR_LIGHT, COLOR_PLAYERS[alliance], 0)
-    PixelArray(resource).replace(REPLACEMENT_COLOR_DARK, COLOR_PLAYERS_DARK[alliance], 0)
     srf = Surface((TILE_SIZE / 2, TILE_SIZE / 2), SRCALPHA)
     transform.scale(resource, (TILE_SIZE // 2, TILE_SIZE // 2), srf)
+    PixelArray(srf).replace(REPLACEMENT_COLOR_LIGHT, COLOR_PLAYERS[alliance], 0)
+    PixelArray(srf).replace(REPLACEMENT_COLOR_DARK, COLOR_PLAYERS_DARK[alliance], 0)
 
     block["pea" + str(alliance)]["resource"] = srf
 
     block["pea_generic"]["offset"] = (TILE_SIZE / -2 + TILE_SIZE / 4, -TILE_SIZE)
+
+
+def load_ui(block: dict):
+    image = load("carrotUI")
+    image = image.convert_alpha(image)
+    block["melee"]["resource"] = image
+    image = load("peaUI")
+    image = image.convert_alpha(image)
+    block["ranged"]["resource"] = image
 
 
 def load_all():
@@ -97,3 +105,5 @@ def load_all():
     load_pea(IMAGE_RESOURCE["entities"], 1)
     load_pea(IMAGE_RESOURCE["entities"], 2)
     load_pea(IMAGE_RESOURCE["entities"], 3)
+
+    load_ui(IMAGE_RESOURCE["ui"])

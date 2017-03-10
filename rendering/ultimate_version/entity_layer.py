@@ -72,9 +72,9 @@ class EntityLayer:
                 player.render_flags["animator"] = EntityAnimator(player, "state_attack")
         if "move" in events:
             if "animator" in player.render_flags:
-                player.render_flags["animator"].set_animation("state_walk", 500, 0)
+                player.render_flags["animator"].set_animation("state_walk", 500)
             else:
-                player.render_flags["animator"] = EntityAnimator(player, "state_walk", 500, 0)
+                player.render_flags["animator"] = EntityAnimator(player, "state_walk", 500)
         if "plant_request" in events:
             if "animator" in player.render_flags:
                 player.render_flags["animator"].set_animation("state_plant")
@@ -124,9 +124,9 @@ class EntityLayer:
                 carrot.render_flags["animator"] = EntityAnimator(carrot, "state_attack")
         if "move" in events:
             if "animator" in carrot.render_flags:
-                carrot.render_flags["animator"].set_animation("state_walk", 500, True)
+                carrot.render_flags["animator"].set_animation("state_walk", 500)
             else:
-                carrot.render_flags["animator"] = EntityAnimator(carrot, "state_walk", 500, True)
+                carrot.render_flags["animator"] = EntityAnimator(carrot, "state_walk", 500)
 
         image = None
         resources = IMAGE_RESOURCE["entities"]
@@ -171,9 +171,9 @@ class EntityLayer:
                 sprout.render_flags["animator"] = EntityAnimator(sprout, "state_attack")
         if "move" in events:
             if "animator" in sprout.render_flags:
-                sprout.render_flags["animator"].set_animation("state_walk", 500, 0)
+                sprout.render_flags["animator"].set_animation("state_walk", 500)
             else:
-                sprout.render_flags["animator"] = EntityAnimator(sprout, "state_walk", 500, 0)
+                sprout.render_flags["animator"] = EntityAnimator(sprout, "state_walk", 500)
 
         image = None
         resources = IMAGE_RESOURCE["entities"]

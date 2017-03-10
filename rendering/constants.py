@@ -14,8 +14,6 @@ WORLD_DIMENSION = {"width": 27, "height": 17}
 SCREEN_SHAKE_OFFSET = (min(RENDER_RESOLUTION[0], RENDER_RESOLUTION[1]) / 20,
                        min(RENDER_RESOLUTION[0], RENDER_RESOLUTION[1]) / 20)
 
-# TODO TILE_SIZE CASTING
-
 TILE_SIZE = int(min(RENDER_RESOLUTION[0] / float(WORLD_DIMENSION["width"]),
                     RENDER_RESOLUTION[1] / float(WORLD_DIMENSION["height"])))
 ARENA_SURFACE_SIZE = (TILE_SIZE * WORLD_DIMENSION["width"],
@@ -29,21 +27,28 @@ IMAGE_RESOURCE = {
     "entities": {
         "player_generic": {"name": "player",
                            "offset": None,
-                           "planting_locks": {
-                               "hard": 0.250,
-                               "soft": 0.250}},
+                           "planting_hard_lock": 0.250,
+                           "planting_soft_lock": 0.250,
+                           "attack_hard_lock": 0.250,
+                           "attack_soft_lock": 0.250},
+
+        "carrot_generic": {"name": "carrot",
+                           "offset": None,
+                           "attack_hard_lock": 0.250,
+                           "attack_soft_lock": 0.250},
+
+        "sprout_generic": {"name": "sprout",
+                           "offset": None,
+                           "attack_hard_lock": 0.250,
+                           "attack_soft_lock": 0.250},
         "player0": {
-            "alliance": 0.0,
+            "alliance": 0,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -55,8 +60,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -68,8 +71,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -81,8 +82,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -96,15 +95,11 @@ IMAGE_RESOURCE = {
         "player1": {
             "alliance": 1,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -116,8 +111,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -129,8 +122,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -142,8 +133,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -157,15 +146,11 @@ IMAGE_RESOURCE = {
         "player2": {
             "alliance": 2,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -177,8 +162,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -190,8 +173,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -203,8 +184,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -218,15 +197,11 @@ IMAGE_RESOURCE = {
         "player3": {
             "alliance": 3,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -238,8 +213,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -251,8 +224,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -264,8 +235,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -277,20 +246,14 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}}},
 
-        "carrot_generic": {"name": "carrot",
-                           "offset": None},
         "carrot0": {
-            "alliance": 0.0,
+            "alliance": 0,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -302,8 +265,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -315,8 +276,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -328,8 +287,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -343,15 +300,11 @@ IMAGE_RESOURCE = {
         "carrot1": {
             "alliance": 1,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -363,8 +316,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -376,8 +327,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -389,8 +338,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -404,15 +351,11 @@ IMAGE_RESOURCE = {
         "carrot2": {
             "alliance": 2,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -424,8 +367,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -437,8 +378,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -450,8 +389,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -465,15 +402,11 @@ IMAGE_RESOURCE = {
         "carrot3": {
             "alliance": 3,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -485,8 +418,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -498,8 +429,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -511,8 +440,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -524,20 +451,14 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}}},
 
-        "sprout_generic": {"name": "sprout",
-                           "offset": None},
         "sprout0": {
-            "alliance": 0.0,
+            "alliance": 0,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -549,8 +470,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -562,8 +481,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -575,8 +492,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -590,15 +505,11 @@ IMAGE_RESOURCE = {
         "sprout1": {
             "alliance": 1,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -610,8 +521,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -623,8 +532,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -636,8 +543,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -651,15 +556,11 @@ IMAGE_RESOURCE = {
         "sprout2": {
             "alliance": 2,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -671,8 +572,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -684,8 +583,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -697,8 +594,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -712,15 +607,11 @@ IMAGE_RESOURCE = {
         "sprout3": {
             "alliance": 3,
             "state_stand": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "stand",
                          "frame0": None},
                 "right": {"name": "stand",
                           "frame0": None}},
             "state_die": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -732,8 +623,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_walk": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -745,8 +634,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_attack": {
-                "hard_lock": 0.125,
-                "soft_lock": 0.250,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -758,8 +645,6 @@ IMAGE_RESOURCE = {
                           "frame2": None,
                           "frame3": None}},
             "state_growing": {
-                "hard_lock": 0.0,
-                "soft_lock": 0.0,
                 "left": {"name": "die",
                          "frame0": None,
                          "frame1": None,
@@ -781,7 +666,8 @@ IMAGE_RESOURCE = {
     "tiles": {
 
     },
-    "juice": {
-
+    "ui": {
+        "melee": {"resource": None},
+        "ranged": {"resource": None}
     }
 }

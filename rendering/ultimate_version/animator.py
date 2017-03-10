@@ -5,26 +5,24 @@ from rendering.constants import IMAGE_RESOURCE
 
 class EntityAnimator:
     # loops if duration == 0
-    def __init__(self, entity, current_animation="state_stand", frame_duration=125, loop=False):
+    def __init__(self, entity, current_animation="state_stand", frame_duration=125):
 
-        self.player = None
+        self.entity = entity
         self.state = current_animation
-        self.loop = loop
         self.frame_duration = frame_duration
         self.start = now()
 
         if issubclass(type(entity), player.Player):
-            self.name = "player" + str(entity.alliance)
-            self.player = entity
+            self.name = "player"
         elif issubclass(type(entity), carrot.Carrot):
-            self.name = "carrot" + str(entity.alliance)
+            self.name = "carrot"
         elif issubclass(type(entity), sprout.Sprout):
-            self.name = "sprout" + str(entity.alliance)
+            self.name = "sprout"
 
-        if current_animation == "state_plant" and self.player:
+        if current_animation == "state_plant":
             self.state = "state_stand"
-            self.player.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_locks"]["hard"]
-            self.player.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_locks"]["soft"]
+            self.entity.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_hard_lock"]
+            self.entity.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_soft_lock"]
             return
 
         self.priority = 0
@@ -33,17 +31,13 @@ class EntityAnimator:
         elif current_animation == "state_walk":
             self.priority = 2
         elif current_animation == "state_attack":
+            self.entity.hard_lock = IMAGE_RESOURCE["entities"][self.name + "_generic"]["attack_hard_lock"]
+            self.entity.soft_lock = IMAGE_RESOURCE["entities"][self.name + "_generic"]["attack_soft_lock"]
             self.priority = 3
         elif current_animation == "state_die":
             self.priority = 4
 
-        if self.player:
-            self.player.hard_lock = IMAGE_RESOURCE["entities"][self.name][current_animation]["hard_lock"]
-            self.player.soft_lock = IMAGE_RESOURCE["entities"][self.name][current_animation]["soft_lock"]
-
     def get_frame(self, looking_left: bool):
-        if self.state == "state_stand":
-            return IMAGE_RESOURCE["entities"][self.name][self.state]["frame0"]
 
         if looking_left:
             dir = "left"
@@ -51,19 +45,17 @@ class EntityAnimator:
             dir = "right"
 
         index = int((now() - self.start) / self.frame_duration)
-        if (not self.loop) and index > 3:
+        if index > 3 or self.state == "state_stand":
             return None
-
-        index = index % 4
-        frame = IMAGE_RESOURCE["entities"][self.name][self.state][dir]["frame" + str(index)]
+        frame = IMAGE_RESOURCE["entities"][self.name + str(self.entity.alliance)][self.state][dir]["frame" + str(index)]
         return frame
 
-    def set_animation(self, current_animation="state_stand", frame_duration=125, loop=False):
+    def set_animation(self, current_animation="state_stand", frame_duration=125):
 
-        if current_animation == "state_plant" and self.player:
+        if current_animation == "state_plant":
             self.state = "state_stand"
-            self.player.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_locks"]["hard"]
-            self.player.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_locks"]["soft"]
+            self.entity.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_hard_lock"]
+            self.entity.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_soft_lock"]
             return
 
         priority = 0
@@ -77,11 +69,10 @@ class EntityAnimator:
             priority = 4
 
         if priority > self.priority:
-            if self.player:
-                self.player.hard_lock = IMAGE_RESOURCE["entities"][self.name][current_animation]["hard_lock"]
-                self.player.soft_lock = IMAGE_RESOURCE["entities"][self.name][current_animation]["soft_lock"]
+            if current_animation == "state_attack":
+                self.entity.hard_lock = IMAGE_RESOURCE["entities"][self.name + "_generic"]["attack_hard_lock"]
+                self.entity.soft_lock = IMAGE_RESOURCE["entities"][self.name + "_generic"]["attack_soft_lock"]
             self.priority = priority
             self.state = current_animation
-            self.loop = loop
             self.frame_duration = frame_duration
             self.start = now()
