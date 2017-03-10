@@ -76,6 +76,15 @@ def load_pea(block: dict, alliance: int):
     block["pea_generic"]["offset"] = (TILE_SIZE / -2 + TILE_SIZE / 4, -TILE_SIZE)
 
 
+def load_ui(block: dict):
+    image = load("carrotUI")
+    image = image.convert_alpha(image)
+    block["melee"]["resource"] = image
+    image = load("peaUI")
+    image = image.convert_alpha(image)
+    block["ranged"]["resource"] = image
+
+
 def load_all():
     put_values_for_entity(IMAGE_RESOURCE["entities"], "player", 0)
     put_values_for_entity(IMAGE_RESOURCE["entities"], "player", 1)
@@ -96,3 +105,5 @@ def load_all():
     load_pea(IMAGE_RESOURCE["entities"], 1)
     load_pea(IMAGE_RESOURCE["entities"], 2)
     load_pea(IMAGE_RESOURCE["entities"], 3)
+
+    load_ui(IMAGE_RESOURCE["ui"])

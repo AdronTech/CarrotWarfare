@@ -666,7 +666,8 @@ IMAGE_RESOURCE = {
     "tiles": {
 
     },
-    "juice": {
-
+    "ui": {
+        "melee": {"resource": None},
+        "ranged": {"resource": None}
     }
 }
