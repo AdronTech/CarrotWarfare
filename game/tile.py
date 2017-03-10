@@ -77,6 +77,10 @@ class Tile:
         self.state = {"name": TileState.pick_up,
                       "seed": seed_mode,
                       "amount": amount}
+        self.worldevents.append({
+            "name": "pick_up_spawn",
+            "type": self.state["seed"],
+            "tile": self})
 
 
 class TileState(Enum):

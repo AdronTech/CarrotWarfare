@@ -29,7 +29,7 @@ class Animator:
         else:
             return False, False
         if frame == 4:
-            return True, True
+            return True, False
 
         self.last_frame = frame
         return False, True
@@ -81,14 +81,19 @@ class GroundLayer:
                         p.pop()
                 self.animators[i].render()
             if fin:
+                for p in self.buffer:  # type: Pop
+                    if p.pos == self.animators[i].pos:
+                        p.pop()
                 del self.animators[i]
                 break
 
         for e in world.events:
             if "rendered" not in e:
+
                 if e["name"] == "death":
                     self.parent_renderer.ground_layer.splatter(e["author"], e["author"].pos)
-                if e["name"] == "plant_request":
+
+                elif e["name"] == "plant_request":
                     if "allowed" in e:
                         if not self.buffer_contains(e["tile"]):
                             srf = Surface((TILE_SIZE, TILE_SIZE))
@@ -116,6 +121,18 @@ class GroundLayer:
                             self.buffer[i].pop()
                             del self.buffer[i]
                             break
+
+                elif e["name"] == "pick_up":
+                    tile = e["tile"]  # type: Tile
+                    del tile.render_flags["environment"]
+
+                elif e["name"] == "pick_up_spawn":
+                    tile = e["tile"]  # type: Tile
+                    if e["type"] == SeedType.melee:
+                        name = "melee"
+                    else:
+                        name = "ranged"
+                    tile.render_flags["environment"] = IMAGE_RESOURCE["ui"][name]["resource"]
 
                 e["rendered"] = True
 

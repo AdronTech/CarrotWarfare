@@ -1,6 +1,6 @@
 from pygame import Surface, draw, Rect
 from pygame.transform import *
-from pygame.gfxdraw import aacircle, aatrigon, filled_circle, filled_trigon
+from pygame.gfxdraw import aacircle, aatrigon, filled_circle, filled_trigon, arc
 from rendering.constants import *
 from pygame.math import Vector2
 from math import floor
