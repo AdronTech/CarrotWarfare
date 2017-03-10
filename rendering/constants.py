@@ -664,8 +664,14 @@ IMAGE_RESOURCE = {
         "pea2": {},
         "pea3": {}
     },
-    "tiles": {
-
+    "juice": {
+        "shadow": {
+            "offset": None,
+            "0": None,
+            "1": None,
+            "2": None,
+            "3": None
+        }
     },
     "ui": {
         "melee": {"resource": None},

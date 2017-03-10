@@ -1,9 +1,10 @@
-from pygame import Surface, error, image, SRCALPHA
+from pygame import Surface, error, image, SRCALPHA, RLEACCEL
 from os.path import join
 from rendering.constants import IMAGE_RESOURCE, TILE_SIZE, ARENA_SURFACE_PADDING
 from pygame import transform
 from pygame import PixelArray
 from rendering.constants import REPLACEMENT_COLOR_LIGHT, REPLACEMENT_COLOR_DARK, COLOR_PLAYERS, COLOR_PLAYERS_DARK
+from pygame.gfxdraw import aaellipse, filled_ellipse
 
 RESOURCE_TILE_SIZE = 128
 
@@ -79,16 +80,39 @@ def load_pea(block: dict, alliance: int):
 def load_ui(block: dict):
     img = load("carrotUI")
     img = img.convert_alpha(img)
-    size = int(ARENA_SURFACE_PADDING[0]/3), int(ARENA_SURFACE_PADDING[0]/3)
+    size = int(ARENA_SURFACE_PADDING[0] / 3), int(ARENA_SURFACE_PADDING[0] / 3)
     srf = Surface(size, SRCALPHA)
     transform.scale(img, size, srf)
     block["melee"]["resource"] = srf
-    
+
     img = load("peaUI")
     img = img.convert_alpha(img)
     srf = Surface(size, SRCALPHA)
     transform.scale(img, size, srf)
     block["ranged"]["resource"] = srf
+
+
+def generate_shadows(block: dict):
+    block["offset"] = (TILE_SIZE / -2, TILE_SIZE / -4)
+
+    x = int(TILE_SIZE / 4)
+    y = int(TILE_SIZE / 8)
+
+    srf = Surface((TILE_SIZE, int(TILE_SIZE / 2)), SRCALPHA)
+    filled_ellipse(srf, x * 2, y * 2, x, y, COLOR_PLAYERS_DARK[0])
+    block["0"] = srf
+
+    srf = Surface((TILE_SIZE, int(TILE_SIZE / 2)), SRCALPHA)
+    filled_ellipse(srf, x * 2, y * 2, x, y, COLOR_PLAYERS_DARK[1])
+    block["1"] = srf
+
+    srf = Surface((TILE_SIZE, int(TILE_SIZE / 2)), SRCALPHA)
+    filled_ellipse(srf, x * 2, y * 2, x, y, COLOR_PLAYERS_DARK[2])
+    block["2"] = srf
+
+    srf = Surface((TILE_SIZE, int(TILE_SIZE / 2)), SRCALPHA)
+    filled_ellipse(srf, x * 2, y * 2, x, y, COLOR_PLAYERS_DARK[3])
+    block["3"] = srf
 
 
 def load_all():
@@ -113,3 +137,5 @@ def load_all():
     load_pea(IMAGE_RESOURCE["entities"], 3)
 
     load_ui(IMAGE_RESOURCE["ui"])
+
+    generate_shadows(IMAGE_RESOURCE["juice"]["shadow"])
