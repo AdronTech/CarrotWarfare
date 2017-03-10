@@ -43,7 +43,6 @@ class UltimateRenderer(AbstractRenderer):
         world.events.clear()
 
         # blit final image
-        # TODO implement scaling to display resolution
         scale(self.main_surface, target.get_size(), target)
 
 

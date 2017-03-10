@@ -5,7 +5,7 @@ from rendering.constants import RENDER_RESOLUTION
 
 class PyGameWindow:
     def __init__(self):
-        self.full_screen = False
+        self.full_screen = True
         self.render_target = None
         self.reset_mode()
 
