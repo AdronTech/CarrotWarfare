@@ -14,7 +14,6 @@ def load(path: str) -> Surface:
     except error:
         raise SystemExit("Could not load image from {}".format(path))
 
-    img.convert_alpha(img)
     return img
 
 
@@ -67,10 +66,10 @@ def put_values_for_entity(block: dict, name: str, alliance: int):
 
 def load_pea(block: dict, alliance: int):
     resource = load(block["pea_generic"]["name"])
-    PixelArray(resource).replace(REPLACEMENT_COLOR_LIGHT, COLOR_PLAYERS[alliance], 0)
-    PixelArray(resource).replace(REPLACEMENT_COLOR_DARK, COLOR_PLAYERS_DARK[alliance], 0)
     srf = Surface((TILE_SIZE / 2, TILE_SIZE / 2), SRCALPHA)
     transform.scale(resource, (TILE_SIZE // 2, TILE_SIZE // 2), srf)
+    PixelArray(srf).replace(REPLACEMENT_COLOR_LIGHT, COLOR_PLAYERS[alliance], 0)
+    PixelArray(srf).replace(REPLACEMENT_COLOR_DARK, COLOR_PLAYERS_DARK[alliance], 0)
 
     block["pea" + str(alliance)]["resource"] = srf
 
