@@ -92,6 +92,8 @@ class GroundLayer:
 
                 if e["name"] == "death":
                     self.parent_renderer.ground_layer.splatter(e["author"], e["author"].pos)
+                    if type(e["author"]) is Player:
+                        self.parent_renderer.screen_shake.impulse(50)
 
                 elif e["name"] == "plant_request":
                     if "allowed" in e:
