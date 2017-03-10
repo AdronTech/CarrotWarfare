@@ -7,6 +7,7 @@ class UILayer:
     def __init__(self, renderer: UltimateRenderer, main_surface: Surface):
         self.parent_renderer = renderer
         self.draw_target = main_surface
+        self.icon_shakers = [(ScreenShaker(), ScreenShaker()) for i in range(4)]
         self.hp_area = (RENDER_RESOLUTION[0]/2, RENDER_RESOLUTION[1]/2)
         self.hp_show = [0] * 4
         self.hp_fill_origins = (
@@ -40,7 +41,7 @@ class UILayer:
                 else:
                     self.hp_show[i] = player.hp
                 self.hp_fill(i, self.hp_show[i])
-                self.draw_hud(i, player.seed_mode.value, player.seeds)
+                self.draw_hud(player)
             else:
                 self.hp_fill(i, 0)
 
@@ -65,14 +66,15 @@ class UILayer:
         self.draw_target.fill(color=c_lower, rect=r_lower)
         self.draw_target.fill(color=c_upper, rect=r_upper)
 
-    def draw_hud(self, id: int, seed_mode: int, seeds):
+    def draw_hud(self, player: Player):
+        id = player.alliance
+        swap = bool([e for e in player.events if e["name"] is "swap"])
         icon_l = self.hud_center - self.icon_w - self.icon_hpad
         icon_r = self.hud_center + self.icon_hpad
         if id < 2:
             icon_y = self.icon_vpad
             bar_y = (icon_y+self.icon_w+self.border_w, HUD_AREA[1]-self.icon_w+self.border_w)
         else:
-            icon_r = self.hud_center + self.icon_hpad
             icon_y = HUD_AREA[1]-self.icon_vpad-self.icon_w
             bar_y = (icon_y-self.border_w, self.icon_vpad-self.border_w)
         # r_l
@@ -80,39 +82,46 @@ class UILayer:
                            bar_x=icon_l + self.icon_w / 2,
                            bar_y=bar_y,
                            width=self.bar_w,
-                           fill=seeds[0])
+                           fill=player.seeds[0])
         self.draw_ammo_icon(id=id,
                             origin=self.hud_origins[id],
                             offset=(icon_l, icon_y),
-                            seed_type="melee",
-                            selected=seed_mode is 0)
+                            seed_mode=0,
+                            swap=swap,
+                            selected=player.seed_mode.value is 0)
         # r_r
         self.draw_ammo_bar(origin=self.hud_origins[id],
                            bar_x=icon_r + self.icon_w / 2,
                            bar_y=bar_y,
                            width=self.bar_w,
-                           fill=seeds[1])
+                           fill=player.seeds[1])
         self.draw_ammo_icon(id=id,
                             origin=self.hud_origins[id],
                             offset=(icon_r, icon_y),
-                            seed_type="ranged",
-                            selected=seed_mode is 1)
+                            seed_mode=1,
+                            swap=swap,
+                            selected=player.seed_mode.value is 1)
 
-    def draw_ammo_icon(self, id: int, origin, offset, seed_type: str, selected):
+    def draw_ammo_icon(self, id: int, origin: tuple, offset: tuple, seed_mode: int, swap: bool, selected: bool):
+        shaker = self.icon_shakers[id][seed_mode]  # type: ScreenShaker
+        sx, sy = shaker.get_shake()
         hx, hy = origin
         x, y = offset
-        pos = (hx + x, hy + y)
+        pos = (hx + x + sx, hy + y + sy)
         size = (self.icon_w, self.icon_w)
         self.draw_target.fill(COLOR_PLAYERS_DARK[id],
                               ((pos[0]-self.border_w, pos[1]-self.border_w),
                                (size[0]+self.border_w*2, size[1]+self.border_w*2)))
-        self.draw_target.blit(source=IMAGE_RESOURCE["ui"][seed_type]["resource"],
+        seeds = ["melee", "ranged"]
+        self.draw_target.blit(source=IMAGE_RESOURCE["ui"][seeds[seed_mode]]["resource"],
                               dest=pos)
         if selected:
             draw.rect(self.draw_target, (0, 0, 0),
                       ((pos[0]-self.border_w, pos[1]-self.border_w),
                        (size[0]+self.border_w*2, size[1]+self.border_w*2)),
                       self.border_w)
+            if swap:
+                shaker.impulse(5)
 
     def draw_ammo_bar(self, origin, bar_x, bar_y, width, fill):
         hx, hy = origin

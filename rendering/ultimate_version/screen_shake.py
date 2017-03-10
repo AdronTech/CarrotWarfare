@@ -5,7 +5,7 @@ from math import sin, cos
 from random import random
 
 PI = 3.1
-DAMP_PERCENT = 0.2
+DAMP_PERCENT = 0.25
 NOISE_PERCENT = 0.4
 SPEED = (Vector2()+SCREEN_SHAKE_OFFSET).length()**2
 
