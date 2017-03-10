@@ -39,5 +39,5 @@ def protocol_redraw(log: bool):
         if log:
             print("]redraw_rate: {:.2f}\tcount:{}".format(avg_redraw_rate, count))
 
-redraw_counter = protocol_redraw(False)
+redraw_counter = protocol_redraw(True)
 redraw_counter.send(None)

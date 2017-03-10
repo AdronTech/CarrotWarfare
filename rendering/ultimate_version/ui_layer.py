@@ -20,7 +20,7 @@ class UILayer:
         self.icon_w = int(ARENA_SURFACE_PADDING[0] / 3)
         self.border_w = int(0.16 * self.icon_w)
         self.bar_w = int(0.2 * self.icon_w)
-        self.icon_hpad = int(self.border_w * 1)
+        self.icon_hpad = int(self.border_w * 1.5)
         self.icon_vpad = int(self.icon_w * 0.6)
         self.hud_origins = (
             (0, 0),
