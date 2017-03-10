@@ -5,62 +5,61 @@ from math import sin, cos
 from random import random
 
 PI = 3.1
-DAMP_PERCENT = 0.1
+DAMP_PERCENT = 0.2
 NOISE_PERCENT = 0.4
-SPEED = 100
+SPEED = (Vector2()+SCREEN_SHAKE_OFFSET).length()**2
 
 
 class ScreenShaker:
     def __init__(self):
-        # new pos calculation
-        self.hold = True
-        self.remaining_force = 0
-        self.angle = PI * 2 * random()
-        # screen position
-        self.pos_next = Vector2()
-        self.pos_current = Vector2()
-        # timing
-        self.last_update = now()
+        self.strength = 0
+        self.shake = None
 
     def impulse(self, impulse: float):
-        if self.hold:
-            self.hold = False
-            self.remaining_force = impulse
-        elif impulse > self.remaining_force:
-            self.remaining_force = impulse
-
-    def set_next_position(self):
-        if self.remaining_force < 0.0001:
-            self.remaining_force = 0
-            hold = True
-            return
-        noise = self.angle * NOISE_PERCENT
-        noise -= 2 * random() * noise
-
-        self.angle += PI + noise
-        self.remaining_force *= 1 - DAMP_PERCENT
-        diretion = Vector2()+(cos(self.angle), sin(self.angle))
-        self.pos_next = diretion * self.remaining_force
+        if impulse > self.strength:
+            self.strength = impulse
+            self.shake = self.shake_generator()
 
     def get_shake(self):
-        if self.remaining_force == 0:
-            return 0, 0
-        else:
-            dt = (now() - self.last_update)/1000
-            delta = (self.pos_next - self.pos_current)
-            if delta.length() <= 0.01:
-                self.set_next_position()
-            self.pos_current += delta * SPEED * dt
-            x = SCREEN_SHAKE_OFFSET[0] * self.pos_current.x
-            y = SCREEN_SHAKE_OFFSET[1] * self.pos_current.y
-            self.last_update = now()
+        if self.shake:
+            x, y = next(self.shake)
             return x, y
+        else:
+            return 0, 0
+
+    def shake_generator(self):
+        last_update = now()
+        angle = PI * 2 * random()
+        pos_last = Vector2()
+        pos_next = Vector2() + (cos(angle), sin(angle))
+        travel_progress = 0
+        move_distance = (pos_next-pos_last).length()
+        while self.strength > 0.001:
+            dt = (now() - last_update)/1000
+            if travel_progress < 1:
+                travel_progress += dt/move_distance * SPEED
+                shake = (pos_next - pos_last) * min(1, travel_progress)
+            else:
+                travel_progress = 0
+                pos_last = pos_next
+                noise = angle * NOISE_PERCENT
+                noise -= 2 * random() * noise
+                angle += PI + noise
+                self.strength *= 1 - DAMP_PERCENT
+                diretion = Vector2() + (cos(angle), sin(angle))
+                pos_next = diretion * self.strength
+                move_distance = (pos_next - pos_last).length()
+                shake = pos_last
+            last_update = now()
+            yield shake
+        self.shake = None
+        yield 0, 0
 
 if __name__ == "__main__":
     from pygame.time import Clock
     clock = Clock()
     shake = ScreenShaker()
     shake.impulse(1)
-    while shake.remaining_force > 0:
+    while shake.strength > 0:
         print("{0}{1.pos_current}{1.hold}".format(shake.get_shake(), shake))
         clock.tick(60)

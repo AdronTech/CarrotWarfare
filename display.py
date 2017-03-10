@@ -7,11 +7,13 @@ class PyGameWindow:
     def __init__(self):
         self.full_screen = True
         self.render_target = None
+        info = display.Info()
+        self.native_resolution = info.current_w, info.current_h
         self.reset_mode()
 
     def reset_mode(self):
         if self.full_screen:
-            self.render_target = display.set_mode(RENDER_RESOLUTION, FULLSCREEN)
+            self.render_target = display.set_mode(self.native_resolution, FULLSCREEN)
         else:
             self.render_target = display.set_mode(RENDER_RESOLUTION)
 

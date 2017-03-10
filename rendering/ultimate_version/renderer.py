@@ -43,8 +43,8 @@ class UltimateRenderer(AbstractRenderer):
         world.events.clear()
 
         # blit final image
-        target.blit(self.buffer_surface, (0, 0))
-
+        #target.blit(self.buffer_surface, (0, 0))
+        scale(self.buffer_surface, target.get_size(), target)
 
 if __name__ == "__main__":
     from pygame import event as pygame_events
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     display = PyGameWindow()
     from game.world import new_game
     DEFAULT_RENDERER = UltimateRenderer()
-    DEFAULT_RENDERER.screen_shake.impulse(1)
+    DEFAULT_RENDERER.screen_shake.impulse(50)
     game_world = new_game()
     Debug.gen_debug_surface(DEFAULT_RENDERER.arena_surface)
     # main loop
