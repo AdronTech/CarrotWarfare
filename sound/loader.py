@@ -13,7 +13,7 @@ class Sound:
         self.sounds = {}
         self.music = {}
 
-        self.gen_structure(self.sounds, self.basepath_sound, (".wav", ".ogg"))
+        self.gen_structure(self.sounds, self.basepath_sound, ".ogg")
         self.gen_structure(self.music, self.basepath_music, ".ogg")
 
         mixer.init()
@@ -84,6 +84,7 @@ if __name__ == "__main__":
     print(s.sounds)
 
     for i in range(100):
-        s.play("hit")
+        print("play")
+        s.play("start")
 
-        # time.sleep(1)
+        time.sleep(1)
