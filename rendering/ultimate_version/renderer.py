@@ -5,10 +5,14 @@ from rendering import debugger as Debug
 
 class UltimateRenderer(AbstractRenderer):
     def __init__(self):
+        super().__init__()
+
         load_all()
 
         self.buffer_surface = Surface(RENDER_RESOLUTION)
         self.arena_surface = Surface(ARENA_SURFACE_SIZE)
+
+        Debug.gen_debug_surface(self.arena_surface)
 
         from rendering.ultimate_version.ui_layer import UILayer
         from rendering.ultimate_version.ground_layer import GroundLayer
@@ -32,12 +36,15 @@ class UltimateRenderer(AbstractRenderer):
         self.entity_layer.render(world)
 
         # markus debuggger
-        Debug.render(DEFAULT_RENDERER.arena_surface)
+        Debug.render(self.arena_surface)
 
         # blit arena to main surface
         x, y = ARENA_SURFACE_PADDING
         s_dx, s_dy = self.screen_shake.get_shake()
-        self.buffer_surface.blit(self.arena_surface, (x + s_dx, y + s_dy))
+
+        self.arena_surface_offset = (x+s_dx, y+s_dy)
+
+        self.buffer_surface.blit(self.arena_surface, self.arena_surface_offset)
 
         # remove all recent events
         world.events.clear()
@@ -57,12 +64,12 @@ if __name__ == "__main__":
     from display import PyGameWindow
     from timing import *
     from random import random, randint
-    game_world = new_game()
+
     # main loop
     clock = Clock()
     pygame_init()
     display = PyGameWindow()
-    from game.world import new_game
+
     DEFAULT_RENDERER = UltimateRenderer()
     DEFAULT_RENDERER.screen_shake.impulse(50)
     game_world = new_game()
@@ -72,7 +79,7 @@ if __name__ == "__main__":
     while True:
 
         # event
-        for e in pygame_events.get():
+        for e in pygame_events.get(QUIT):
             if e.type is QUIT:
                 quit()
         pygame_events.pump()
