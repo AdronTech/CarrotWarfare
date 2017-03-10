@@ -19,7 +19,7 @@ class Player(Entity):
         self.attack_range = 1.5
         self.attack_angle = 90
         self.damage = PLAYER_DAMAGE
-        self.speed = 5
+        self.speed = 4
 
         self.spawnpoint = spawn
         self.respawn_timer = 0

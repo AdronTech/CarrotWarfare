@@ -9,7 +9,7 @@ class Sprout(Entity):
         self.state = None
         self.call(self.pos)
 
-        self.speed = 1.3
+        self.speed = 1.5
         self.hp = 30
 
         self.turn_speed = 5
@@ -104,8 +104,6 @@ class Sprout(Entity):
                     self.events.append({
                         "name": "attack"
                     })
-
-                    self.soft_lock = 1
 
             dx, dy = (self.world.int_vec(self.pos) - self.world.int_vec(self.target.pos))
 
