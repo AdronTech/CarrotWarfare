@@ -1,17 +1,43 @@
 from rendering.ultimate_version.renderer import *
 
+FRAME_DURATION = 1000
 
-class Pop(object):
+
+class Pop:
     def __init__(self, srf: Surface, buffer: Surface, target: Surface, pos: (int, int)):
         buffer.blit(srf, (pos[0] * TILE_SIZE, pos[1] * TILE_SIZE))
         self.target = target
-        self.updated = now()
-        self.pos = pos
+        self.pos = (pos[0] * TILE_SIZE, pos[1] * TILE_SIZE)
         self.buffer = buffer
 
     def pop(self):
-        position = (self.pos[0] * TILE_SIZE, self.pos[1] * TILE_SIZE)
-        self.target.blit(self.buffer, (0, 0), (position, (TILE_SIZE, TILE_SIZE)))
+        self.target.blit(self.buffer, (0, 0), (self.pos, (TILE_SIZE, TILE_SIZE)))
+
+
+class Animator:
+    def __init__(self, name: str, target: Surface, pos: (int, int)):
+        self.target = target
+        self.updated = 0
+        self.pos = pos
+        self.block = IMAGE_RESOURCE["entities"][name]
+        self.last_frame = -1
+
+    def update(self):
+        if (now() - self.updated) > FRAME_DURATION:
+            frame = self.last_frame + 1
+            self.updated = now()
+        else:
+            return False, False
+        if frame == 4:
+            return True, True
+
+        self.last_frame = frame
+        return False, True
+
+    def render(self):
+        pos = self.pos
+        srf = self.block["state_growing"]["right"]["frame" + str(self.last_frame)]
+        self.target.blit(srf, pos)
 
 
 class GroundLayer:
@@ -22,6 +48,7 @@ class GroundLayer:
         self.ground_surface.fill(COLOR_BACKGROUND)
         self.arena_subsurface = arena_subsurface
         self.buffer = []
+        self.animators = []
 
     def buffer_contains(self, tile: Tile):
         for e in self.buffer:  # type: Pop
@@ -45,8 +72,20 @@ class GroundLayer:
             filled_circle(self.buffer_surface, x, y, radius, COLOR_PLAYERS_LIGHT[entity.alliance])
 
     def render(self, world: World):
+
+        for i in range(len(self.animators)):
+            fin, redraw = self.animators[i].update()
+            if redraw:
+                for p in self.buffer:  # type: Pop
+                    if p.pos == self.animators[i].pos:
+                        p.pop()
+                self.animators[i].render()
+            if fin:
+                del self.animators[i]
+                break
+
         for e in world.events:
-            if not "rendered" in e:
+            if "rendered" not in e:
                 if e["name"] == "death":
                     self.parent_renderer.ground_layer.splatter(e["author"], e["author"].pos)
                 if e["name"] == "plant_request":
@@ -61,7 +100,15 @@ class GroundLayer:
                                                    self.ground_surface.subsurface(target_rect),
                                                    (e["tile"].x, e["tile"].y)))
 
-                            self.ground_surface.fill(COLOR_BACKGROUND_SECONDARY, target_rect)
+                            if e["type"] == SeedType.melee:
+                                name = "carrot" + str(e["alliance"])
+                            else:
+                                name = "sprout" + str(e["alliance"])
+
+                            anim = Animator(name, self.ground_surface, target_rect[0])
+                            anim.update()
+                            anim.render()
+                            self.animators.append(anim)
 
                 elif e["name"] == "full_grown":
                     for i in range(len(self.buffer)):

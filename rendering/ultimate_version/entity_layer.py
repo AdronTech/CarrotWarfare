@@ -69,7 +69,7 @@ class EntityLayer:
             player.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["attack_hard_lock"]
             player.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["attack_soft_lock"]
             if "animator" in player.render_flags:
-                player.render_flags["animator"].set_animation("state_attack", True)
+                player.render_flags["animator"].set_animation("state_attack")
             else:
                 player.render_flags["animator"] = EntityAnimator(player, "state_attack")
         if "move" in events:

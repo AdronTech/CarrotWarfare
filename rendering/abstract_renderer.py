@@ -13,7 +13,7 @@ from game.bullet import Bullet
 from game.player import Player, SeedType
 from rendering.loader import load_all
 from game.constants import *
-
+from random import randint, random, randrange
 
 
 class AbstractRenderer:
