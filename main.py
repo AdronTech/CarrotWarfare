@@ -40,15 +40,11 @@ class Application:
 
     async def _main_menu(self):
         while self.running:
-<<<<<<< HEAD
             from menu.title_screen import poll_for_players
             g = poll_for_players(self.display.render_target)
             self.game = {
                 "world": g,
                 "renderer": Renderer()}
-=======
-            self.game = {"world": new_game(), "renderer": Renderer(self.display.native_resolution), "sound": Sound()}
->>>>>>> 5a2ea3f826e057f3fcb6e4fb873ce4d6db25c8b3
             # run the process
             exit_code = self._game_loop(**self.game)
             # handle exit
@@ -81,12 +77,7 @@ class Application:
 
             if time_since_update >= update_delay:
                 Debug.clear()
-<<<<<<< HEAD
                 input = get_input(events, world, renderer)
-=======
-
-                input = get_input(events, renderer, world)
->>>>>>> 5a2ea3f826e057f3fcb6e4fb873ce4d6db25c8b3
                 game_update(input)
                 game_sound(world)
 
