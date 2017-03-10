@@ -50,9 +50,9 @@ class EntityLayer:
                                                 entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
                     self.render_sprout(entity)
                 elif e_type is Bullet:
-                    self.arena_subsurface.blit(shadow_block[str(entity.alliance)],
-                                               (entity.pos.x * TILE_SIZE + shadow_block["offset"][0],
-                                                entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
+                    # self.arena_subsurface.blit(shadow_block[str(entity.alliance)],
+                    #                            (entity.pos.x * TILE_SIZE + shadow_block["offset"][0],
+                    #                             entity.pos.y * TILE_SIZE + shadow_block["offset"][1]))
                     self.render_pea(entity)
                 else:
                     surf, x, y = entity
