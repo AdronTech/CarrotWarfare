@@ -66,11 +66,11 @@ class Application:
                 if e.type is QUIT or (e.type is KEYDOWN and e.key is K_ESCAPE):
                     return ExitCode.EXIT
 
-            input = get_input(events, renderer, world)
             pygame_events.pump()
 
             if time_since_update >= update_delay:
                 Debug.clear()
+                input = get_input(events, renderer, world)
                 game_update(input)
                 for e in world.events:
                     if e["name"] is "main_menu":

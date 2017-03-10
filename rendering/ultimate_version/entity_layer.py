@@ -49,6 +49,7 @@ class EntityLayer:
 
     def render_player(self, player: Player):
         events = []
+        # print(player.events)
         for e in player.events:
             if e["name"] == "death":
                 events.append("death")
@@ -59,6 +60,9 @@ class EntityLayer:
             elif e["name"] == "plant_request":
                 if "allowed" in e:
                     events.append("plant_request")
+            elif e["name"] == "call":
+                events.append("call")
+        player.events.clear()
 
         if "death" in events:
             if "animator" in player.render_flags:
@@ -66,6 +70,8 @@ class EntityLayer:
             else:
                 player.render_flags["animator"] = EntityAnimator(player, "state_die")
         if "attack" in events:
+            player.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["attack_hard_lock"]
+            player.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["attack_soft_lock"]
             if "animator" in player.render_flags:
                 player.render_flags["animator"].set_animation("state_attack")
             else:
@@ -76,10 +82,15 @@ class EntityLayer:
             else:
                 player.render_flags["animator"] = EntityAnimator(player, "state_walk", 500)
         if "plant_request" in events:
+            player.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_hard_lock"]
+            player.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_soft_lock"]
+        if "call" in events:
             if "animator" in player.render_flags:
-                player.render_flags["animator"].set_animation("state_plant")
+                player.render_flags["animator"].set_animation("state_attack", 500)
             else:
-                player.render_flags["animator"] = EntityAnimator(player, "state_plant")
+                player.render_flags["animator"] = EntityAnimator(player, "state_attack", 500)
+            player.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["call_hard_lock"]
+            player.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["call_soft_lock"]
 
         image = None
         resources = IMAGE_RESOURCE["entities"]
@@ -111,6 +122,7 @@ class EntityLayer:
                 events.append("attack")
             elif e["name"] == "move":
                 events.append("move")
+        carrot.events.clear()
 
         if "death" in events:
             if "animator" in carrot.render_flags:
@@ -118,6 +130,8 @@ class EntityLayer:
             else:
                 carrot.render_flags["animator"] = EntityAnimator(carrot, "state_die")
         if "attack" in events:
+            carrot.hard_lock = IMAGE_RESOURCE["entities"]["sprout_generic"]["attack_hard_lock"]
+            carrot.soft_lock = IMAGE_RESOURCE["entities"]["sprout_generic"]["attack_soft_lock"]
             if "animator" in carrot.render_flags:
                 carrot.render_flags["animator"].set_animation("state_attack")
             else:
@@ -158,6 +172,7 @@ class EntityLayer:
                 events.append("attack")
             elif e["name"] == "move":
                 events.append("move")
+        sprout.events.clear()
 
         if "death" in events:
             if "animator" in sprout.render_flags:
@@ -165,6 +180,8 @@ class EntityLayer:
             else:
                 sprout.render_flags["animator"] = EntityAnimator(sprout, "state_die")
         if "attack" in events:
+            sprout.hard_lock = IMAGE_RESOURCE["entities"]["sprout_generic"]["attack_hard_lock"]
+            sprout.soft_lock = IMAGE_RESOURCE["entities"]["sprout_generic"]["attack_soft_lock"]
             if "animator" in sprout.render_flags:
                 sprout.render_flags["animator"].set_animation("state_attack")
             else:

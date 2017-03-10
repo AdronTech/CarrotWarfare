@@ -27,20 +27,24 @@ IMAGE_RESOURCE = {
     "entities": {
         "player_generic": {"name": "player",
                            "offset": None,
-                           "planting_hard_lock": 0.250,
-                           "planting_soft_lock": 0.250,
-                           "attack_hard_lock": 0.250,
-                           "attack_soft_lock": 0.250},
+                           "planting_hard_lock": 0.5,
+                           "planting_soft_lock": 1,
+
+                           "call_hard_lock": 2,
+                           "call_soft_lock": 2,
+
+                           "attack_hard_lock": 0.5,
+                           "attack_soft_lock": 1},
 
         "carrot_generic": {"name": "carrot",
                            "offset": None,
-                           "attack_hard_lock": 0.250,
-                           "attack_soft_lock": 0.250},
+                           "attack_hard_lock": 0.5,
+                           "attack_soft_lock": 1},
 
         "sprout_generic": {"name": "sprout",
                            "offset": None,
-                           "attack_hard_lock": 0.250,
-                           "attack_soft_lock": 0.250},
+                           "attack_hard_lock": 0.5,
+                           "attack_soft_lock": 1},
         "player0": {
             "alliance": 0,
             "state_stand": {

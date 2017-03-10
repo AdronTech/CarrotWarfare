@@ -19,20 +19,12 @@ class EntityAnimator:
         elif issubclass(type(entity), sprout.Sprout):
             self.name = "sprout"
 
-        if current_animation == "state_plant":
-            self.state = "state_stand"
-            self.entity.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_hard_lock"]
-            self.entity.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_soft_lock"]
-            return
-
         self.priority = 0
         if current_animation == "state_idle":
             self.priority = 1
         elif current_animation == "state_walk":
             self.priority = 2
         elif current_animation == "state_attack":
-            self.entity.hard_lock = IMAGE_RESOURCE["entities"][self.name + "_generic"]["attack_hard_lock"]
-            self.entity.soft_lock = IMAGE_RESOURCE["entities"][self.name + "_generic"]["attack_soft_lock"]
             self.priority = 3
         elif current_animation == "state_die":
             self.priority = 4
@@ -52,12 +44,6 @@ class EntityAnimator:
 
     def set_animation(self, current_animation="state_stand", frame_duration=125):
 
-        if current_animation == "state_plant":
-            self.state = "state_stand"
-            self.entity.hard_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_hard_lock"]
-            self.entity.soft_lock = IMAGE_RESOURCE["entities"]["player_generic"]["planting_soft_lock"]
-            return
-
         priority = 0
         if current_animation == "state_idle":
             priority = 1
@@ -69,9 +55,6 @@ class EntityAnimator:
             priority = 4
 
         if priority > self.priority:
-            if current_animation == "state_attack":
-                self.entity.hard_lock = IMAGE_RESOURCE["entities"][self.name + "_generic"]["attack_hard_lock"]
-                self.entity.soft_lock = IMAGE_RESOURCE["entities"][self.name + "_generic"]["attack_soft_lock"]
             self.priority = priority
             self.state = current_animation
             self.frame_duration = frame_duration
