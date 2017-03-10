@@ -6,7 +6,7 @@ from pygame import event as pygame_events
 from pygame import init as pygame_init
 from display import *
 # own imports
-from rendering.simple_renderer import SimpleRenderer as Renderer
+from rendering.ultimate_version.renderer import UltimateRenderer as Renderer
 from rendering import debugger as Debug
 from game.world import new_game
 from timing import *
@@ -57,7 +57,7 @@ class Application:
             time_since_update = now() - last_update
 
             # event handling
-            for e in pygame_events.get():
+            for e in pygame_events.get(QUIT):
                 if e.type is QUIT:
                     return ExitCode.EXIT
             pygame_events.pump()

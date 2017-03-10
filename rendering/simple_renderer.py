@@ -7,6 +7,7 @@ CLR = {"white": (255, 255, 255), "black": (0, 0, 0)}
 
 
 class SimpleRenderer(AbstractRenderer):
+
     def render_player(self, target, player: Player):
         angle = -player.dir.as_polar()[1]
         draw.arc(target,
